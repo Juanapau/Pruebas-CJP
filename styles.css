@@ -1,0 +1,422 @@
+/* Variables de color institucionales PNSA */
+:root {
+    --color-primario: #000000;
+    --color-secundario: #CC0000;
+    --color-texto: #333333;
+    --color-fondo: #f5f5f5;
+    --color-blanco: #ffffff;
+    --color-gris-claro: #e0e0e0;
+    --color-gris-medio: #999999;
+    --color-gris-oscuro: #666666;
+    --color-aprobado: #28a745;
+    --color-reprobado: #dc3545;
+    --color-advertencia: #ffc107;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-gris-oscuro) 100%);
+    color: var(--color-blanco);
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: var(--color-blanco);
+}
+
+header p {
+    font-size: 1rem;
+    color: var(--color-gris-claro);
+}
+
+/* Filtros Section */
+.filtros-seccion {
+    background: var(--color-blanco);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid var(--color-secundario);
+}
+
+.filtro-header h2 {
+    color: var(--color-primario);
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.filtros-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.filtro-grupo {
+    display: flex;
+    flex-direction: column;
+}
+
+.filtro-grupo label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--color-texto);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icono {
+    font-size: 1.2rem;
+}
+
+.filtro-grupo select {
+    padding: 12px;
+    border: 2px solid var(--color-gris-claro);
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: var(--color-blanco);
+    color: var(--color-texto);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filtro-grupo select:hover {
+    border-color: var(--color-secundario);
+}
+
+.filtro-grupo select:focus {
+    outline: none;
+    border-color: var(--color-secundario);
+    box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
+}
+
+/* Tabla Container */
+.tabla-container {
+    background: var(--color-blanco);
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+}
+
+.tabla-container h2 {
+    color: var(--color-primario);
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    border-bottom: 3px solid var(--color-secundario);
+    padding-bottom: 10px;
+}
+
+.tabla-scroll {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 600px;
+}
+
+/* Tablas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 800px;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+    z-index: 10;
+}
+
+th {
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    border: 1px solid var(--color-gris-claro);
+    font-size: 0.9rem;
+}
+
+th.header-ra {
+    background-color: var(--color-secundario);
+}
+
+th.header-valor {
+    background-color: var(--color-primario);
+}
+
+th.header-minimo {
+    background-color: var(--color-gris-oscuro);
+}
+
+th.header-oportunidad {
+    background-color: var(--color-gris-medio);
+    color: var(--color-blanco);
+}
+
+tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+    background-color: #f0f0f0;
+}
+
+td {
+    padding: 10px 8px;
+    text-align: center;
+    border: 1px solid var(--color-gris-claro);
+    font-size: 0.9rem;
+}
+
+td.nombre-estudiante {
+    text-align: left;
+    font-weight: 500;
+    position: sticky;
+    left: 0;
+    background-color: inherit;
+    z-index: 5;
+}
+
+td.numero {
+    font-weight: 600;
+    background-color: #f5f5f5;
+}
+
+/* Inputs en tabla */
+input[type="number"] {
+    width: 60px;
+    padding: 6px;
+    border: 2px solid var(--color-gris-claro);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--color-secundario);
+    box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1);
+}
+
+input[type="number"].reprobado {
+    color: var(--color-reprobado);
+    font-weight: bold;
+    border-color: var(--color-reprobado);
+}
+
+input[type="number"].aprobado {
+    color: var(--color-aprobado);
+    font-weight: bold;
+}
+
+input[type="number"]:disabled {
+    background-color: var(--color-gris-claro);
+    cursor: not-allowed;
+}
+
+.celda-minimo {
+    background-color: var(--color-gris-claro);
+    font-weight: bold;
+}
+
+.celda-total {
+    background-color: #e3f2fd;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Vista de Actividades */
+.vista-actividades {
+    animation: fadeIn 0.3s ease;
+}
+
+.actividades-header {
+    background: var(--color-blanco);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-volver {
+    background-color: var(--color-secundario);
+    color: var(--color-blanco);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.btn-volver:hover {
+    background-color: #a00000;
+    transform: translateX(-5px);
+}
+
+.ra-descripcion {
+    margin-top: 15px;
+}
+
+.ra-descripcion h3 {
+    color: var(--color-primario);
+    margin-bottom: 10px;
+}
+
+.ra-descripcion textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid var(--color-gris-claro);
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.ra-descripcion textarea:focus {
+    outline: none;
+    border-color: var(--color-secundario);
+}
+
+/* Tooltip para actividades */
+.actividad-header {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 100;
+    margin-bottom: 5px;
+}
+
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: var(--color-primario);
+}
+
+.actividad-header:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Loading */
+.loading {
+    text-align: center;
+    padding: 40px;
+}
+
+.spinner {
+    border: 4px solid var(--color-gris-claro);
+    border-top: 4px solid var(--color-secundario);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    .filtros-container {
+        grid-template-columns: 1fr;
+    }
+
+    .tabla-scroll {
+        max-height: 400px;
+    }
+
+    th, td {
+        font-size: 0.8rem;
+        padding: 8px 5px;
+    }
+
+    input[type="number"] {
+        width: 50px;
+        font-size: 0.8rem;
+    }
+}
+
+/* Estilos adicionales para mejorar UX */
+.actualizado {
+    animation: highlight 0.5s ease;
+}
+
+@keyframes highlight {
+    0%, 100% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: #fff3cd;
+    }
+}

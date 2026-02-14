@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Calificaciones - PNSA</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sistema de Calificaciones - PNSA</h1>
+            <p>Centro Educativo Nuestra Señora de la Altagracia</p>
+        </header>
+
+        <!-- Vista Principal: Registro de Calificaciones -->
+        <div id="vistaRegistro" class="vista-principal">
+            <div class="filtros-seccion">
+                <div class="filtro-header">
+                    <h2>📋 Filtros de Selección</h2>
+                </div>
+                <div class="filtros-container">
+                    <div class="filtro-grupo">
+                        <label for="selectModulo">
+                            <span class="icono">📚</span> Módulo
+                        </label>
+                        <select id="selectModulo">
+                            <option value="">Seleccione un módulo</option>
+                        </select>
+                    </div>
+
+                    <div class="filtro-grupo">
+                        <label for="selectRA">
+                            <span class="icono">📊</span> Actividades por RA
+                        </label>
+                        <select id="selectRA">
+                            <option value="">Seleccione un RA</option>
+                        </select>
+                    </div>
+
+                    <div class="filtro-grupo">
+                        <label for="selectVista">
+                            <span class="icono">👁️</span> Vista
+                        </label>
+                        <select id="selectVista">
+                            <option value="general">General - Con Nombre</option>
+                            <option value="actividades">Actividades del RA</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Calificaciones por RA -->
+            <div id="tablaRegistroContainer" class="tabla-container">
+                <h2>Registro de Calificaciones - Asignaturas</h2>
+                <div class="tabla-scroll">
+                    <table id="tablaRegistro">
+                        <thead id="tablaRegistroHead">
+                            <!-- Se genera dinámicamente -->
+                        </thead>
+                        <tbody id="tablaRegistroBody">
+                            <!-- Se genera dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Actividades por RA -->
+        <div id="vistaActividades" class="vista-actividades" style="display: none;">
+            <div class="actividades-header">
+                <button id="btnVolverRegistro" class="btn-volver">← Volver a Registro</button>
+                <div class="ra-descripcion">
+                    <h3>Descripción del RA</h3>
+                    <textarea id="raDescripcion" rows="3" placeholder="Descripción del Resultado de Aprendizaje..."></textarea>
+                </div>
+            </div>
+
+            <div class="tabla-container">
+                <h2 id="tituloActividades">Actividades del RA</h2>
+                <div class="tabla-scroll">
+                    <table id="tablaActividades">
+                        <thead id="tablaActividadesHead">
+                            <!-- Se genera dinámicamente -->
+                        </thead>
+                        <tbody id="tablaActividadesBody">
+                            <!-- Se genera dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Cargando datos...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
