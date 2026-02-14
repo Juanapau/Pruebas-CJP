@@ -271,12 +271,16 @@ function generarTablaRegistro() {
     headerHTML += '<th rowspan="3" class="header-total">Total</th>';
     headerHTML += '</tr>';
     
-    // Segunda fila del encabezado con Valor y 70%
+    // Segunda fila del encabezado con valores numéricos y las 3 celdas vacías
     headerHTML += '<tr>';
     
     state.ras.forEach(ra => {
-        headerHTML += `<th colspan="2" class="header-valor">${ra.valorTotal || 0}</th>`;
-        headerHTML += `<th colspan="3" class="header-minimo">${calcularMinimo(ra.valorTotal || 0)}</th>`;
+        headerHTML += `<th class="header-valor-num"><input type="number" class="input-valor-ra" data-ra="${ra.id}" value="${ra.valorTotal || 0}" min="0" max="100"></th>`;
+        const minimo = calcularMinimo(ra.valorTotal || 0);
+        headerHTML += `<th class="header-minimo-num">${minimo}</th>`;
+        headerHTML += `<th class="header-oportunidad"></th>`;
+        headerHTML += `<th class="header-oportunidad"></th>`;
+        headerHTML += `<th class="header-oportunidad"></th>`;
     });
     
     headerHTML += '</tr>';
@@ -420,6 +424,23 @@ function generarActividadesEjemplo() {
 
 // Eventos de inputs
 function agregarEventosInputsRegistro() {
+    // Eventos para cambiar valor total del RA
+    document.querySelectorAll('.input-valor-ra').forEach(input => {
+        input.addEventListener('change', function() {
+            const raId = this.dataset.ra;
+            const nuevoValor = parseFloat(this.value) || 0;
+            
+            // Actualizar el RA en el estado
+            const ra = state.ras.find(r => r.id == raId);
+            if (ra) {
+                ra.valorTotal = nuevoValor;
+            }
+            
+            // Recalcular y regenerar tabla
+            generarTablaRegistro();
+        });
+    });
+    
     // Eventos para oportunidades
     document.querySelectorAll('.input-oportunidad').forEach(input => {
         // Permitir pegar desde Excel
