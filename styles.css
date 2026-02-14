@@ -167,12 +167,21 @@ th.header-ra {
 
 th.header-valor {
     background-color: var(--color-primario);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
-th.header-minimo {
+th.header-valor-num {
+    background-color: var(--color-primario);
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 8px;
+}
+
+th.header-minimo-num {
     background-color: var(--color-gris-oscuro);
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 8px;
 }
 
 th.header-sub {
@@ -189,6 +198,35 @@ th.header-oportunidad {
 th.header-total {
     background-color: var(--color-primario);
     font-weight: bold;
+}
+
+/* Input para valor del RA en el encabezado */
+.input-valor-ra {
+    width: 60px;
+    padding: 4px;
+    border: 2px solid var(--color-blanco);
+    border-radius: 4px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background-color: var(--color-primario);
+    color: var(--color-blanco);
+}
+
+.input-valor-ra::-webkit-outer-spin-button,
+.input-valor-ra::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input-valor-ra {
+    -moz-appearance: textfield;
+}
+
+.input-valor-ra:focus {
+    outline: none;
+    border-color: var(--color-secundario);
+    background-color: #1a1a1a;
 }
 
 tbody tr {
