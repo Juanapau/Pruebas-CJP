@@ -261,23 +261,35 @@ function generarTablaRegistro() {
 
     // Generar encabezado - Primera fila con los códigos de RA
     let headerHTML = '<tr>';
-    headerHTML += '<th rowspan="2" class="header-valor">#</th>';
-    headerHTML += '<th rowspan="2" class="header-valor">Nombre</th>';
+    headerHTML += '<th rowspan="3" class="header-valor">#</th>';
+    headerHTML += '<th rowspan="3" class="header-valor">Nombre</th>';
     
     state.ras.forEach(ra => {
-        headerHTML += `<th colspan="2" class="header-ra">%${ra.codigo}</th>`;
+        headerHTML += `<th colspan="5" class="header-ra">%${ra.codigo}</th>`;
     });
     
-    headerHTML += '<th rowspan="2" class="header-total">Total</th>';
+    headerHTML += '<th rowspan="3" class="header-total">Total</th>';
     headerHTML += '</tr>';
     
     // Segunda fila del encabezado con Valor y 70%
     headerHTML += '<tr>';
     
     state.ras.forEach(ra => {
-        headerHTML += `<th class="header-valor">${ra.valorTotal || 0}</th>`;
-        const minimo = calcularMinimo(ra.valorTotal || 0);
-        headerHTML += `<th class="header-minimo">${minimo}</th>`;
+        headerHTML += `<th colspan="2" class="header-valor">${ra.valorTotal || 0}</th>`;
+        headerHTML += `<th colspan="3" class="header-minimo">${calcularMinimo(ra.valorTotal || 0)}</th>`;
+    });
+    
+    headerHTML += '</tr>';
+    
+    // Tercera fila con etiquetas Valor y 70%
+    headerHTML += '<tr>';
+    
+    state.ras.forEach(ra => {
+        headerHTML += `<th class="header-sub">Valor</th>`;
+        headerHTML += `<th class="header-sub">70%</th>`;
+        headerHTML += `<th class="header-oportunidad"></th>`;
+        headerHTML += `<th class="header-oportunidad"></th>`;
+        headerHTML += `<th class="header-oportunidad"></th>`;
     });
     
     headerHTML += '</tr>';
@@ -301,11 +313,16 @@ function generarTablaRegistro() {
             const valorFinal = obtenerUltimoValor(calificacion);
             totalEstudiante += valorFinal;
             
-            // Celda de Valor (con input editable)
-            bodyHTML += `<td><input type="number" class="input-calificacion" data-estudiante="${estudiante.id}" data-ra="${ra.id}" value="${valorFinal || ''}" min="0" max="${ra.valorTotal}"></td>`;
+            // Celda con el valor (no editable, se calcula del último valor de las 3 oportunidades)
+            bodyHTML += `<td class="celda-valor">${valorFinal || ''}</td>`;
             
-            // Celda vacía (para mantener la estructura)
+            // Celda vacía para 70%
             bodyHTML += `<td class="celda-vacia"></td>`;
+            
+            // 3 celdas editables para las oportunidades
+            bodyHTML += `<td><input type="number" class="input-oportunidad" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="1" value="${calificacion.op1 || ''}" min="0" max="${ra.valorTotal}"></td>`;
+            bodyHTML += `<td><input type="number" class="input-oportunidad" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="2" value="${calificacion.op2 || ''}" min="0" max="${ra.valorTotal}"></td>`;
+            bodyHTML += `<td><input type="number" class="input-oportunidad" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="3" value="${calificacion.op3 || ''}" min="0" max="${ra.valorTotal}"></td>`;
         });
         
         bodyHTML += `<td class="celda-total">${totalEstudiante}</td>`;
@@ -369,11 +386,15 @@ function calcularMinimo(valorTotal) {
 
 function obtenerCalificacion(estudianteId, raId) {
     const calif = state.calificaciones.find(c => c.estudianteId == estudianteId && c.raId == raId);
-    return calif || { valor: null };
+    return calif || { op1: null, op2: null, op3: null };
 }
 
 function obtenerUltimoValor(calificacion) {
-    return calificacion.valor || 0;
+    // Retorna el último valor registrado (prioridad: op3 > op2 > op1)
+    if (calificacion.op3 !== null && calificacion.op3 !== '') return parseFloat(calificacion.op3);
+    if (calificacion.op2 !== null && calificacion.op2 !== '') return parseFloat(calificacion.op2);
+    if (calificacion.op1 !== null && calificacion.op1 !== '') return parseFloat(calificacion.op1);
+    return 0;
 }
 
 function obtenerValorActividad(estudianteId, actividadNumero) {
@@ -399,8 +420,8 @@ function generarActividadesEjemplo() {
 
 // Eventos de inputs
 function agregarEventosInputsRegistro() {
-    // Eventos para calificaciones
-    document.querySelectorAll('.input-calificacion').forEach(input => {
+    // Eventos para oportunidades
+    document.querySelectorAll('.input-oportunidad').forEach(input => {
         // Permitir pegar desde Excel
         input.addEventListener('paste', function(e) {
             e.preventDefault();
@@ -431,6 +452,7 @@ function agregarEventosInputsActividades() {
 function validarCalificacion(input) {
     const estudianteId = input.dataset.estudiante;
     const raId = input.dataset.ra;
+    const oportunidad = input.dataset.oportunidad;
     const valor = parseFloat(input.value) || 0;
     
     const ra = state.ras.find(r => r.id == raId);
@@ -452,6 +474,7 @@ function validarCalificacion(input) {
 async function guardarCalificacion(input) {
     const estudianteId = input.dataset.estudiante;
     const raId = input.dataset.ra;
+    const oportunidad = input.dataset.oportunidad;
     const valor = parseFloat(input.value) || null;
     
     try {
@@ -461,6 +484,7 @@ async function guardarCalificacion(input) {
                 action: 'guardarCalificacion',
                 estudianteId,
                 raId,
+                oportunidad,
                 valor
             })
         });
@@ -470,27 +494,56 @@ async function guardarCalificacion(input) {
             // Actualizar estado local
             let calif = state.calificaciones.find(c => c.estudianteId == estudianteId && c.raId == raId);
             if (!calif) {
-                calif = { estudianteId, raId, valor };
+                calif = { estudianteId, raId, op1: null, op2: null, op3: null };
                 state.calificaciones.push(calif);
-            } else {
-                calif.valor = valor;
             }
+            calif[`op${oportunidad}`] = valor;
             
             // Recalcular totales
-            generarTablaRegistro();
+            actualizarTotales();
         }
     } catch (error) {
         console.error('Error al guardar calificación:', error);
         // En modo desarrollo, actualizar localmente
         let calif = state.calificaciones.find(c => c.estudianteId == estudianteId && c.raId == raId);
         if (!calif) {
-            calif = { estudianteId, raId, valor };
+            calif = { estudianteId, raId, op1: null, op2: null, op3: null };
             state.calificaciones.push(calif);
-        } else {
-            calif.valor = valor;
         }
-        generarTablaRegistro();
+        calif[`op${oportunidad}`] = valor;
+        actualizarTotales();
     }
+}
+
+// Nueva función para actualizar solo los totales sin regenerar toda la tabla
+function actualizarTotales() {
+    const filas = elementos.tablaRegistroBody.querySelectorAll('tr');
+    
+    filas.forEach((fila, index) => {
+        const estudiante = state.estudiantes[index];
+        if (!estudiante) return;
+        
+        let totalEstudiante = 0;
+        
+        state.ras.forEach((ra, raIndex) => {
+            const calificacion = obtenerCalificacion(estudiante.id, ra.id);
+            const valorFinal = obtenerUltimoValor(calificacion);
+            totalEstudiante += valorFinal;
+            
+            // Actualizar la celda de valor (primera celda de cada RA)
+            const celdaValorIndex = 2 + (raIndex * 5); // 2 iniciales (# y Nombre) + 5 celdas por RA
+            const celdaValor = fila.cells[celdaValorIndex];
+            if (celdaValor) {
+                celdaValor.textContent = valorFinal || '';
+            }
+        });
+        
+        // Actualizar celda total (última celda)
+        const celdaTotal = fila.cells[fila.cells.length - 1];
+        if (celdaTotal) {
+            celdaTotal.textContent = totalEstudiante;
+        }
+    });
 }
 
 async function guardarActividad(input) {
