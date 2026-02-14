@@ -1,7 +1,7 @@
 // Configuración
 const CONFIG = {
     // URL del Web App de Google Apps Script (reemplazar con tu URL)
-    GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw3CURWoHl3tsZd8wflU0z4C_lvU1V55RcUldl2kIzQqIc3l1JsUOlR8R8qxWvsDOtl/exec',
+    GOOGLE_SCRIPT_URL: 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI',
     NUM_ACTIVIDADES: 15,
     PORCENTAJE_APROBATORIO: 70
 };
@@ -19,9 +19,9 @@ const state = {
 
 // Elementos DOM
 const elementos = {
+    selectCurso: document.getElementById('selectCurso'),
     selectModulo: document.getElementById('selectModulo'),
     selectRA: document.getElementById('selectRA'),
-    selectVista: document.getElementById('selectVista'),
     vistaRegistro: document.getElementById('vistaRegistro'),
     vistaActividades: document.getElementById('vistaActividades'),
     tablaRegistroHead: document.getElementById('tablaRegistroHead'),
@@ -41,9 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function inicializarEventos() {
+    elementos.selectCurso.addEventListener('change', manejarCambioCurso);
     elementos.selectModulo.addEventListener('change', manejarCambioModulo);
     elementos.selectRA.addEventListener('change', manejarCambioRA);
-    elementos.selectVista.addEventListener('change', manejarCambioVista);
     elementos.btnVolverRegistro.addEventListener('click', volverARegistro);
 }
 
@@ -52,7 +52,6 @@ async function cargarDatosIniciales() {
     mostrarCargando(true);
     try {
         await cargarModulos();
-        await cargarEstudiantes();
     } catch (error) {
         console.error('Error al cargar datos iniciales:', error);
         alert('Error al cargar los datos. Por favor, verifica la configuración.');
@@ -79,18 +78,23 @@ async function cargarModulos() {
     }
 }
 
-async function cargarEstudiantes() {
+async function cargarEstudiantes(curso) {
     try {
-        const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes`);
+        const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`);
         const data = await response.json();
         state.estudiantes = data.estudiantes || [];
     } catch (error) {
         console.error('Error al cargar estudiantes:', error);
         // Datos de ejemplo para desarrollo
         state.estudiantes = [
-            { id: 1, nombre: 'Ashly Adames Acosta', numero: 1 },
-            { id: 2, nombre: 'Jeremy Almonte Rosario', numero: 2 },
-            { id: 3, nombre: 'Danyeli Nicole Astacio Rodriguez', numero: 3 }
+            { id: 1, nombre: 'Ashly Adames Acosta', numero: 1, curso: curso },
+            { id: 2, nombre: 'Jeremy Almonte Rosario', numero: 2, curso: curso },
+            { id: 3, nombre: 'Astacio Rodriguez Danyeli Nicole', numero: 3, curso: curso },
+            { id: 4, nombre: 'Aybar Alberth', numero: 4, curso: curso },
+            { id: 5, nombre: 'Batista Castillo Albani Joel', numero: 5, curso: curso },
+            { id: 6, nombre: 'Bonifacio Espino Johanlly', numero: 6, curso: curso },
+            { id: 7, nombre: 'Candelario De León Nashla', numero: 7, curso: curso },
+            { id: 8, nombre: 'Del Rosario R. María Esterlin', numero: 8, curso: curso }
         ];
     }
 }
@@ -172,9 +176,31 @@ function poblarSelectRAs() {
 }
 
 // Manejadores de eventos
+async function manejarCambioCurso(e) {
+    const curso = e.target.value;
+    if (curso) {
+        state.cursoSeleccionado = curso;
+        await cargarEstudiantes(curso);
+        // Si ya hay un módulo seleccionado, recargar la tabla
+        if (state.moduloSeleccionado) {
+            await cargarCalificaciones(state.moduloSeleccionado);
+        }
+    } else {
+        state.cursoSeleccionado = null;
+        state.estudiantes = [];
+        elementos.tablaRegistroHead.innerHTML = '';
+        elementos.tablaRegistroBody.innerHTML = '';
+    }
+}
+
 async function manejarCambioModulo(e) {
     const moduloId = e.target.value;
     if (moduloId) {
+        if (!state.cursoSeleccionado) {
+            alert('Por favor, seleccione primero un curso');
+            e.target.value = '';
+            return;
+        }
         state.moduloSeleccionado = moduloId;
         await cargarRAsDelModulo(moduloId);
         await cargarCalificaciones(moduloId);
@@ -189,20 +215,17 @@ async function manejarCambioModulo(e) {
 
 function manejarCambioRA(e) {
     const raId = e.target.value;
-    state.raSeleccionado = raId;
-}
-
-function manejarCambioVista(e) {
-    const vista = e.target.value;
-    if (vista === 'actividades' && state.raSeleccionado) {
+    if (raId) {
+        state.raSeleccionado = raId;
         mostrarVistaActividades();
     } else {
-        mostrarVistaRegistro();
+        state.raSeleccionado = null;
     }
 }
 
 function volverARegistro() {
-    elementos.selectVista.value = 'general';
+    elementos.selectRA.value = '';
+    state.raSeleccionado = null;
     mostrarVistaRegistro();
 }
 
@@ -214,7 +237,6 @@ function mostrarVistaRegistro() {
 function mostrarVistaActividades() {
     if (!state.raSeleccionado) {
         alert('Por favor, seleccione un RA primero');
-        elementos.selectVista.value = 'general';
         return;
     }
     elementos.vistaRegistro.style.display = 'none';
@@ -231,37 +253,33 @@ function mostrarVistaActividades() {
 
 // Generación de tablas
 function generarTablaRegistro() {
-    if (state.ras.length === 0) {
+    if (state.ras.length === 0 || state.estudiantes.length === 0) {
         elementos.tablaRegistroHead.innerHTML = '';
         elementos.tablaRegistroBody.innerHTML = '';
         return;
     }
 
-    // Generar encabezado
+    // Generar encabezado - Primera fila con los códigos de RA
     let headerHTML = '<tr>';
-    headerHTML += '<th class="header-valor">#</th>';
-    headerHTML += '<th class="header-valor">Nombre</th>';
+    headerHTML += '<th rowspan="2" class="header-valor">#</th>';
+    headerHTML += '<th rowspan="2" class="header-valor">Nombre</th>';
     
     state.ras.forEach(ra => {
-        headerHTML += `<th colspan="5" class="header-ra">${ra.codigo}</th>`;
+        headerHTML += `<th colspan="2" class="header-ra">%${ra.codigo}</th>`;
     });
     
-    headerHTML += '<th class="header-total">Total</th>';
+    headerHTML += '<th rowspan="2" class="header-total">Total</th>';
     headerHTML += '</tr>';
     
+    // Segunda fila del encabezado con Valor y 70%
     headerHTML += '<tr>';
-    headerHTML += '<th class="header-valor"></th>';
-    headerHTML += '<th class="header-valor"></th>';
     
     state.ras.forEach(ra => {
-        headerHTML += '<th class="header-valor">Valor</th>';
-        headerHTML += '<th class="header-minimo">70%</th>';
-        headerHTML += '<th class="header-oportunidad">1ra</th>';
-        headerHTML += '<th class="header-oportunidad">2da</th>';
-        headerHTML += '<th class="header-oportunidad">3ra</th>';
+        headerHTML += `<th class="header-valor">${ra.valorTotal || 0}</th>`;
+        const minimo = calcularMinimo(ra.valorTotal || 0);
+        headerHTML += `<th class="header-minimo">${minimo}</th>`;
     });
     
-    headerHTML += '<th class="header-total"></th>';
     headerHTML += '</tr>';
     
     elementos.tablaRegistroHead.innerHTML = headerHTML;
@@ -279,14 +297,15 @@ function generarTablaRegistro() {
             const minimo = calcularMinimo(ra.valorTotal);
             const calificacion = obtenerCalificacion(estudiante.id, ra.id);
             
-            bodyHTML += `<td><input type="number" class="input-valor-total" data-estudiante="${estudiante.id}" data-ra="${ra.id}" value="${ra.valorTotal}" min="0" max="100"></td>`;
-            bodyHTML += `<td class="celda-minimo">${minimo}</td>`;
-            bodyHTML += `<td><input type="number" class="input-oportunidad" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="1" value="${calificacion.op1 || ''}" min="0" max="${ra.valorTotal}"></td>`;
-            bodyHTML += `<td><input type="number" class="input-oportunidad" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="2" value="${calificacion.op2 || ''}" min="0" max="${ra.valorTotal}"></td>`;
-            bodyHTML += `<td><input type="number" class="input-oportunidad" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="3" value="${calificacion.op3 || ''}" min="0" max="${ra.valorTotal}"></td>`;
-            
+            // Obtener el último valor de las 3 oportunidades
             const valorFinal = obtenerUltimoValor(calificacion);
             totalEstudiante += valorFinal;
+            
+            // Celda de Valor (con input editable)
+            bodyHTML += `<td><input type="number" class="input-calificacion" data-estudiante="${estudiante.id}" data-ra="${ra.id}" value="${valorFinal || ''}" min="0" max="${ra.valorTotal}"></td>`;
+            
+            // Celda vacía (para mantener la estructura)
+            bodyHTML += `<td class="celda-vacia"></td>`;
         });
         
         bodyHTML += `<td class="celda-total">${totalEstudiante}</td>`;
@@ -298,6 +317,7 @@ function generarTablaRegistro() {
     // Agregar eventos a los inputs
     agregarEventosInputsRegistro();
 }
+
 
 function generarTablaActividades() {
     const raActual = state.ras.find(ra => ra.id == state.raSeleccionado);
@@ -349,14 +369,11 @@ function calcularMinimo(valorTotal) {
 
 function obtenerCalificacion(estudianteId, raId) {
     const calif = state.calificaciones.find(c => c.estudianteId == estudianteId && c.raId == raId);
-    return calif || { op1: null, op2: null, op3: null };
+    return calif || { valor: null };
 }
 
 function obtenerUltimoValor(calificacion) {
-    if (calificacion.op3 !== null && calificacion.op3 !== '') return parseFloat(calificacion.op3);
-    if (calificacion.op2 !== null && calificacion.op2 !== '') return parseFloat(calificacion.op2);
-    if (calificacion.op1 !== null && calificacion.op1 !== '') return parseFloat(calificacion.op1);
-    return 0;
+    return calificacion.valor || 0;
 }
 
 function obtenerValorActividad(estudianteId, actividadNumero) {
@@ -382,27 +399,19 @@ function generarActividadesEjemplo() {
 
 // Eventos de inputs
 function agregarEventosInputsRegistro() {
-    // Eventos para cambio de valor total
-    document.querySelectorAll('.input-valor-total').forEach(input => {
-        input.addEventListener('change', function() {
-            const raId = this.dataset.ra;
-            const nuevoValor = parseFloat(this.value) || 0;
-            
-            // Actualizar el RA en el estado
-            const ra = state.ras.find(r => r.id == raId);
-            if (ra) {
-                ra.valorTotal = nuevoValor;
-            }
-            
-            // Recalcular tabla
-            generarTablaRegistro();
+    // Eventos para calificaciones
+    document.querySelectorAll('.input-calificacion').forEach(input => {
+        // Permitir pegar desde Excel
+        input.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pasteData = e.clipboardData.getData('text');
+            const valor = parseFloat(pasteData.trim()) || '';
+            this.value = valor;
+            guardarCalificacion(this);
         });
-    });
-    
-    // Eventos para oportunidades
-    document.querySelectorAll('.input-oportunidad').forEach(input => {
+        
         input.addEventListener('input', function() {
-            validarOportunidad(this);
+            validarCalificacion(this);
         });
         
         input.addEventListener('change', function() {
@@ -419,7 +428,7 @@ function agregarEventosInputsActividades() {
     });
 }
 
-function validarOportunidad(input) {
+function validarCalificacion(input) {
     const estudianteId = input.dataset.estudiante;
     const raId = input.dataset.ra;
     const valor = parseFloat(input.value) || 0;
@@ -443,7 +452,6 @@ function validarOportunidad(input) {
 async function guardarCalificacion(input) {
     const estudianteId = input.dataset.estudiante;
     const raId = input.dataset.ra;
-    const oportunidad = input.dataset.oportunidad;
     const valor = parseFloat(input.value) || null;
     
     try {
@@ -453,7 +461,6 @@ async function guardarCalificacion(input) {
                 action: 'guardarCalificacion',
                 estudianteId,
                 raId,
-                oportunidad,
                 valor
             })
         });
@@ -463,10 +470,11 @@ async function guardarCalificacion(input) {
             // Actualizar estado local
             let calif = state.calificaciones.find(c => c.estudianteId == estudianteId && c.raId == raId);
             if (!calif) {
-                calif = { estudianteId, raId, op1: null, op2: null, op3: null };
+                calif = { estudianteId, raId, valor };
                 state.calificaciones.push(calif);
+            } else {
+                calif.valor = valor;
             }
-            calif[`op${oportunidad}`] = valor;
             
             // Recalcular totales
             generarTablaRegistro();
@@ -476,10 +484,11 @@ async function guardarCalificacion(input) {
         // En modo desarrollo, actualizar localmente
         let calif = state.calificaciones.find(c => c.estudianteId == estudianteId && c.raId == raId);
         if (!calif) {
-            calif = { estudianteId, raId, op1: null, op2: null, op3: null };
+            calif = { estudianteId, raId, valor };
             state.calificaciones.push(calif);
+        } else {
+            calif.valor = valor;
         }
-        calif[`op${oportunidad}`] = valor;
         generarTablaRegistro();
     }
 }
