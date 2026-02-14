@@ -167,15 +167,28 @@ th.header-ra {
 
 th.header-valor {
     background-color: var(--color-primario);
+    font-size: 1.1rem;
 }
 
 th.header-minimo {
     background-color: var(--color-gris-oscuro);
+    font-size: 1.1rem;
+}
+
+th.header-sub {
+    background-color: var(--color-primario);
+    font-size: 0.85rem;
+    font-weight: 500;
 }
 
 th.header-oportunidad {
     background-color: var(--color-gris-medio);
     color: var(--color-blanco);
+}
+
+th.header-total {
+    background-color: var(--color-primario);
+    font-weight: bold;
 }
 
 tbody tr {
@@ -266,8 +279,15 @@ input[type="number"]:disabled {
     font-weight: bold;
 }
 
-.celda-vacia {
+.celda-valor {
     background-color: #f5f5f5;
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.celda-vacia {
+    background-color: #f9f9f9;
 }
 
 .celda-total {
