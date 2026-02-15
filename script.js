@@ -389,7 +389,16 @@ function generarTablaActividades() {
     headerHTML += '<th>Nombres</th>';
     
     for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
-        headerHTML += `<th class="actividad-header">Ac.${i}<span class="tooltip">Actividad ${i}: ${obtenerDescripcionActividad(i)}</span></th>`;
+        const descripcion = obtenerDescripcionActividad(i);
+        const tieneDescripcion = descripcion && descripcion !== `Descripción de actividad ${i}`;
+        const iconoNota = tieneDescripcion ? '<span class="icono-nota">📝</span>' : '';
+        
+        headerHTML += `
+            <th class="actividad-header" data-actividad="${i}">
+                <span class="actividad-titulo">Ac.${i}${iconoNota}</span>
+                <div class="tooltip-descripcion">${descripcion}</div>
+                <textarea class="input-descripcion" data-actividad="${i}" placeholder="Escriba la descripción de la actividad..." style="display: none;">${descripcion}</textarea>
+            </th>`;
     }
     
     headerHTML += '<th class="header-total">Total</th>';
@@ -420,6 +429,7 @@ function generarTablaActividades() {
     
     // Agregar eventos
     agregarEventosInputsActividades();
+    agregarEventosDescripcionesActividades();
 }
 
 // Funciones auxiliares
@@ -450,8 +460,12 @@ function obtenerValorActividad(estudianteId, actividadNumero) {
 }
 
 function obtenerDescripcionActividad(numero) {
-    const descripcion = state.actividades.find(a => a.numero == numero);
-    return descripcion ? descripcion.descripcion : `Descripción de actividad ${numero}`;
+    const descripcion = state.actividades.find(a => 
+        a.numero == numero && 
+        a.estudianteId == 0 && 
+        a.raId == state.raSeleccionado
+    );
+    return descripcion ? descripcion.descripcion : `Actividad ${numero}`;
 }
 
 function generarActividadesEjemplo() {
@@ -923,5 +937,71 @@ async function guardarTodoElRegistro() {
             elementos.btnGuardarRegistro.textContent = '💾 Guardar';
             elementos.btnGuardarRegistro.disabled = false;
         }, 2000);
+    }
+}
+
+// Eventos para edición de descripciones de actividades
+function agregarEventosDescripcionesActividades() {
+    document.querySelectorAll('.actividad-header').forEach(header => {
+        const actividadNumero = header.dataset.actividad;
+        const titulo = header.querySelector('.actividad-titulo');
+        const textarea = header.querySelector('.input-descripcion');
+        const tooltip = header.querySelector('.tooltip-descripcion');
+        
+        // Click en el título para editar
+        titulo.addEventListener('click', function(e) {
+            e.stopPropagation();
+            titulo.style.display = 'none';
+            tooltip.style.display = 'none';
+            textarea.style.display = 'block';
+            textarea.focus();
+            textarea.select();
+        });
+        
+        // Guardar al hacer clic fuera o presionar Enter
+        textarea.addEventListener('blur', function() {
+            guardarDescripcionActividad(actividadNumero, textarea.value);
+        });
+        
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                textarea.blur();
+            }
+            if (e.key === 'Escape') {
+                textarea.blur();
+            }
+        });
+        
+        // Prevenir que se cierre al hacer clic dentro del textarea
+        textarea.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    });
+}
+
+async function guardarDescripcionActividad(actividadNumero, descripcion) {
+    try {
+        // Guardar en Google Sheets
+        const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'guardarDescripcionActividad',
+                raId: state.raSeleccionado,
+                actividadNumero: actividadNumero,
+                descripcion: descripcion
+            })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            console.log(`✅ Descripción de Actividad ${actividadNumero} guardada`);
+            // Recargar la tabla para actualizar el tooltip
+            generarTablaActividades();
+        }
+    } catch (error) {
+        console.error('Error al guardar descripción:', error);
+        // Recargar de todos modos para restaurar el estado
+        generarTablaActividades();
     }
 }
