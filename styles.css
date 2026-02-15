@@ -1,4 +1,4 @@
-/* Variables de color institucionales PNSA - Tonos Pasteles */
+/* Variables de color institucionales PNSA - Tonos Suaves */
 :root {
     --color-primario: #5C6BC0;
     --color-secundario: #EF5350;
@@ -12,11 +12,11 @@
     --color-reprobado: #EF5350;
     --color-advertencia: #FFA726;
     
-    /* Nuevos colores pasteles para tabla */
-    --color-header-principal: #7986CB;
-    --color-header-ra: #FF8A80;
-    --color-header-valor: #64B5F6;
-    --color-header-70: #90A4AE;
+    /* Colores muy suaves para tabla - Opción 1: Tonos neutros */
+    --color-header-principal: #546E7A;
+    --color-header-ra: #F8BBD0;
+    --color-header-valor: #B0BEC5;
+    --color-header-70: #CFD8DC;
 }
 
 * {
