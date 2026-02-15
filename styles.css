@@ -61,7 +61,6 @@ header p {
     padding: 25px;
     margin-bottom: 25px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    border-left: 5px solid var(--color-secundario);
 }
 
 .filtro-header h2 {
@@ -72,41 +71,70 @@ header p {
 
 .filtros-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
 }
 
 .filtro-grupo {
     display: flex;
     flex-direction: column;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filtro-grupo:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Colores distintivos para cada filtro */
+.filtro-grupo:nth-child(1) {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border-left: 4px solid #2196F3;
+}
+
+.filtro-grupo:nth-child(2) {
+    background: linear-gradient(135deg, #fff9e6 0%, #ffecb3 100%);
+    border-left: 4px solid #FFA726;
+}
+
+.filtro-grupo:nth-child(3) {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border-left: 4px solid #66BB6A;
 }
 
 .filtro-grupo label {
     font-weight: 600;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     color: var(--color-texto);
     display: flex;
     align-items: center;
     gap: 8px;
+    font-size: 0.95rem;
 }
 
 .icono {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
 }
 
 .filtro-grupo select {
-    padding: 12px;
-    border: 2px solid var(--color-gris-claro);
-    border-radius: 5px;
+    padding: 12px 15px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
     font-size: 1rem;
     background-color: var(--color-blanco);
     color: var(--color-texto);
     cursor: pointer;
     transition: all 0.3s ease;
+    font-weight: 500;
 }
 
 .filtro-grupo select:hover {
-    border-color: var(--color-secundario);
+    border-color: rgba(0, 0, 0, 0.2);
+    background-color: #fafafa;
 }
 
 .filtro-grupo select:focus {
@@ -254,7 +282,6 @@ th.header-total {
 
 .input-valor-ra:focus {
     outline: none;
-    border: 2px solid var(--color-secundario);
     background-color: #1a1a1a;
 }
 
