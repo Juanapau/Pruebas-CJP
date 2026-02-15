@@ -546,8 +546,8 @@ input[type="number"]:disabled {
 .ra-descripcion-header h3 {
     color: var(--color-primario);
     margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1.5rem;  /* Igual que "Actividades del RA" */
+    font-weight: 700;   /* Negrita igual */
 }
 
 .btn-volver-nuevo {
@@ -579,7 +579,7 @@ input[type="number"]:disabled {
     border: 2px solid rgba(46, 125, 50, 0.2);
     border-radius: 6px;
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 1rem;  /* Más grande (antes 0.9rem) */
     resize: vertical;
     min-height: 50px;
     transition: all 0.3s ease;
