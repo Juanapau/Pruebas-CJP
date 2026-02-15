@@ -1,16 +1,22 @@
-/* Variables de color institucionales PNSA */
+/* Variables de color institucionales PNSA - Tonos Pasteles */
 :root {
-    --color-primario: #000000;
-    --color-secundario: #CC0000;
+    --color-primario: #5C6BC0;
+    --color-secundario: #EF5350;
     --color-texto: #333333;
     --color-fondo: #f5f5f5;
     --color-blanco: #ffffff;
     --color-gris-claro: #e0e0e0;
-    --color-gris-medio: #999999;
-    --color-gris-oscuro: #666666;
-    --color-aprobado: #28a745;
-    --color-reprobado: #dc3545;
-    --color-advertencia: #ffc107;
+    --color-gris-medio: #B0BEC5;
+    --color-gris-oscuro: #78909C;
+    --color-aprobado: #66BB6A;
+    --color-reprobado: #EF5350;
+    --color-advertencia: #FFA726;
+    
+    /* Nuevos colores pasteles para tabla */
+    --color-header-principal: #7986CB;
+    --color-header-ra: #FF8A80;
+    --color-header-valor: #64B5F6;
+    --color-header-70: #90A4AE;
 }
 
 * {
@@ -178,7 +184,7 @@ table {
 thead {
     position: sticky;
     top: 0;
-    background-color: var(--color-primario);
+    background-color: var(--color-header-principal);
     color: var(--color-blanco);
     z-index: 10;
 }
@@ -193,29 +199,29 @@ th {
 
 th.header-numero {
     width: 40px;
-    background-color: var(--color-primario);
+    background-color: var(--color-header-principal);
 }
 
 th.header-nombre {
     width: 280px;
-    background-color: var(--color-primario);
+    background-color: var(--color-header-principal);
     text-align: left;
     padding-left: 15px;
 }
 
 th.header-ra {
-    background-color: var(--color-secundario);
+    background-color: var(--color-header-ra);
 }
 
 th.header-valor-num {
-    background-color: var(--color-primario);
+    background-color: var(--color-header-principal);
     font-size: 1.2rem;
     font-weight: bold;
     padding: 8px 2px;
 }
 
 th.header-minimo-num {
-    background-color: var(--color-gris-oscuro);
+    background-color: var(--color-header-70);
     font-size: 1.2rem;
     font-weight: bold;
     padding: 8px 2px;
@@ -228,31 +234,31 @@ th.header-vacia {
 }
 
 th.header-sub-valor {
-    background-color: var(--color-primario);
+    background-color: var(--color-header-principal);
     font-size: 0.85rem;
     font-weight: 500;
 }
 
 th.header-sub-minimo {
-    background-color: var(--color-primario);
+    background-color: var(--color-header-principal);
     font-size: 0.85rem;
     font-weight: 500;
 }
 
 th.header-label-valor {
-    background-color: var(--color-primario);
+    background-color: var(--color-header-principal);
     font-size: 0.85rem;
     font-weight: 500;
 }
 
 th.header-label-70 {
-    background-color: var(--color-primario);
+    background-color: var(--color-header-principal);
     font-size: 0.85rem;
     font-weight: 500;
 }
 
 th.header-total {
-    background-color: var(--color-primario);
+    background-color: var(--color-header-principal);
     font-weight: bold;
     width: 70px;
 }
@@ -268,7 +274,7 @@ th.header-total {
     text-align: center !important;
     font-size: 1.1rem !important;
     font-weight: bold !important;
-    background-color: var(--color-primario) !important;
+    background-color: var(--color-header-principal) !important;
     color: var(--color-blanco) !important;
     box-shadow: none !important;
 }
@@ -286,7 +292,7 @@ th.header-total {
 .input-valor-ra:focus {
     outline: 0 !important;
     border: 0 !important;
-    background-color: #1a1a1a !important;
+    background-color: #5C6BC0 !important;
     box-shadow: none !important;
 }
 
