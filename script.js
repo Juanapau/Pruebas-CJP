@@ -70,8 +70,8 @@ async function cargarModulos() {
         console.error('Error al cargar módulos:', error);
         // Datos de ejemplo para desarrollo
         state.modulos = [
-            { id: 1, nombre: 'Análisis y Diseño de Reportes', codigo: 'ADR' },
-            { id: 2, nombre: 'Desarrollo de Portales Web y Recursos Multimedia', codigo: 'DPWRM' }
+            { id: 1, nombre: 'Análisis y Diseño de Reportes', codigo: 'ADR', curso: '5toB' },
+            { id: 2, nombre: 'Desarrollo de Portales Web y Recursos Multimedia', codigo: 'DPWRM', curso: '4toB' }
         ];
         poblarSelectModulos();
     }
@@ -167,7 +167,13 @@ async function cargarActividadesRA(raId) {
 // Funciones para poblar selectores
 function poblarSelectModulos() {
     elementos.selectModulo.innerHTML = '<option value="">Seleccione un módulo</option>';
-    state.modulos.forEach(modulo => {
+    
+    // Filtrar módulos según el curso seleccionado
+    const modulosFiltrados = state.cursoSeleccionado 
+        ? state.modulos.filter(m => m.curso === state.cursoSeleccionado)
+        : state.modulos;
+    
+    modulosFiltrados.forEach(modulo => {
         const option = document.createElement('option');
         option.value = modulo.id;
         option.textContent = modulo.nombre;
