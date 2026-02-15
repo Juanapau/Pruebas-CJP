@@ -1,7 +1,7 @@
 // Configuración
 const CONFIG = {
     // URL del Web App de Google Apps Script (reemplazar con tu URL)
-    GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw3CURWoHl3tsZd8wflU0z4C_lvU1V55RcUldl2kIzQqIc3l1JsUOlR8R8qxWvsDOtl/exec',
+    GOOGLE_SCRIPT_URL: 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI',
     NUM_ACTIVIDADES: 15,
     PORCENTAJE_APROBATORIO: 70
 };
@@ -159,12 +159,19 @@ async function cargarActividadesRA(raId) {
     try {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getActividades&raId=${raId}`);
         const data = await response.json();
-        state.actividades = data.actividades || [];
+        
+        // Filtrar solo las actividades del RA actual (no sobrescribir todo)
+        const actividadesDelRA = data.actividades || [];
+        
+        // Eliminar actividades anteriores de este RA y agregar las nuevas
+        state.actividades = state.actividades.filter(a => a.raId != raId);
+        state.actividades.push(...actividadesDelRA);
+        
         generarTablaActividades();
+        console.log(`Actividades cargadas de Google Sheets: ${actividadesDelRA.length}`);
     } catch (error) {
         console.error('Error al cargar actividades:', error);
-        // Datos de ejemplo para desarrollo
-        state.actividades = generarActividadesEjemplo();
+        // Si falla, intentar mostrar lo que hay en memoria
         generarTablaActividades();
     } finally {
         mostrarCargando(false);
@@ -524,7 +531,7 @@ function actualizarTotalActividades(input) {
     }
 }
 
-function guardarTotalEnRegistroCalificaciones(estudianteId, total) {
+async function guardarTotalEnRegistroCalificaciones(estudianteId, total) {
     const raId = state.raSeleccionado;
     
     // Buscar si ya existe una calificación para este estudiante y RA
@@ -546,10 +553,29 @@ function guardarTotalEnRegistroCalificaciones(estudianteId, total) {
         state.calificaciones.push(calificacion);
     }
     
+    // Guardar en Google Sheets
+    try {
+        const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                action: 'guardarCalificacion',
+                estudianteId: estudianteId,
+                raId: raId,
+                oportunidad: 1,
+                valor: total
+            })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            console.log(`Total (${total}) guardado en Google Sheets - RA ${raId}, Estudiante ${estudianteId}`);
+        }
+    } catch (error) {
+        console.error('Error al guardar total en Google Sheets:', error);
+    }
+    
     // Actualizar la tabla de registro si está visible
     actualizarTotales();
-    
-    console.log(`Total de actividades (${total}) guardado en oportunidad 1 del RA ${raId} para estudiante ${estudianteId}`);
 }
 
 function validarCalificacion(input) {
@@ -693,7 +719,9 @@ async function guardarTodasLasActividades() {
     elementos.btnGuardarActividades.textContent = '⏳ Guardando...';
     
     try {
-        // Guardar todas las actividades del RA actual
+        let actividadesAGuardar = [];
+        
+        // Recopilar todas las actividades del RA actual
         for (const estudiante of state.estudiantes) {
             let totalEstudiante = 0;
             
@@ -706,12 +734,28 @@ async function guardarTodasLasActividades() {
                 
                 if (actividad && actividad.valor !== null) {
                     totalEstudiante += actividad.valor;
-                    // Aquí iría el guardado en servidor cuando esté configurado
+                    
+                    // Guardar cada actividad individual en Google Sheets
+                    const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'guardarActividad',
+                            raId: state.raSeleccionado,
+                            estudianteId: estudiante.id,
+                            actividadNumero: i,
+                            valor: actividad.valor
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (!result.success) {
+                        console.error('Error al guardar actividad:', result);
+                    }
                 }
             }
             
             // Guardar el total en oportunidad 1 del registro de calificaciones
-            guardarTotalEnRegistroCalificaciones(estudiante.id, totalEstudiante);
+            await guardarTotalEnRegistroCalificaciones(estudiante.id, totalEstudiante);
         }
         
         elementos.btnGuardarActividades.textContent = '✅ Guardado';
@@ -720,7 +764,7 @@ async function guardarTodasLasActividades() {
             elementos.btnGuardarActividades.disabled = false;
         }, 2000);
         
-        console.log('Todas las actividades guardadas correctamente');
+        console.log('Todas las actividades guardadas correctamente en Google Sheets');
     } catch (error) {
         console.error('Error al guardar actividades:', error);
         elementos.btnGuardarActividades.textContent = '❌ Error';
@@ -736,15 +780,64 @@ async function guardarTodoElRegistro() {
     elementos.btnGuardarRegistro.textContent = '⏳ Guardando...';
     
     try {
-        // Aquí iría el guardado de todas las calificaciones del registro
-        // Por ahora solo actualizamos el estado local
-        console.log('Registro guardado:', state.calificaciones);
+        // Recopilar todos los valores de los inputs
+        const inputs = document.querySelectorAll('.input-oportunidad-simple');
+        
+        for (const input of inputs) {
+            const estudianteId = input.dataset.estudiante;
+            const raId = input.dataset.ra;
+            const oportunidad = input.dataset.oportunidad;
+            const valor = parseFloat(input.value) || null;
+            
+            if (valor !== null) {
+                // Actualizar estado local
+                let calificacion = state.calificaciones.find(c => 
+                    c.estudianteId == estudianteId && c.raId == raId
+                );
+                
+                if (!calificacion) {
+                    calificacion = {
+                        id: Date.now(),
+                        estudianteId: estudianteId,
+                        raId: raId,
+                        op1: null,
+                        op2: null,
+                        op3: null
+                    };
+                    state.calificaciones.push(calificacion);
+                }
+                
+                // Actualizar la oportunidad correspondiente
+                if (oportunidad == 1) calificacion.op1 = valor;
+                else if (oportunidad == 2) calificacion.op2 = valor;
+                else if (oportunidad == 3) calificacion.op3 = valor;
+                
+                // Guardar en Google Sheets
+                const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'guardarCalificacion',
+                        estudianteId: estudianteId,
+                        raId: raId,
+                        oportunidad: parseInt(oportunidad),
+                        valor: valor
+                    })
+                });
+                
+                const result = await response.json();
+                if (!result.success) {
+                    console.error('Error al guardar calificación:', result);
+                }
+            }
+        }
         
         elementos.btnGuardarRegistro.textContent = '✅ Guardado';
         setTimeout(() => {
             elementos.btnGuardarRegistro.textContent = '💾 Guardar';
             elementos.btnGuardarRegistro.disabled = false;
         }, 2000);
+        
+        console.log('Registro completo guardado en Google Sheets');
     } catch (error) {
         console.error('Error al guardar registro:', error);
         elementos.btnGuardarRegistro.textContent = '❌ Error';
