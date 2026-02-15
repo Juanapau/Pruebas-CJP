@@ -812,9 +812,9 @@ input[type="number"]:disabled {
 
 /* Información del módulo en título de actividades */
 .modulo-info {
-    font-size: 0.9rem;
-    font-weight: 400;
-    color: #666;
+    font-size: 1.5rem;  /* Mismo tamaño que el título */
+    font-weight: 600;   /* Mismo peso que el título */
+    color: #66bb6a;     /* Verde agradable del sistema */
     margin-left: 15px;
     display: inline-block;
 }
