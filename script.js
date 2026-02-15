@@ -348,6 +348,9 @@ function generarTablaRegistro() {
     
     // Agregar eventos a los inputs
     agregarEventosInputsRegistro();
+    
+    // Aplicar validación de colores a TODOS los inputs (incluyendo los cargados de BD)
+    aplicarValidacionColoresATodos();
 }
 
 
@@ -885,6 +888,7 @@ async function guardarTodoElRegistro() {
                 method: 'POST',
                 body: JSON.stringify({
                     action: 'guardarTodoRegistro',
+                    moduloId: state.moduloSeleccionado,  // Agregar moduloId para calcular totales
                     calificaciones: calificacionesAGuardar
                 })
             });
@@ -976,4 +980,11 @@ async function guardarDescripcionActividad(actividadNumero, descripcion) {
         // Recargar de todos modos para restaurar el estado
         generarTablaActividades();
     }
+}
+
+// Aplicar validación de colores a todos los inputs al cargar
+function aplicarValidacionColoresATodos() {
+    document.querySelectorAll('.input-oportunidad-simple').forEach(input => {
+        validarCalificacion(input);
+    });
 }
