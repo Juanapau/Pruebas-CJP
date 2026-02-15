@@ -695,3 +695,86 @@ input[type="number"]:disabled {
         background-color: #fff3cd;
     }
 }
+
+/* Estilos para edición de descripciones de actividades */
+.actividad-header {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.actividad-titulo {
+    display: inline-block;
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.actividad-titulo:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.icono-nota {
+    font-size: 0.7rem;
+    margin-left: 2px;
+    opacity: 0.8;
+}
+
+.tooltip-descripcion {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 5px;
+    padding: 8px 12px;
+    background-color: #333;
+    color: white;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: normal;
+    white-space: normal;
+    max-width: 250px;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    pointer-events: none;
+}
+
+.tooltip-descripcion::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-bottom-color: #333;
+}
+
+.actividad-header:hover .tooltip-descripcion {
+    display: block;
+}
+
+.input-descripcion {
+    width: 200px;
+    min-height: 60px;
+    padding: 8px;
+    border: 2px solid var(--color-secundario);
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-family: inherit;
+    resize: vertical;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 5px;
+    background-color: white;
+    z-index: 1001;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.input-descripcion:focus {
+    outline: none;
+    border-color: var(--color-primario);
+}
