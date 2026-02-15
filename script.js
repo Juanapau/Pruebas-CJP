@@ -70,9 +70,8 @@ async function cargarModulos() {
         console.error('Error al cargar módulos:', error);
         // Datos de ejemplo para desarrollo
         state.modulos = [
-            { id: 1, nombre: 'Análisis y diseño de reportes' },
-            { id: 2, nombre: 'Desarrollo de Aplicaciones Web' },
-            { id: 3, nombre: 'Base de Datos Avanzada' }
+            { id: 1, nombre: 'Análisis y Diseño de Reportes', codigo: 'ADR' },
+            { id: 2, nombre: 'Desarrollo de Portales Web y Recursos Multimedia', codigo: 'DPWRM' }
         ];
         poblarSelectModulos();
     }
@@ -109,11 +108,22 @@ async function cargarRAsDelModulo(moduloId) {
     } catch (error) {
         console.error('Error al cargar RAs:', error);
         // Datos de ejemplo para desarrollo
-        state.ras = [
-            { id: 1, codigo: 'RA01', nombre: 'Clasificar los requerimientos de información', valorTotal: 40, descripcion: 'Clasificar los requerimientos de información de los diversos usuarios para producir reportes empresariales, siguiendo parámetros establecidos.' },
-            { id: 2, codigo: 'RA02', nombre: 'Analizar reportes empresariales', valorTotal: 37, descripcion: 'Analizar en grupo diferentes ejemplos de reportes empresariales y clasificarlos según su tipo (internos o externos).' },
-            { id: 3, codigo: 'RA03', nombre: 'Observar reportes empresariales', valorTotal: 23, descripcion: 'Observar un reporte empresarial real y subrayar en él sus partes principales (encabezado, cuerpo, pie).' }
-        ];
+        if (moduloId == 1) {
+            // Análisis y Diseño de Reportes - 3 RAs
+            state.ras = [
+                { id: 1, moduloId: 1, codigo: 'RA01', nombre: 'RA1', valorTotal: 40, descripcion: 'Clasificar los requerimientos de información de los diversos usuarios para producir reportes empresariales, siguiendo parámetros establecidos.' },
+                { id: 2, moduloId: 1, codigo: 'RA02', nombre: 'RA2', valorTotal: 37, descripcion: 'Analizar en grupo diferentes ejemplos de reportes empresariales y clasificarlos según su tipo (internos o externos).' },
+                { id: 3, moduloId: 1, codigo: 'RA03', nombre: 'RA3', valorTotal: 23, descripcion: 'Observar un reporte empresarial real y subrayar en él sus partes principales (encabezado, cuerpo, pie).' }
+            ];
+        } else if (moduloId == 2) {
+            // Desarrollo de Portales Web y Recursos Multimedia - 4 RAs
+            state.ras = [
+                { id: 4, moduloId: 2, codigo: 'RA01', nombre: 'RA1', valorTotal: 25, descripcion: 'Desarrollar portales web aplicando tecnologías actuales.' },
+                { id: 5, moduloId: 2, codigo: 'RA02', nombre: 'RA2', valorTotal: 25, descripcion: 'Integrar recursos multimedia en portales web.' },
+                { id: 6, moduloId: 2, codigo: 'RA03', nombre: 'RA3', valorTotal: 25, descripcion: 'Implementar diseño responsive en portales web.' },
+                { id: 7, moduloId: 2, codigo: 'RA04', nombre: 'RA4', valorTotal: 25, descripcion: 'Optimizar portales web para rendimiento y accesibilidad.' }
+            ];
+        }
         poblarSelectRAs();
     } finally {
         mostrarCargando(false);
@@ -170,7 +180,7 @@ function poblarSelectRAs() {
     state.ras.forEach(ra => {
         const option = document.createElement('option');
         option.value = ra.id;
-        option.textContent = `${ra.codigo} - ${ra.nombre}`;
+        option.textContent = `Actividades ${ra.nombre}`;
         elementos.selectRA.appendChild(option);
     });
 }
