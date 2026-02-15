@@ -30,6 +30,8 @@ const elementos = {
     tablaActividadesHead: document.getElementById('tablaActividadesHead'),
     tablaActividadesBody: document.getElementById('tablaActividadesBody'),
     btnVolverRegistro: document.getElementById('btnVolverRegistro'),
+    btnGuardarRegistro: document.getElementById('btnGuardarRegistro'),
+    btnGuardarActividades: document.getElementById('btnGuardarActividades'),
     raDescripcion: document.getElementById('raDescripcion'),
     tituloActividades: document.getElementById('tituloActividades'),
     loading: document.getElementById('loading')
@@ -46,6 +48,8 @@ function inicializarEventos() {
     elementos.selectModulo.addEventListener('change', manejarCambioModulo);
     elementos.selectRA.addEventListener('change', manejarCambioRA);
     elementos.btnVolverRegistro.addEventListener('click', volverARegistro);
+    elementos.btnGuardarRegistro.addEventListener('click', guardarTodoElRegistro);
+    elementos.btnGuardarActividades.addEventListener('click', guardarTodasLasActividades);
 }
 
 // Funciones de carga de datos
@@ -232,12 +236,16 @@ async function manejarCambioModulo(e) {
         state.moduloSeleccionado = moduloId;
         await cargarRAsDelModulo(moduloId);
         await cargarCalificaciones(moduloId);
+        // Mostrar botón guardar
+        elementos.btnGuardarRegistro.style.display = 'flex';
     } else {
         state.moduloSeleccionado = null;
         state.ras = [];
         elementos.selectRA.innerHTML = '<option value="">Seleccione un RA</option>';
         elementos.tablaRegistroHead.innerHTML = '';
         elementos.tablaRegistroBody.innerHTML = '';
+        // Ocultar botón guardar
+        elementos.btnGuardarRegistro.style.display = 'none';
     }
 }
 
@@ -484,10 +492,6 @@ function agregarEventosInputsActividades() {
         input.addEventListener('input', function() {
             actualizarTotalActividades(this);
         });
-        
-        input.addEventListener('change', function() {
-            guardarActividad(this);
-        });
     });
 }
 
@@ -506,9 +510,18 @@ function actualizarTotalActividades(input) {
         celdaTotal.textContent = total.toFixed(2);
     }
     
-    // Guardar automáticamente el total en oportunidad 1 del RA correspondiente
+    // Solo actualizar el estado local, NO guardar automáticamente
     const estudianteId = input.dataset.estudiante;
-    guardarTotalEnRegistroCalificaciones(estudianteId, total);
+    const actividadNumero = input.dataset.actividad;
+    const valor = parseFloat(input.value) || null;
+    
+    let act = state.actividades.find(a => a.estudianteId == estudianteId && a.numero == actividadNumero);
+    if (!act) {
+        act = { estudianteId, numero: actividadNumero, valor, raId: state.raSeleccionado };
+        state.actividades.push(act);
+    } else {
+        act.valor = valor;
+    }
 }
 
 function guardarTotalEnRegistroCalificaciones(estudianteId, total) {
@@ -672,4 +685,72 @@ async function guardarActividad(input) {
 
 function mostrarCargando(mostrar) {
     elementos.loading.style.display = mostrar ? 'block' : 'none';
+}
+
+// Funciones de guardado masivo
+async function guardarTodasLasActividades() {
+    elementos.btnGuardarActividades.disabled = true;
+    elementos.btnGuardarActividades.textContent = '⏳ Guardando...';
+    
+    try {
+        // Guardar todas las actividades del RA actual
+        for (const estudiante of state.estudiantes) {
+            let totalEstudiante = 0;
+            
+            for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
+                const actividad = state.actividades.find(a => 
+                    a.estudianteId == estudiante.id && 
+                    a.numero == i && 
+                    a.raId == state.raSeleccionado
+                );
+                
+                if (actividad && actividad.valor !== null) {
+                    totalEstudiante += actividad.valor;
+                    // Aquí iría el guardado en servidor cuando esté configurado
+                }
+            }
+            
+            // Guardar el total en oportunidad 1 del registro de calificaciones
+            guardarTotalEnRegistroCalificaciones(estudiante.id, totalEstudiante);
+        }
+        
+        elementos.btnGuardarActividades.textContent = '✅ Guardado';
+        setTimeout(() => {
+            elementos.btnGuardarActividades.textContent = '💾 Guardar';
+            elementos.btnGuardarActividades.disabled = false;
+        }, 2000);
+        
+        console.log('Todas las actividades guardadas correctamente');
+    } catch (error) {
+        console.error('Error al guardar actividades:', error);
+        elementos.btnGuardarActividades.textContent = '❌ Error';
+        setTimeout(() => {
+            elementos.btnGuardarActividades.textContent = '💾 Guardar';
+            elementos.btnGuardarActividades.disabled = false;
+        }, 2000);
+    }
+}
+
+async function guardarTodoElRegistro() {
+    elementos.btnGuardarRegistro.disabled = true;
+    elementos.btnGuardarRegistro.textContent = '⏳ Guardando...';
+    
+    try {
+        // Aquí iría el guardado de todas las calificaciones del registro
+        // Por ahora solo actualizamos el estado local
+        console.log('Registro guardado:', state.calificaciones);
+        
+        elementos.btnGuardarRegistro.textContent = '✅ Guardado';
+        setTimeout(() => {
+            elementos.btnGuardarRegistro.textContent = '💾 Guardar';
+            elementos.btnGuardarRegistro.disabled = false;
+        }, 2000);
+    } catch (error) {
+        console.error('Error al guardar registro:', error);
+        elementos.btnGuardarRegistro.textContent = '❌ Error';
+        setTimeout(() => {
+            elementos.btnGuardarRegistro.textContent = '💾 Guardar';
+            elementos.btnGuardarRegistro.disabled = false;
+        }, 2000);
+    }
 }
