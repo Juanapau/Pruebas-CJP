@@ -265,43 +265,38 @@ function generarTablaRegistro() {
     headerHTML += '<th rowspan="3" class="header-nombre">Nombre</th>';
     
     state.ras.forEach(ra => {
-        // Cada RA ocupa 5 columnas: Valor, 70%, Op1, Op2, Op3
-        headerHTML += `<th colspan="5" class="header-ra">%${ra.codigo}</th>`;
+        // Cada RA ocupa SOLO 3 columnas (las 3 oportunidades)
+        headerHTML += `<th colspan="3" class="header-ra">%${ra.codigo}</th>`;
     });
     
     headerHTML += '<th rowspan="3" class="header-total">Total</th>';
     headerHTML += '</tr>';
     
-    // Segunda fila: números (40, 28, vacío, vacío, vacío)
+    // Segunda fila: 40 (colspan 2) y 28 (colspan 1) sobre las 3 columnas
     headerHTML += '<tr>';
     
     state.ras.forEach(ra => {
         const minimo = calcularMinimo(ra.valorTotal || 0);
-        headerHTML += `<th class="header-valor-num"><input type="number" class="input-valor-ra" data-ra="${ra.id}" value="${ra.valorTotal || 0}" min="0" max="100"></th>`;
+        // 40 ocupa 2 columnas, 28 ocupa 1 columna (total 3)
+        headerHTML += `<th colspan="2" class="header-valor-num"><input type="number" class="input-valor-ra" data-ra="${ra.id}" value="${ra.valorTotal || 0}" min="0" max="100"></th>`;
         headerHTML += `<th class="header-minimo-num">${minimo}</th>`;
-        headerHTML += `<th class="header-vacia"></th>`;
-        headerHTML += `<th class="header-vacia"></th>`;
-        headerHTML += `<th class="header-vacia"></th>`;
     });
     
     headerHTML += '</tr>';
     
-    // Tercera fila: "Valor", "70%", vacío, vacío, vacío
+    // Tercera fila: "Valor" (colspan 2) y "70%" (colspan 1)
     headerHTML += '<tr>';
     
     state.ras.forEach(ra => {
-        headerHTML += `<th class="header-label-valor">Valor</th>`;
+        headerHTML += `<th colspan="2" class="header-label-valor">Valor</th>`;
         headerHTML += `<th class="header-label-70">70%</th>`;
-        headerHTML += `<th class="header-vacia"></th>`;
-        headerHTML += `<th class="header-vacia"></th>`;
-        headerHTML += `<th class="header-vacia"></th>`;
     });
     
     headerHTML += '</tr>';
     
     elementos.tablaRegistroHead.innerHTML = headerHTML;
     
-    // Generar cuerpo
+    // Generar cuerpo - SOLO 3 celdas por RA (las 3 oportunidades)
     let bodyHTML = '';
     state.estudiantes.forEach(estudiante => {
         bodyHTML += '<tr>';
@@ -315,13 +310,7 @@ function generarTablaRegistro() {
             const valorFinal = obtenerUltimoValor(calificacion);
             totalEstudiante += valorFinal;
             
-            // Celda 1: Valor calculado (bajo "Valor")
-            bodyHTML += `<td class="celda-valor-calculado">${valorFinal || ''}</td>`;
-            
-            // Celda 2: Vacía (bajo "70%")
-            bodyHTML += `<td class="celda-70-vacia"></td>`;
-            
-            // Celdas 3, 4, 5: Las 3 oportunidades
+            // SOLO 3 celdas: las 3 oportunidades
             bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="1" value="${calificacion.op1 || ''}" min="0" max="${ra.valorTotal}"></td>`;
             bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="2" value="${calificacion.op2 || ''}" min="0" max="${ra.valorTotal}"></td>`;
             bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="3" value="${calificacion.op3 || ''}" min="0" max="${ra.valorTotal}"></td>`;
@@ -548,14 +537,6 @@ function actualizarTotales() {
             const calificacion = obtenerCalificacion(estudiante.id, ra.id);
             const valorFinal = obtenerUltimoValor(calificacion);
             totalEstudiante += valorFinal;
-            
-            // Actualizar el valor calculado (primera celda de cada RA)
-            // 2 celdas iniciales (# y Nombre) + 5 celdas por RA anterior
-            const celdaIndex = 2 + (raIndex * 5);
-            const celda = fila.cells[celdaIndex];
-            if (celda) {
-                celda.textContent = valorFinal || '';
-            }
         });
         
         // Actualizar celda total (última celda)
