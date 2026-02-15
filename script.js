@@ -908,13 +908,8 @@ async function guardarTodasLasActividades() {
         invalidarCache('actividades', state.raSeleccionado);
         invalidarCache('calificaciones', state.moduloSeleccionado);
         
-        // IMPORTANTE: Recargar datos frescos desde Sheets para evitar desincronización
-        await Promise.all([
-            cargarActividadesRA(state.raSeleccionado),
-            cargarCalificaciones(state.moduloSeleccionado)
-        ]);
-        
-        console.log('✅ Datos recargados desde Google Sheets');
+        // NO recargar inmediatamente - confiar en los datos locales que acabamos de guardar
+        console.log('✅ Datos guardados - caché invalidado para próxima carga');
         
         setTimeout(() => {
             elementos.btnGuardarActividades.textContent = '💾 Guardar';
@@ -1002,10 +997,8 @@ async function guardarTodoElRegistro() {
         // Invalidar caché de calificaciones
         invalidarCache('calificaciones', state.moduloSeleccionado);
         
-        // IMPORTANTE: Recargar datos frescos desde Sheets
-        await cargarCalificaciones(state.moduloSeleccionado);
-        
-        console.log('✅ Calificaciones recargadas desde Google Sheets');
+        // NO recargar inmediatamente - confiar en los datos locales que acabamos de guardar
+        console.log('✅ Registro guardado - caché invalidado para próxima carga');
         
         setTimeout(() => {
             elementos.btnGuardarRegistro.textContent = '💾 Guardar';
