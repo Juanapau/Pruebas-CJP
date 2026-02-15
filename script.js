@@ -467,10 +467,30 @@ function agregarEventosInputsRegistro() {
 
 function agregarEventosInputsActividades() {
     document.querySelectorAll('.input-actividad').forEach(input => {
+        input.addEventListener('input', function() {
+            actualizarTotalActividades(this);
+        });
+        
         input.addEventListener('change', function() {
             guardarActividad(this);
         });
     });
+}
+
+function actualizarTotalActividades(input) {
+    const fila = input.closest('tr');
+    const inputs = fila.querySelectorAll('.input-actividad');
+    let total = 0;
+    
+    inputs.forEach(inp => {
+        const valor = parseFloat(inp.value) || 0;
+        total += valor;
+    });
+    
+    const celdaTotal = fila.querySelector('.celda-total');
+    if (celdaTotal) {
+        celdaTotal.textContent = total.toFixed(2);
+    }
 }
 
 function validarCalificacion(input) {
