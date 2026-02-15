@@ -49,7 +49,12 @@
 
             <!-- Tabla de Calificaciones por RA -->
             <div id="tablaRegistroContainer" class="tabla-container">
-                <h2>Registro de Calificaciones - Módulos</h2>
+                <div class="tabla-header-con-boton">
+                    <h2>Registro de Calificaciones - Módulos</h2>
+                    <button id="btnGuardarRegistro" class="btn-guardar" style="display: none;">
+                        💾 Guardar
+                    </button>
+                </div>
                 <div class="tabla-scroll">
                     <table id="tablaRegistro">
                         <thead id="tablaRegistroHead">
@@ -74,7 +79,12 @@
             </div>
 
             <div class="tabla-container">
-                <h2 id="tituloActividades">Actividades del RA</h2>
+                <div class="tabla-header-con-boton">
+                    <h2 id="tituloActividades">Actividades del RA</h2>
+                    <button id="btnGuardarActividades" class="btn-guardar">
+                        💾 Guardar
+                    </button>
+                </div>
                 <div class="tabla-scroll">
                     <table id="tablaActividades">
                         <thead id="tablaActividadesHead">
