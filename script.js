@@ -1,7 +1,7 @@
 // Configuración
 const CONFIG = {
-    // URL del Web App de Google Apps Script (reemplazar con tu URL)
-    GOOGLE_SCRIPT_URL: 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI',
+    // URL del Web App de Google Apps Script
+    GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw3CURWoHl3tsZd8wflU0z4C_lvU1V55RcUldl2kIzQqIc3l1JsUOlR8R8qxWvsDOtl/exec',
     NUM_ACTIVIDADES: 15,
     PORCENTAJE_APROBATORIO: 70
 };
@@ -70,16 +70,16 @@ async function cargarModulos() {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getModulos`);
         const data = await response.json();
         state.modulos = data.modulos || [];
-        console.log('Módulos cargados desde servidor:', state.modulos);
+        console.log('✅ Módulos cargados desde Google Sheets:', state.modulos.length);
         poblarSelectModulos();
     } catch (error) {
-        console.error('Error al cargar módulos:', error);
+        console.error('❌ ERROR al cargar módulos desde Google Sheets:', error);
+        console.log('⚠️ Usando datos de ejemplo locales');
         // Datos de ejemplo para desarrollo
         state.modulos = [
             { id: 1, nombre: 'Análisis y Diseño de Reportes', codigo: 'ADR', curso: '5toB' },
             { id: 2, nombre: 'Desarrollo de Portales Web y Recursos Multimedia', codigo: 'DPWRM', curso: '4toB' }
         ];
-        console.log('Módulos cargados (modo desarrollo):', state.modulos);
         poblarSelectModulos();
     }
 }
@@ -89,8 +89,10 @@ async function cargarEstudiantes(curso) {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`);
         const data = await response.json();
         state.estudiantes = data.estudiantes || [];
+        console.log(`✅ Estudiantes de ${curso} cargados desde Google Sheets:`, state.estudiantes.length);
     } catch (error) {
-        console.error('Error al cargar estudiantes:', error);
+        console.error(`❌ ERROR al cargar estudiantes de ${curso}:`, error);
+        console.log('⚠️ Usando datos de ejemplo locales (8 estudiantes)');
         // Datos de ejemplo para desarrollo
         state.estudiantes = [
             { id: 1, nombre: 'Ashly Adames Acosta', numero: 1, curso: curso },
