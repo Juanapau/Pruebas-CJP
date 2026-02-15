@@ -210,6 +210,18 @@ th.header-sub-minimo {
     font-weight: 500;
 }
 
+th.header-label-valor {
+    background-color: var(--color-primario);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+th.header-label-70 {
+    background-color: var(--color-primario);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
 th.header-total {
     background-color: var(--color-primario);
     font-weight: bold;
