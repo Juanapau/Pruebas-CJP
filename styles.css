@@ -1,4 +1,4 @@
-/* Variables de color institucionales PNSA - Tonos Suaves */
+/* Variables de color institucionales PNSA - Usando colores de filtros */
 :root {
     --color-primario: #5C6BC0;
     --color-secundario: #EF5350;
@@ -12,11 +12,11 @@
     --color-reprobado: #EF5350;
     --color-advertencia: #FFA726;
     
-    /* Colores muy suaves para tabla - Opción 1: Tonos neutros */
-    --color-header-principal: #546E7A;
-    --color-header-ra: #F8BBD0;
-    --color-header-valor: #B0BEC5;
-    --color-header-70: #CFD8DC;
+    /* Colores de la tabla - Usando los mismos de los filtros */
+    --color-header-principal: #bbdefb;  /* Azul claro como caja Curso */
+    --color-header-ra: #ffecb3;         /* Amarillo claro como caja Módulo */
+    --color-header-valor: #c8e6c9;      /* Verde claro como caja Actividades */
+    --color-header-70: #e0e0e0;         /* Gris claro neutro */
 }
 
 * {
@@ -185,7 +185,7 @@ thead {
     position: sticky;
     top: 0;
     background-color: var(--color-header-principal);
-    color: var(--color-blanco);
+    color: var(--color-texto);
     z-index: 10;
 }
 
@@ -200,6 +200,7 @@ th {
 th.header-numero {
     width: 40px;
     background-color: var(--color-header-principal);
+    color: var(--color-texto);
 }
 
 th.header-nombre {
@@ -207,10 +208,12 @@ th.header-nombre {
     background-color: var(--color-header-principal);
     text-align: left;
     padding-left: 15px;
+    color: var(--color-texto);
 }
 
 th.header-ra {
     background-color: var(--color-header-ra);
+    color: var(--color-texto);
 }
 
 th.header-valor-num {
@@ -218,6 +221,7 @@ th.header-valor-num {
     font-size: 1.2rem;
     font-weight: bold;
     padding: 8px 2px;
+    color: var(--color-texto);
 }
 
 th.header-minimo-num {
@@ -225,6 +229,7 @@ th.header-minimo-num {
     font-size: 1.2rem;
     font-weight: bold;
     padding: 8px 2px;
+    color: var(--color-texto);
 }
 
 th.header-vacia {
@@ -237,30 +242,35 @@ th.header-sub-valor {
     background-color: var(--color-header-principal);
     font-size: 0.85rem;
     font-weight: 500;
+    color: var(--color-texto);
 }
 
 th.header-sub-minimo {
     background-color: var(--color-header-principal);
     font-size: 0.85rem;
     font-weight: 500;
+    color: var(--color-texto);
 }
 
 th.header-label-valor {
-    background-color: var(--color-header-principal);
+    background-color: var(--color-header-valor);
     font-size: 0.85rem;
     font-weight: 500;
+    color: var(--color-texto);
 }
 
 th.header-label-70 {
-    background-color: var(--color-header-principal);
+    background-color: var(--color-header-70);
     font-size: 0.85rem;
     font-weight: 500;
+    color: var(--color-texto);
 }
 
 th.header-total {
     background-color: var(--color-header-principal);
     font-weight: bold;
     width: 70px;
+    color: var(--color-texto);
 }
 
 /* Input para valor del RA en el encabezado */
@@ -275,7 +285,7 @@ th.header-total {
     font-size: 1.1rem !important;
     font-weight: bold !important;
     background-color: var(--color-header-principal) !important;
-    color: var(--color-blanco) !important;
+    color: var(--color-texto) !important;
     box-shadow: none !important;
 }
 
@@ -292,7 +302,7 @@ th.header-total {
 .input-valor-ra:focus {
     outline: 0 !important;
     border: 0 !important;
-    background-color: #5C6BC0 !important;
+    background-color: #90CAF9 !important;
     box-shadow: none !important;
 }
 
