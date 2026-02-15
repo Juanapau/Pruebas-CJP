@@ -265,34 +265,34 @@ function generarTablaRegistro() {
     headerHTML += '<th rowspan="3" class="header-nombre">Nombre</th>';
     
     state.ras.forEach(ra => {
-        // Cada RA tiene 4 columnas: Valor, 70%, Op1, Op2, Op3
-        // Pero las agrupamos visualmente en 2: [Valor con 3 ops] y [70% vacía]
-        headerHTML += `<th colspan="4" class="header-ra">%${ra.codigo}</th>`;
+        // Cada RA ocupa 5 columnas: Valor, 70%, Op1, Op2, Op3
+        headerHTML += `<th colspan="5" class="header-ra">%${ra.codigo}</th>`;
     });
     
     headerHTML += '<th rowspan="3" class="header-total">Total</th>';
     headerHTML += '</tr>';
     
-    // Segunda fila del encabezado con valores numéricos
+    // Segunda fila: números (40, 28, vacío, vacío, vacío)
     headerHTML += '<tr>';
     
     state.ras.forEach(ra => {
         const minimo = calcularMinimo(ra.valorTotal || 0);
-        // Valor ocupa 1 columna, 70% ocupa 1 columna, y dejamos 2 vacías
         headerHTML += `<th class="header-valor-num"><input type="number" class="input-valor-ra" data-ra="${ra.id}" value="${ra.valorTotal || 0}" min="0" max="100"></th>`;
         headerHTML += `<th class="header-minimo-num">${minimo}</th>`;
+        headerHTML += `<th class="header-vacia"></th>`;
         headerHTML += `<th class="header-vacia"></th>`;
         headerHTML += `<th class="header-vacia"></th>`;
     });
     
     headerHTML += '</tr>';
     
-    // Tercera fila con etiquetas
+    // Tercera fila: "Valor", "70%", vacío, vacío, vacío
     headerHTML += '<tr>';
     
     state.ras.forEach(ra => {
-        headerHTML += `<th class="header-sub-valor">Valor</th>`;
-        headerHTML += `<th class="header-sub-minimo">70%</th>`;
+        headerHTML += `<th class="header-label-valor">Valor</th>`;
+        headerHTML += `<th class="header-label-70">70%</th>`;
+        headerHTML += `<th class="header-vacia"></th>`;
         headerHTML += `<th class="header-vacia"></th>`;
         headerHTML += `<th class="header-vacia"></th>`;
     });
@@ -311,20 +311,17 @@ function generarTablaRegistro() {
         let totalEstudiante = 0;
         
         state.ras.forEach(ra => {
-            const minimo = calcularMinimo(ra.valorTotal);
             const calificacion = obtenerCalificacion(estudiante.id, ra.id);
-            
-            // Obtener el último valor de las 3 oportunidades
             const valorFinal = obtenerUltimoValor(calificacion);
             totalEstudiante += valorFinal;
             
-            // Celda 1: Valor calculado
+            // Celda 1: Valor calculado (bajo "Valor")
             bodyHTML += `<td class="celda-valor-calculado">${valorFinal || ''}</td>`;
             
-            // Celda 2: Vacía (70%)
+            // Celda 2: Vacía (bajo "70%")
             bodyHTML += `<td class="celda-70-vacia"></td>`;
             
-            // Celda 3, 4, 5: Las 3 oportunidades
+            // Celdas 3, 4, 5: Las 3 oportunidades
             bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="1" value="${calificacion.op1 || ''}" min="0" max="${ra.valorTotal}"></td>`;
             bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="2" value="${calificacion.op2 || ''}" min="0" max="${ra.valorTotal}"></td>`;
             bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="3" value="${calificacion.op3 || ''}" min="0" max="${ra.valorTotal}"></td>`;
@@ -553,8 +550,8 @@ function actualizarTotales() {
             totalEstudiante += valorFinal;
             
             // Actualizar el valor calculado (primera celda de cada RA)
-            // 2 celdas iniciales (# y Nombre) + 4 celdas por RA anterior
-            const celdaIndex = 2 + (raIndex * 4);
+            // 2 celdas iniciales (# y Nombre) + 5 celdas por RA anterior
+            const celdaIndex = 2 + (raIndex * 5);
             const celda = fila.cells[celdaIndex];
             if (celda) {
                 celda.textContent = valorFinal || '';
