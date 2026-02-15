@@ -94,12 +94,14 @@ async function cargarEstudiantes(curso) {
 }
 
 async function cargarRAsDelModulo(moduloId) {
+    console.time('⏱️ Carga de RAs');
     mostrarCargando(true);
     try {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getRAs&moduloId=${moduloId}`);
         const data = await response.json();
         state.ras = data.ras || [];
-        console.log(`✅ RAs cargados desde Google Sheets (Módulo ${moduloId}):`, state.ras);
+        console.timeEnd('⏱️ Carga de RAs');
+        console.log(`✅ RAs cargados desde Google Sheets (Módulo ${moduloId}):`, state.ras.length);
         poblarSelectRAs();
     } catch (error) {
         console.error('❌ ERROR al cargar RAs desde Google Sheets:', error);
@@ -112,15 +114,17 @@ async function cargarRAsDelModulo(moduloId) {
 }
 
 async function cargarCalificaciones(moduloId) {
+    console.time('⏱️ Carga de Calificaciones');
     mostrarCargando(true);
     try {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getCalificaciones&moduloId=${moduloId}`);
         const data = await response.json();
         state.calificaciones = data.calificaciones || [];
+        console.timeEnd('⏱️ Carga de Calificaciones');
+        console.log(`📊 ${state.calificaciones.length} calificaciones cargadas`);
         generarTablaRegistro();
     } catch (error) {
         console.error('Error al cargar calificaciones:', error);
-        // Datos de ejemplo para desarrollo
         state.calificaciones = [];
         generarTablaRegistro();
     } finally {
@@ -129,6 +133,7 @@ async function cargarCalificaciones(moduloId) {
 }
 
 async function cargarActividadesRA(raId) {
+    console.time('⏱️ Carga de Actividades');
     mostrarCargando(true);
     try {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getActividades&raId=${raId}`);
@@ -141,8 +146,9 @@ async function cargarActividadesRA(raId) {
         state.actividades = state.actividades.filter(a => a.raId != raId);
         state.actividades.push(...actividadesDelRA);
         
+        console.timeEnd('⏱️ Carga de Actividades');
+        console.log(`📋 ${actividadesDelRA.length} actividades cargadas de Google Sheets`);
         generarTablaActividades();
-        console.log(`Actividades cargadas de Google Sheets: ${actividadesDelRA.length}`);
     } catch (error) {
         console.error('Error al cargar actividades:', error);
         // Si falla, intentar mostrar lo que hay en memoria
