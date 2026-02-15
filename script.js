@@ -446,16 +446,7 @@ function generarTablaActividades() {
     headerHTML += '<th>Nombres</th>';
     
     for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
-        const descripcion = obtenerDescripcionActividad(i);
-        const tieneDescripcion = descripcion && descripcion !== `Descripción de actividad ${i}`;
-        const iconoNota = tieneDescripcion ? '<span class="icono-nota">📝</span>' : '';
-        
-        headerHTML += `
-            <th class="actividad-header" data-actividad="${i}">
-                <span class="actividad-titulo">Ac.${i}${iconoNota}</span>
-                <div class="tooltip-descripcion">${descripcion}</div>
-                <textarea class="input-descripcion" data-actividad="${i}" placeholder="Escriba la descripción de la actividad..." style="display: none;">${descripcion}</textarea>
-            </th>`;
+        headerHTML += `<th class="actividad-header">Ac.${i}</th>`;
     }
     
     headerHTML += '<th class="header-total">Total</th>';
@@ -486,7 +477,6 @@ function generarTablaActividades() {
     
     // Agregar eventos
     agregarEventosInputsActividades();
-    agregarEventosDescripcionesActividades();
 }
 
 // Funciones auxiliares
