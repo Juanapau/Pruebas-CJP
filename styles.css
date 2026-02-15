@@ -172,6 +172,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     table-layout: auto;
+    border-spacing: 0;
 }
 
 thead {
@@ -183,7 +184,7 @@ thead {
 }
 
 th {
-    padding: 10px 5px;
+    padding: 10px 3px;
     text-align: center;
     font-weight: 600;
     border: 1px solid var(--color-gris-claro);
@@ -196,10 +197,10 @@ th.header-numero {
 }
 
 th.header-nombre {
-    width: 200px;
+    width: 280px;
     background-color: var(--color-primario);
     text-align: left;
-    padding-left: 10px;
+    padding-left: 15px;
 }
 
 th.header-ra {
@@ -210,19 +211,19 @@ th.header-valor-num {
     background-color: var(--color-primario);
     font-size: 1.2rem;
     font-weight: bold;
-    padding: 8px;
+    padding: 8px 2px;
 }
 
 th.header-minimo-num {
     background-color: var(--color-gris-oscuro);
     font-size: 1.2rem;
     font-weight: bold;
-    padding: 8px;
+    padding: 8px 2px;
 }
 
 th.header-vacia {
     background-color: var(--color-gris-medio);
-    padding: 8px;
+    padding: 8px 2px;
     width: 60px;
 }
 
@@ -261,13 +262,15 @@ th.header-total {
     width: 100%;
     max-width: 70px;
     padding: 4px;
-    border: none;
+    border: 0;
+    outline: 0;
     border-radius: 4px;
     text-align: center;
     font-size: 1.1rem;
     font-weight: bold;
     background-color: var(--color-primario);
     color: var(--color-blanco);
+    box-shadow: none;
 }
 
 .input-valor-ra::-webkit-outer-spin-button,
@@ -281,8 +284,10 @@ th.header-total {
 }
 
 .input-valor-ra:focus {
-    outline: none;
+    outline: 0;
+    border: 0;
     background-color: #1a1a1a;
+    box-shadow: inset 0 0 0 1px var(--color-secundario);
 }
 
 tbody tr {
@@ -298,7 +303,7 @@ tbody tr:hover {
 }
 
 td {
-    padding: 10px 5px;
+    padding: 8px 2px;
     text-align: center;
     border: 1px solid var(--color-gris-claro);
     font-size: 0.9rem;
@@ -308,7 +313,8 @@ td {
 td.nombre-estudiante {
     text-align: left;
     font-weight: 500;
-    padding-left: 10px;
+    padding-left: 15px;
+    padding-right: 10px;
 }
 
 td.numero {
@@ -328,16 +334,16 @@ td.numero {
     background-color: #e8e8e8;
 }
 
-/* Celdas de oportunidades */
+/* Celdas de oportunidades - padding reducido */
 .celda-oportunidad {
-    padding: 5px 3px;
+    padding: 4px 1px;
 }
 
-/* Input simple de oportunidad */
+/* Input simple de oportunidad - más compacto */
 .input-oportunidad-simple {
     width: 100%;
-    max-width: 60px;
-    padding: 6px 4px;
+    max-width: 58px;
+    padding: 6px 2px;
     border: 1px solid var(--color-gris-claro);
     border-radius: 3px;
     text-align: center;
