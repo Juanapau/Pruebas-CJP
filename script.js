@@ -14,7 +14,8 @@ const state = {
     calificaciones: [],
     actividades: [],
     moduloSeleccionado: null,
-    raSeleccionado: null
+    raSeleccionado: null,
+    cursoSeleccionado: null
 };
 
 // Elementos DOM
