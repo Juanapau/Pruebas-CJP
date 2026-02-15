@@ -809,3 +809,12 @@ input[type="number"]:disabled {
     outline: none;
     border-color: var(--color-primario);
 }
+
+/* Información del módulo en título de actividades */
+.modulo-info {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #666;
+    margin-left: 15px;
+    display: inline-block;
+}
