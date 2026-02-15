@@ -403,7 +403,7 @@ function generarTablaActividades() {
         
         for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
             const valor = obtenerValorActividad(estudiante.id, i);
-            bodyHTML += `<td><input type="number" class="input-actividad" data-estudiante="${estudiante.id}" data-actividad="${i}" value="${valor || ''}" min="0" max="10"></td>`;
+            bodyHTML += `<td><input type="number" class="input-actividad" data-estudiante="${estudiante.id}" data-actividad="${i}" data-ra="${state.raSeleccionado}" value="${valor || ''}" min="0" max="10"></td>`;
             totalActividades += valor || 0;
         }
         
@@ -436,7 +436,11 @@ function obtenerUltimoValor(calificacion) {
 }
 
 function obtenerValorActividad(estudianteId, actividadNumero) {
-    const actividad = state.actividades.find(a => a.estudianteId == estudianteId && a.numero == actividadNumero);
+    const actividad = state.actividades.find(a => 
+        a.estudianteId == estudianteId && 
+        a.numero == actividadNumero && 
+        a.raId == state.raSeleccionado
+    );
     return actividad ? actividad.valor : null;
 }
 
@@ -522,11 +526,16 @@ function actualizarTotalActividades(input) {
     // Solo actualizar el estado local, NO guardar automáticamente
     const estudianteId = input.dataset.estudiante;
     const actividadNumero = input.dataset.actividad;
+    const raId = input.dataset.ra || state.raSeleccionado;
     const valor = parseFloat(input.value) || null;
     
-    let act = state.actividades.find(a => a.estudianteId == estudianteId && a.numero == actividadNumero);
+    let act = state.actividades.find(a => 
+        a.estudianteId == estudianteId && 
+        a.numero == actividadNumero && 
+        a.raId == raId
+    );
     if (!act) {
-        act = { estudianteId, numero: actividadNumero, valor, raId: state.raSeleccionado };
+        act = { estudianteId, numero: actividadNumero, valor, raId: raId };
         state.actividades.push(act);
     } else {
         act.valor = valor;
