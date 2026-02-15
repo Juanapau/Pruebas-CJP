@@ -668,7 +668,6 @@ async function guardarActividad(input) {
             act.valor = valor;
         }
     }
-    }
 }
 
 function mostrarCargando(mostrar) {
