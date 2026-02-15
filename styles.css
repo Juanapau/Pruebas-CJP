@@ -143,7 +143,7 @@ header p {
 table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed;
+    table-layout: auto;
 }
 
 thead {
@@ -163,13 +163,15 @@ th {
 }
 
 th.header-numero {
-    width: 50px;
+    width: 40px;
     background-color: var(--color-primario);
 }
 
 th.header-nombre {
-    width: 250px;
+    width: 200px;
     background-color: var(--color-primario);
+    text-align: left;
+    padding-left: 10px;
 }
 
 th.header-ra {
@@ -181,7 +183,6 @@ th.header-valor-num {
     font-size: 1.2rem;
     font-weight: bold;
     padding: 8px;
-    width: 15%;
 }
 
 th.header-minimo-num {
@@ -189,7 +190,12 @@ th.header-minimo-num {
     font-size: 1.2rem;
     font-weight: bold;
     padding: 8px;
-    width: 15%;
+}
+
+th.header-vacia {
+    background-color: var(--color-gris-medio);
+    padding: 8px;
+    width: 60px;
 }
 
 th.header-sub-valor {
@@ -207,7 +213,7 @@ th.header-sub-minimo {
 th.header-total {
     background-color: var(--color-primario);
     font-weight: bold;
-    width: 80px;
+    width: 70px;
 }
 
 /* Input para valor del RA en el encabezado */
@@ -215,7 +221,7 @@ th.header-total {
     width: 100%;
     max-width: 70px;
     padding: 4px;
-    border: 2px solid var(--color-blanco);
+    border: none;
     border-radius: 4px;
     text-align: center;
     font-size: 1.1rem;
@@ -236,7 +242,7 @@ th.header-total {
 
 .input-valor-ra:focus {
     outline: none;
-    border-color: var(--color-secundario);
+    border: 2px solid var(--color-secundario);
     background-color: #1a1a1a;
 }
 
@@ -253,19 +259,16 @@ tbody tr:hover {
 }
 
 td {
-    padding: 8px 5px;
+    padding: 10px 5px;
     text-align: center;
     border: 1px solid var(--color-gris-claro);
     font-size: 0.9rem;
+    vertical-align: middle;
 }
 
 td.nombre-estudiante {
     text-align: left;
     font-weight: 500;
-    position: sticky;
-    left: 0;
-    background-color: inherit;
-    z-index: 5;
     padding-left: 10px;
 }
 
@@ -274,66 +277,61 @@ td.numero {
     background-color: #f5f5f5;
 }
 
-/* Celda que contiene valor final y las 3 oportunidades */
-.celda-valor-final {
-    padding: 5px;
-}
-
-.valor-display {
+/* Celda con valor calculado */
+.celda-valor-calculado {
     font-weight: bold;
-    font-size: 1.1rem;
-    margin-bottom: 5px;
-    min-height: 20px;
+    font-size: 1rem;
+    background-color: #f9f9f9;
 }
 
-.oportunidades-container {
-    display: flex;
-    gap: 3px;
-    justify-content: center;
+/* Celda vacía del 70% */
+.celda-70-vacia {
+    background-color: #e8e8e8;
 }
 
-/* Inputs de oportunidades compactos */
-.input-oportunidad-compacta {
-    width: 45px;
-    padding: 4px 2px;
+/* Celdas de oportunidades */
+.celda-oportunidad {
+    padding: 5px 3px;
+}
+
+/* Input simple de oportunidad */
+.input-oportunidad-simple {
+    width: 100%;
+    max-width: 60px;
+    padding: 6px 4px;
     border: 1px solid var(--color-gris-claro);
     border-radius: 3px;
     text-align: center;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     transition: all 0.2s ease;
 }
 
-.input-oportunidad-compacta::-webkit-outer-spin-button,
-.input-oportunidad-compacta::-webkit-inner-spin-button {
+.input-oportunidad-simple::-webkit-outer-spin-button,
+.input-oportunidad-simple::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-.input-oportunidad-compacta {
+.input-oportunidad-simple {
     -moz-appearance: textfield;
 }
 
-.input-oportunidad-compacta:focus {
+.input-oportunidad-simple:focus {
     outline: none;
     border-color: var(--color-secundario);
     box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1);
 }
 
-.input-oportunidad-compacta.reprobado {
+.input-oportunidad-simple.reprobado {
     color: var(--color-reprobado);
     font-weight: bold;
     border-color: var(--color-reprobado);
     background-color: #ffebee;
 }
 
-.input-oportunidad-compacta.aprobado {
+.input-oportunidad-simple.aprobado {
     color: var(--color-aprobado);
     font-weight: bold;
-}
-
-.input-oportunidad-compacta::placeholder {
-    color: #ccc;
-    font-size: 0.75rem;
 }
 
 /* Inputs en tabla */
@@ -556,16 +554,16 @@ input[type="number"]:disabled {
     }
     
     th.header-nombre {
-        width: 180px;
+        width: 150px;
     }
 
-    .input-oportunidad-compacta {
-        width: 40px;
-        font-size: 0.75rem;
+    .input-oportunidad-simple {
+        max-width: 50px;
+        font-size: 0.8rem;
     }
     
-    .valor-display {
-        font-size: 0.95rem;
+    .celda-valor-calculado {
+        font-size: 0.9rem;
     }
 }
 
