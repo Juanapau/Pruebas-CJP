@@ -243,6 +243,8 @@ function volverARegistro() {
     elementos.selectRA.value = '';
     state.raSeleccionado = null;
     mostrarVistaRegistro();
+    // Regenerar la tabla para mostrar los valores actualizados
+    generarTablaRegistro();
 }
 
 function mostrarVistaRegistro() {
@@ -491,6 +493,38 @@ function actualizarTotalActividades(input) {
     if (celdaTotal) {
         celdaTotal.textContent = total.toFixed(2);
     }
+    
+    // Guardar automáticamente el total en oportunidad 1 del RA correspondiente
+    const estudianteId = input.dataset.estudiante;
+    guardarTotalEnRegistroCalificaciones(estudianteId, total);
+}
+
+function guardarTotalEnRegistroCalificaciones(estudianteId, total) {
+    const raId = state.raSeleccionado;
+    
+    // Buscar si ya existe una calificación para este estudiante y RA
+    let calificacion = state.calificaciones.find(c => c.estudianteId == estudianteId && c.raId == raId);
+    
+    if (calificacion) {
+        // Actualizar oportunidad 1
+        calificacion.op1 = total;
+    } else {
+        // Crear nueva calificación
+        calificacion = {
+            id: Date.now(),
+            estudianteId: estudianteId,
+            raId: raId,
+            op1: total,
+            op2: null,
+            op3: null
+        };
+        state.calificaciones.push(calificacion);
+    }
+    
+    // Actualizar la tabla de registro si está visible
+    actualizarTotales();
+    
+    console.log(`Total de actividades (${total}) guardado en oportunidad 1 del RA ${raId} para estudiante ${estudianteId}`);
 }
 
 function validarCalificacion(input) {
@@ -610,12 +644,18 @@ async function guardarActividad(input) {
             } else {
                 act.valor = valor;
             }
-            
-            // Recalcular totales
-            generarTablaActividades();
         }
     } catch (error) {
         console.error('Error al guardar actividad:', error);
+        // Actualizar estado local aunque falle el guardado en servidor
+        let act = state.actividades.find(a => a.estudianteId == estudianteId && a.numero == actividadNumero);
+        if (!act) {
+            act = { estudianteId, numero: actividadNumero, valor };
+            state.actividades.push(act);
+        } else {
+            act.valor = valor;
+        }
+    }
     }
 }
 
