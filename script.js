@@ -350,7 +350,20 @@ function mostrarVistaActividades() {
     
     const raActual = state.ras.find(ra => ra.id == state.raSeleccionado);
     if (raActual) {
+        // Obtener el módulo actual
+        const moduloActual = state.modulos.find(m => m.id == state.moduloSeleccionado);
+        const nombreModulo = moduloActual ? moduloActual.nombre : '';
+        
         elementos.tituloActividades.textContent = `Actividades del ${raActual.codigo}`;
+        
+        // Agregar nombre del módulo si existe
+        if (nombreModulo) {
+            elementos.tituloActividades.innerHTML = `
+                Actividades del ${raActual.codigo}
+                <span class="modulo-info">Módulo: ${nombreModulo}</span>
+            `;
+        }
+        
         elementos.raDescripcion.value = raActual.descripcion || '';
     }
     
