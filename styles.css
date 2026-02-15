@@ -167,6 +167,55 @@ header p {
     padding-bottom: 10px;
 }
 
+/* Header con botón */
+.tabla-header-con-boton {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.tabla-header-con-boton h2 {
+    margin-bottom: 0;
+    border-bottom: 3px solid var(--color-secundario);
+    padding-bottom: 10px;
+    flex: 1;
+}
+
+/* Botón Guardar */
+.btn-guardar {
+    background-color: #bbdefb;
+    color: var(--color-texto);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-guardar:hover {
+    background-color: #90CAF9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-guardar:active {
+    transform: translateY(0);
+}
+
+.btn-guardar:disabled {
+    background-color: #e0e0e0;
+    color: #999;
+    cursor: not-allowed;
+    transform: none;
+}
+
 .tabla-scroll {
     overflow-x: hidden;
     overflow-y: auto;
