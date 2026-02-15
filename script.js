@@ -1151,3 +1151,83 @@ function invalidarCache(tipo = null, clave = null) {
         }
     }
 }
+
+// ==========================================
+// COPIAR Y PEGAR DESDE EXCEL
+// ==========================================
+
+// Event listener global para paste - funciona en cualquier input
+document.addEventListener('paste', function(e) {
+    const target = e.target;
+    
+    // Solo procesar si es un input de calificación o actividad
+    if (!target.matches('.input-oportunidad-simple') && !target.matches('.input-actividad')) {
+        return;
+    }
+    
+    e.preventDefault();
+    
+    // Obtener datos del clipboard
+    const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+    if (!pastedData) return;
+    
+    // Parsear datos (separados por tabs y saltos de línea)
+    const rows = pastedData.split(/\r?\n/).filter(row => row.trim());
+    const parsedRows = rows.map(row => row.split('\t'));
+    
+    // Encontrar posición actual
+    const currentCell = target.closest('td');
+    if (!currentCell) return;
+    
+    const currentRow = currentCell.closest('tr');
+    const tbody = currentRow.parentElement;
+    const allRows = Array.from(tbody.querySelectorAll('tr'));
+    const currentRowIndex = allRows.indexOf(currentRow);
+    
+    const allCellsInRow = Array.from(currentRow.querySelectorAll('td'));
+    const currentCellIndex = allCellsInRow.indexOf(currentCell);
+    
+    console.log(`📋 Pegando datos: ${parsedRows.length} filas × ${parsedRows[0].length} columnas`);
+    
+    // Pegar datos en las celdas correspondientes
+    parsedRows.forEach((rowData, rowOffset) => {
+        const targetRowIndex = currentRowIndex + rowOffset;
+        if (targetRowIndex >= allRows.length) return; // No hay más filas
+        
+        const targetRow = allRows[targetRowIndex];
+        const cellsInTargetRow = Array.from(targetRow.querySelectorAll('td'));
+        
+        rowData.forEach((cellValue, colOffset) => {
+            const targetCellIndex = currentCellIndex + colOffset;
+            if (targetCellIndex >= cellsInTargetRow.length) return; // No hay más columnas
+            
+            const targetCell = cellsInTargetRow[targetCellIndex];
+            const input = targetCell.querySelector('input[type="number"]');
+            
+            if (input) {
+                const cleanValue = cellValue.trim().replace(/,/g, ''); // Quitar comas
+                const numericValue = parseFloat(cleanValue);
+                
+                if (!isNaN(numericValue) && numericValue >= 0) {
+                    input.value = numericValue;
+                    
+                    // Disparar evento change para actualizar validaciones
+                    const event = new Event('change', { bubbles: true });
+                    input.dispatchEvent(event);
+                    
+                    // Validar si es input de calificación
+                    if (input.classList.contains('input-oportunidad-simple')) {
+                        validarCalificacion(input);
+                    }
+                    
+                    // Actualizar total si es input de actividad
+                    if (input.classList.contains('input-actividad')) {
+                        actualizarTotalActividades(input);
+                    }
+                }
+            }
+        });
+    });
+    
+    console.log('✅ Datos pegados correctamente');
+});
