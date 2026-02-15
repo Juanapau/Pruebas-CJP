@@ -526,56 +526,78 @@ input[type="number"]:disabled {
     animation: fadeIn 0.3s ease;
 }
 
-.actividades-header {
-    background: var(--color-blanco);
+/* Caja de descripción del RA - Diseño compacto y bonito */
+.ra-descripcion-box {
+    background: var(--color-header-valor);  /* Verde claro - mismo de "Actividades por RA" */
     border-radius: 10px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(46, 125, 50, 0.1);
 }
 
-.btn-volver {
-    background-color: var(--color-secundario);
-    color: var(--color-blanco);
+.ra-descripcion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.ra-descripcion-header h3 {
+    color: var(--color-primario);
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.btn-volver-nuevo {
+    background-color: #bbdefb;  /* Mismo azul del botón guardar */
+    color: var(--color-texto);
     border: none;
-    padding: 12px 24px;
-    border-radius: 5px;
-    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.btn-volver:hover {
-    background-color: #a00000;
-    transform: translateX(-5px);
+.btn-volver-nuevo:hover {
+    background-color: #90CAF9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.ra-descripcion {
-    margin-top: 15px;
+.btn-volver-nuevo:active {
+    transform: translateY(0);
 }
 
-.ra-descripcion h3 {
-    color: var(--color-primario);
-    margin-bottom: 10px;
-}
-
-.ra-descripcion textarea {
+.ra-descripcion-textarea {
     width: 100%;
-    padding: 12px;
-    border: 2px solid var(--color-gris-claro);
-    border-radius: 5px;
+    padding: 10px 12px;
+    border: 2px solid rgba(46, 125, 50, 0.2);
+    border-radius: 6px;
     font-family: inherit;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     resize: vertical;
-    transition: border-color 0.3s ease;
+    min-height: 50px;
+    transition: all 0.3s ease;
+    background-color: white;
 }
 
-.ra-descripcion textarea:focus {
+.ra-descripcion-textarea:focus {
     outline: none;
-    border-color: var(--color-secundario);
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
 }
+
+.ra-descripcion-textarea::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* Estilos antiguos removidos */
 
 /* Tooltip para actividades */
 .actividad-header {
