@@ -809,35 +809,55 @@ async function guardarTodasLasActividades() {
     elementos.btnGuardarActividades.textContent = '⏳ Guardando...';
     
     try {
-        // Recopilar todas las actividades a guardar
+        // Recopilar actividades DIRECTAMENTE de los inputs DOM (más confiable que state)
+        const inputs = document.querySelectorAll('.input-actividad');
         let actividadesAGuardar = [];
         let totalesPorEstudiante = {};
         
-        for (const estudiante of state.estudiantes) {
-            let totalEstudiante = 0;
+        console.log(`📝 Leyendo ${inputs.length} inputs de actividades...`);
+        
+        inputs.forEach(input => {
+            const estudianteId = input.dataset.estudiante;
+            const actividadNumero = input.dataset.actividad;
+            const raId = input.dataset.ra || state.raSeleccionado;
+            const valor = parseFloat(input.value);
             
-            for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
-                const actividad = state.actividades.find(a => 
-                    a.estudianteId == estudiante.id && 
-                    a.numero == i && 
-                    a.raId == state.raSeleccionado
-                );
+            if (!isNaN(valor) && valor >= 0) {
+                // Guardar actividad
+                actividadesAGuardar.push({
+                    raId: raId,
+                    estudianteId: estudianteId,
+                    actividadNumero: actividadNumero,
+                    valor: valor
+                });
                 
-                if (actividad && actividad.valor !== null) {
-                    totalEstudiante += actividad.valor;
-                    
-                    // Agregar al array para guardar en lote
-                    actividadesAGuardar.push({
-                        raId: state.raSeleccionado,
-                        estudianteId: estudiante.id,
-                        actividadNumero: i,
-                        valor: actividad.valor
+                // Actualizar state local
+                let act = state.actividades.find(a => 
+                    a.estudianteId == estudianteId && 
+                    a.numero == actividadNumero && 
+                    a.raId == raId
+                );
+                if (!act) {
+                    state.actividades.push({
+                        id: Date.now(),
+                        estudianteId: estudianteId,
+                        numero: actividadNumero,
+                        valor: valor,
+                        raId: raId
                     });
+                } else {
+                    act.valor = valor;
                 }
+                
+                // Calcular total por estudiante
+                if (!totalesPorEstudiante[estudianteId]) {
+                    totalesPorEstudiante[estudianteId] = 0;
+                }
+                totalesPorEstudiante[estudianteId] += valor;
             }
-            
-            totalesPorEstudiante[estudiante.id] = totalEstudiante;
-        }
+        });
+        
+        console.log(`📦 Total de actividades a guardar: ${actividadesAGuardar.length}`);
         
         // OPTIMIZACIÓN: 1 sola petición para TODAS las actividades
         if (actividadesAGuardar.length > 0) {
