@@ -243,8 +243,13 @@ async function manejarCambioModulo(e) {
             return;
         }
         state.moduloSeleccionado = moduloId;
-        await cargarRAsDelModulo(moduloId);
-        await cargarCalificaciones(moduloId);
+        
+        // OPTIMIZACIÓN: Cargar RAs y Calificaciones en paralelo (más rápido)
+        await Promise.all([
+            cargarRAsDelModulo(moduloId),
+            cargarCalificaciones(moduloId)
+        ]);
+        
         // Mostrar botón guardar
         elementos.btnGuardarRegistro.style.display = 'flex';
     } else {
@@ -730,9 +735,10 @@ async function guardarTodasLasActividades() {
     elementos.btnGuardarActividades.textContent = '⏳ Guardando...';
     
     try {
+        // Recopilar todas las actividades a guardar
         let actividadesAGuardar = [];
+        let totalesPorEstudiante = {};
         
-        // Recopilar todas las actividades del RA actual
         for (const estudiante of state.estudiantes) {
             let totalEstudiante = 0;
             
@@ -746,27 +752,80 @@ async function guardarTodasLasActividades() {
                 if (actividad && actividad.valor !== null) {
                     totalEstudiante += actividad.valor;
                     
-                    // Guardar cada actividad individual en Google Sheets
-                    const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
-                        method: 'POST',
-                        body: JSON.stringify({
-                            action: 'guardarActividad',
-                            raId: state.raSeleccionado,
-                            estudianteId: estudiante.id,
-                            actividadNumero: i,
-                            valor: actividad.valor
-                        })
+                    // Agregar al array para guardar en lote
+                    actividadesAGuardar.push({
+                        raId: state.raSeleccionado,
+                        estudianteId: estudiante.id,
+                        actividadNumero: i,
+                        valor: actividad.valor
                     });
-                    
-                    const result = await response.json();
-                    if (!result.success) {
-                        console.error('Error al guardar actividad:', result);
-                    }
                 }
             }
             
-            // Guardar el total en oportunidad 1 del registro de calificaciones
-            await guardarTotalEnRegistroCalificaciones(estudiante.id, totalEstudiante);
+            totalesPorEstudiante[estudiante.id] = totalEstudiante;
+        }
+        
+        // OPTIMIZACIÓN: 1 sola petición para TODAS las actividades
+        if (actividadesAGuardar.length > 0) {
+            const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'guardarTodasActividades',
+                    actividades: actividadesAGuardar
+                })
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                console.log(`✅ ${result.count} actividades guardadas en Google Sheets`);
+            }
+        }
+        
+        // Guardar totales en calificaciones (también por lotes)
+        let calificacionesAGuardar = [];
+        for (const estudiante of state.estudiantes) {
+            const total = totalesPorEstudiante[estudiante.id] || 0;
+            if (total > 0) {
+                calificacionesAGuardar.push({
+                    estudianteId: estudiante.id,
+                    raId: state.raSeleccionado,
+                    oportunidad: 1,
+                    valor: total
+                });
+                
+                // Actualizar estado local
+                let calificacion = state.calificaciones.find(c => 
+                    c.estudianteId == estudiante.id && c.raId == state.raSeleccionado
+                );
+                if (calificacion) {
+                    calificacion.op1 = total;
+                } else {
+                    state.calificaciones.push({
+                        id: Date.now(),
+                        estudianteId: estudiante.id,
+                        raId: state.raSeleccionado,
+                        op1: total,
+                        op2: null,
+                        op3: null
+                    });
+                }
+            }
+        }
+        
+        // Guardar calificaciones por lotes
+        if (calificacionesAGuardar.length > 0) {
+            const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'guardarTodoRegistro',
+                    calificaciones: calificacionesAGuardar
+                })
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                console.log(`✅ ${result.count} calificaciones guardadas en Google Sheets`);
+            }
         }
         
         elementos.btnGuardarActividades.textContent = '✅ Guardado';
@@ -775,9 +834,9 @@ async function guardarTodasLasActividades() {
             elementos.btnGuardarActividades.disabled = false;
         }, 2000);
         
-        console.log('Todas las actividades guardadas correctamente en Google Sheets');
+        console.log('✅ Todas las actividades y totales guardados correctamente');
     } catch (error) {
-        console.error('Error al guardar actividades:', error);
+        console.error('❌ Error al guardar actividades:', error);
         elementos.btnGuardarActividades.textContent = '❌ Error';
         setTimeout(() => {
             elementos.btnGuardarActividades.textContent = '💾 Guardar';
@@ -793,6 +852,7 @@ async function guardarTodoElRegistro() {
     try {
         // Recopilar todos los valores de los inputs
         const inputs = document.querySelectorAll('.input-oportunidad-simple');
+        let calificacionesAGuardar = [];
         
         for (const input of inputs) {
             const estudianteId = input.dataset.estudiante;
@@ -823,22 +883,29 @@ async function guardarTodoElRegistro() {
                 else if (oportunidad == 2) calificacion.op2 = valor;
                 else if (oportunidad == 3) calificacion.op3 = valor;
                 
-                // Guardar en Google Sheets
-                const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: 'guardarCalificacion',
-                        estudianteId: estudianteId,
-                        raId: raId,
-                        oportunidad: parseInt(oportunidad),
-                        valor: valor
-                    })
+                // Agregar al array para guardar por lotes
+                calificacionesAGuardar.push({
+                    estudianteId: estudianteId,
+                    raId: raId,
+                    oportunidad: parseInt(oportunidad),
+                    valor: valor
                 });
-                
-                const result = await response.json();
-                if (!result.success) {
-                    console.error('Error al guardar calificación:', result);
-                }
+            }
+        }
+        
+        // OPTIMIZACIÓN: 1 sola petición para TODAS las calificaciones
+        if (calificacionesAGuardar.length > 0) {
+            const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'guardarTodoRegistro',
+                    calificaciones: calificacionesAGuardar
+                })
+            });
+            
+            const result = await response.json();
+            if (result.success) {
+                console.log(`✅ ${result.count} calificaciones guardadas en Google Sheets`);
             }
         }
         
@@ -848,9 +915,9 @@ async function guardarTodoElRegistro() {
             elementos.btnGuardarRegistro.disabled = false;
         }, 2000);
         
-        console.log('Registro completo guardado en Google Sheets');
+        console.log('✅ Registro completo guardado en Google Sheets');
     } catch (error) {
-        console.error('Error al guardar registro:', error);
+        console.error('❌ Error al guardar registro:', error);
         elementos.btnGuardarRegistro.textContent = '❌ Error';
         setTimeout(() => {
             elementos.btnGuardarRegistro.textContent = '💾 Guardar';
