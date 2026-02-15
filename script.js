@@ -197,6 +197,7 @@ async function manejarCambioCurso(e) {
     if (curso) {
         state.cursoSeleccionado = curso;
         await cargarEstudiantes(curso);
+        poblarSelectModulos(); // Filtrar módulos según el curso seleccionado
         // Si ya hay un módulo seleccionado, recargar la tabla
         if (state.moduloSeleccionado) {
             await cargarCalificaciones(state.moduloSeleccionado);
@@ -204,6 +205,7 @@ async function manejarCambioCurso(e) {
     } else {
         state.cursoSeleccionado = null;
         state.estudiantes = [];
+        poblarSelectModulos(); // Mostrar todos los módulos
         elementos.tablaRegistroHead.innerHTML = '';
         elementos.tablaRegistroBody.innerHTML = '';
     }
