@@ -15,7 +15,16 @@ const state = {
     actividades: [],
     moduloSeleccionado: null,
     raSeleccionado: null,
-    cursoSeleccionado: null
+    cursoSeleccionado: null,
+    // Sistema de caché
+    cache: {
+        modulos: { data: null, timestamp: null },
+        ras: {},  // Por moduloId
+        estudiantes: {},  // Por curso
+        calificaciones: {},  // Por moduloId
+        actividades: {}  // Por raId
+    },
+    CACHE_DURATION: 5 * 60 * 1000  // 5 minutos
 };
 
 // Elementos DOM
@@ -66,10 +75,25 @@ async function cargarDatosIniciales() {
 }
 
 async function cargarModulos() {
+    // Intentar cargar desde caché primero
+    const cached = obtenerDeCache('modulos');
+    if (cached) {
+        state.modulos = cached;
+        poblarSelectModulos();
+        return;
+    }
+    
+    // Si no hay caché, cargar desde Google Sheets
+    console.time('⏱️ Carga de Módulos (Sheets)');
     try {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getModulos`);
         const data = await response.json();
         state.modulos = data.modulos || [];
+        
+        // Guardar en caché
+        guardarEnCache('modulos', state.modulos);
+        
+        console.timeEnd('⏱️ Carga de Módulos (Sheets)');
         console.log('✅ Módulos cargados desde Google Sheets:', state.modulos.length);
         poblarSelectModulos();
     } catch (error) {
@@ -81,10 +105,24 @@ async function cargarModulos() {
 }
 
 async function cargarEstudiantes(curso) {
+    // Intentar cargar desde caché
+    const cached = obtenerDeCache('estudiantes', curso);
+    if (cached) {
+        state.estudiantes = cached;
+        return;
+    }
+    
+    // Cargar desde Sheets
+    console.time(`⏱️ Carga de Estudiantes ${curso} (Sheets)`);
     try {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`);
         const data = await response.json();
         state.estudiantes = data.estudiantes || [];
+        
+        // Guardar en caché
+        guardarEnCache('estudiantes', state.estudiantes, curso);
+        
+        console.timeEnd(`⏱️ Carga de Estudiantes ${curso} (Sheets)`);
         console.log(`✅ Estudiantes de ${curso} cargados desde Google Sheets:`, state.estudiantes.length);
     } catch (error) {
         console.error(`❌ ERROR al cargar estudiantes de ${curso}:`, error);
@@ -94,13 +132,26 @@ async function cargarEstudiantes(curso) {
 }
 
 async function cargarRAsDelModulo(moduloId) {
-    console.time('⏱️ Carga de RAs');
+    // Intentar cargar desde caché
+    const cached = obtenerDeCache('ras', moduloId);
+    if (cached) {
+        state.ras = cached;
+        poblarSelectRAs();
+        return;
+    }
+    
+    // Cargar desde Sheets
+    console.time('⏱️ Carga de RAs (Sheets)');
     mostrarCargando(true);
     try {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getRAs&moduloId=${moduloId}`);
         const data = await response.json();
         state.ras = data.ras || [];
-        console.timeEnd('⏱️ Carga de RAs');
+        
+        // Guardar en caché
+        guardarEnCache('ras', state.ras, moduloId);
+        
+        console.timeEnd('⏱️ Carga de RAs (Sheets)');
         console.log(`✅ RAs cargados desde Google Sheets (Módulo ${moduloId}):`, state.ras.length);
         poblarSelectRAs();
     } catch (error) {
@@ -114,13 +165,26 @@ async function cargarRAsDelModulo(moduloId) {
 }
 
 async function cargarCalificaciones(moduloId) {
-    console.time('⏱️ Carga de Calificaciones');
+    // Intentar cargar desde caché
+    const cached = obtenerDeCache('calificaciones', moduloId);
+    if (cached) {
+        state.calificaciones = cached;
+        generarTablaRegistro();
+        return;
+    }
+    
+    // Cargar desde Sheets
+    console.time('⏱️ Carga de Calificaciones (Sheets)');
     mostrarCargando(true);
     try {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getCalificaciones&moduloId=${moduloId}`);
         const data = await response.json();
         state.calificaciones = data.calificaciones || [];
-        console.timeEnd('⏱️ Carga de Calificaciones');
+        
+        // Guardar en caché
+        guardarEnCache('calificaciones', state.calificaciones, moduloId);
+        
+        console.timeEnd('⏱️ Carga de Calificaciones (Sheets)');
         console.log(`📊 ${state.calificaciones.length} calificaciones cargadas`);
         generarTablaRegistro();
     } catch (error) {
@@ -133,25 +197,37 @@ async function cargarCalificaciones(moduloId) {
 }
 
 async function cargarActividadesRA(raId) {
-    console.time('⏱️ Carga de Actividades');
+    // Intentar cargar desde caché
+    const cached = obtenerDeCache('actividades', raId);
+    if (cached) {
+        // Eliminar actividades anteriores de este RA y agregar las del caché
+        state.actividades = state.actividades.filter(a => a.raId != raId);
+        state.actividades.push(...cached);
+        generarTablaActividades();
+        return;
+    }
+    
+    // Cargar desde Sheets
+    console.time('⏱️ Carga de Actividades (Sheets)');
     mostrarCargando(true);
     try {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getActividades&raId=${raId}`);
         const data = await response.json();
         
-        // Filtrar solo las actividades del RA actual (no sobrescribir todo)
         const actividadesDelRA = data.actividades || [];
+        
+        // Guardar en caché
+        guardarEnCache('actividades', actividadesDelRA, raId);
         
         // Eliminar actividades anteriores de este RA y agregar las nuevas
         state.actividades = state.actividades.filter(a => a.raId != raId);
         state.actividades.push(...actividadesDelRA);
         
-        console.timeEnd('⏱️ Carga de Actividades');
+        console.timeEnd('⏱️ Carga de Actividades (Sheets)');
         console.log(`📋 ${actividadesDelRA.length} actividades cargadas de Google Sheets`);
         generarTablaActividades();
     } catch (error) {
         console.error('Error al cargar actividades:', error);
-        // Si falla, intentar mostrar lo que hay en memoria
         generarTablaActividades();
     } finally {
         mostrarCargando(false);
@@ -824,6 +900,11 @@ async function guardarTodasLasActividades() {
         }
         
         elementos.btnGuardarActividades.textContent = '✅ Guardado';
+        
+        // Invalidar caché de actividades y calificaciones
+        invalidarCache('actividades', state.raSeleccionado);
+        invalidarCache('calificaciones', state.moduloSeleccionado);
+        
         setTimeout(() => {
             elementos.btnGuardarActividades.textContent = '💾 Guardar';
             elementos.btnGuardarActividades.disabled = false;
@@ -906,6 +987,10 @@ async function guardarTodoElRegistro() {
         }
         
         elementos.btnGuardarRegistro.textContent = '✅ Guardado';
+        
+        // Invalidar caché de calificaciones
+        invalidarCache('calificaciones', state.moduloSeleccionado);
+        
         setTimeout(() => {
             elementos.btnGuardarRegistro.textContent = '💾 Guardar';
             elementos.btnGuardarRegistro.disabled = false;
@@ -993,4 +1078,73 @@ function aplicarValidacionColoresATodos() {
     document.querySelectorAll('.input-oportunidad-simple').forEach(input => {
         validarCalificacion(input);
     });
+}
+
+// ==========================================
+// SISTEMA DE CACHÉ
+// ==========================================
+
+function esCacheValido(timestamp) {
+    if (!timestamp) return false;
+    const ahora = Date.now();
+    return (ahora - timestamp) < state.CACHE_DURATION;
+}
+
+function obtenerDeCache(tipo, clave = null) {
+    if (tipo === 'modulos') {
+        const cache = state.cache.modulos;
+        if (esCacheValido(cache.timestamp)) {
+            console.log('✨ Módulos cargados desde CACHÉ (instantáneo)');
+            return cache.data;
+        }
+    } else {
+        const cache = state.cache[tipo][clave];
+        if (cache && esCacheValido(cache.timestamp)) {
+            console.log(`✨ ${tipo} cargados desde CACHÉ (instantáneo)`);
+            return cache.data;
+        }
+    }
+    return null;
+}
+
+function guardarEnCache(tipo, data, clave = null) {
+    if (tipo === 'modulos') {
+        state.cache.modulos = {
+            data: data,
+            timestamp: Date.now()
+        };
+    } else {
+        state.cache[tipo][clave] = {
+            data: data,
+            timestamp: Date.now()
+        };
+    }
+}
+
+function invalidarCache(tipo = null, clave = null) {
+    if (!tipo) {
+        // Invalidar todo el caché
+        state.cache = {
+            modulos: { data: null, timestamp: null },
+            ras: {},
+            estudiantes: {},
+            calificaciones: {},
+            actividades: {}
+        };
+        console.log('🗑️ Caché completo invalidado');
+    } else if (tipo && !clave) {
+        // Invalidar todo un tipo
+        if (tipo === 'modulos') {
+            state.cache.modulos = { data: null, timestamp: null };
+        } else {
+            state.cache[tipo] = {};
+        }
+        console.log(`🗑️ Caché de ${tipo} invalidado`);
+    } else {
+        // Invalidar una clave específica
+        if (state.cache[tipo][clave]) {
+            delete state.cache[tipo][clave];
+            console.log(`🗑️ Caché de ${tipo}[${clave}] invalidado`);
+        }
+    }
 }
