@@ -74,12 +74,8 @@ async function cargarModulos() {
         poblarSelectModulos();
     } catch (error) {
         console.error('❌ ERROR al cargar módulos desde Google Sheets:', error);
-        console.log('⚠️ Usando datos de ejemplo locales');
-        // Datos de ejemplo para desarrollo
-        state.modulos = [
-            { id: 1, nombre: 'Análisis y Diseño de Reportes', codigo: 'ADR', curso: '5toB' },
-            { id: 2, nombre: 'Desarrollo de Portales Web y Recursos Multimedia', codigo: 'DPWRM', curso: '4toB' }
-        ];
+        alert('Error al cargar los módulos. Verifica la conexión con Google Sheets.');
+        state.modulos = [];
         poblarSelectModulos();
     }
 }
@@ -92,18 +88,8 @@ async function cargarEstudiantes(curso) {
         console.log(`✅ Estudiantes de ${curso} cargados desde Google Sheets:`, state.estudiantes.length);
     } catch (error) {
         console.error(`❌ ERROR al cargar estudiantes de ${curso}:`, error);
-        console.log('⚠️ Usando datos de ejemplo locales (8 estudiantes)');
-        // Datos de ejemplo para desarrollo
-        state.estudiantes = [
-            { id: 1, nombre: 'Ashly Adames Acosta', numero: 1, curso: curso },
-            { id: 2, nombre: 'Jeremy Almonte Rosario', numero: 2, curso: curso },
-            { id: 3, nombre: 'Astacio Rodriguez Danyeli Nicole', numero: 3, curso: curso },
-            { id: 4, nombre: 'Aybar Alberth', numero: 4, curso: curso },
-            { id: 5, nombre: 'Batista Castillo Albani Joel', numero: 5, curso: curso },
-            { id: 6, nombre: 'Bonifacio Espino Johanlly', numero: 6, curso: curso },
-            { id: 7, nombre: 'Candelario De León Nashla', numero: 7, curso: curso },
-            { id: 8, nombre: 'Del Rosario R. María Esterlin', numero: 8, curso: curso }
-        ];
+        alert('Error al cargar los estudiantes. Verifica la conexión con Google Sheets.');
+        state.estudiantes = [];
     }
 }
 
@@ -113,26 +99,12 @@ async function cargarRAsDelModulo(moduloId) {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getRAs&moduloId=${moduloId}`);
         const data = await response.json();
         state.ras = data.ras || [];
+        console.log(`✅ RAs cargados desde Google Sheets (Módulo ${moduloId}):`, state.ras);
         poblarSelectRAs();
     } catch (error) {
-        console.error('Error al cargar RAs:', error);
-        // Datos de ejemplo para desarrollo
-        if (moduloId == 1) {
-            // Análisis y Diseño de Reportes - 3 RAs
-            state.ras = [
-                { id: 1, moduloId: 1, codigo: 'RA01', nombre: 'RA1', valorTotal: 40, descripcion: 'Clasificar los requerimientos de información de los diversos usuarios para producir reportes empresariales, siguiendo parámetros establecidos.' },
-                { id: 2, moduloId: 1, codigo: 'RA02', nombre: 'RA2', valorTotal: 37, descripcion: 'Analizar en grupo diferentes ejemplos de reportes empresariales y clasificarlos según su tipo (internos o externos).' },
-                { id: 3, moduloId: 1, codigo: 'RA03', nombre: 'RA3', valorTotal: 23, descripcion: 'Observar un reporte empresarial real y subrayar en él sus partes principales (encabezado, cuerpo, pie).' }
-            ];
-        } else if (moduloId == 2) {
-            // Desarrollo de Portales Web y Recursos Multimedia - 4 RAs
-            state.ras = [
-                { id: 4, moduloId: 2, codigo: 'RA01', nombre: 'RA1', valorTotal: 25, descripcion: 'Desarrollar portales web aplicando tecnologías actuales.' },
-                { id: 5, moduloId: 2, codigo: 'RA02', nombre: 'RA2', valorTotal: 25, descripcion: 'Integrar recursos multimedia en portales web.' },
-                { id: 6, moduloId: 2, codigo: 'RA03', nombre: 'RA3', valorTotal: 25, descripcion: 'Implementar diseño responsive en portales web.' },
-                { id: 7, moduloId: 2, codigo: 'RA04', nombre: 'RA4', valorTotal: 25, descripcion: 'Optimizar portales web para rendimiento y accesibilidad.' }
-            ];
-        }
+        console.error('❌ ERROR al cargar RAs desde Google Sheets:', error);
+        alert('Error al cargar los RAs. Verifica la conexión con Google Sheets.');
+        state.ras = [];
         poblarSelectRAs();
     } finally {
         mostrarCargando(false);
