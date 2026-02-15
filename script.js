@@ -66,6 +66,7 @@ async function cargarModulos() {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getModulos`);
         const data = await response.json();
         state.modulos = data.modulos || [];
+        console.log('Módulos cargados desde servidor:', state.modulos);
         poblarSelectModulos();
     } catch (error) {
         console.error('Error al cargar módulos:', error);
@@ -74,6 +75,7 @@ async function cargarModulos() {
             { id: 1, nombre: 'Análisis y Diseño de Reportes', codigo: 'ADR', curso: '5toB' },
             { id: 2, nombre: 'Desarrollo de Portales Web y Recursos Multimedia', codigo: 'DPWRM', curso: '4toB' }
         ];
+        console.log('Módulos cargados (modo desarrollo):', state.modulos);
         poblarSelectModulos();
     }
 }
@@ -169,10 +171,15 @@ async function cargarActividadesRA(raId) {
 function poblarSelectModulos() {
     elementos.selectModulo.innerHTML = '<option value="">Seleccione un módulo</option>';
     
+    console.log('Estado actual - cursoSeleccionado:', state.cursoSeleccionado);
+    console.log('Módulos disponibles:', state.modulos);
+    
     // Filtrar módulos según el curso seleccionado
     const modulosFiltrados = state.cursoSeleccionado 
         ? state.modulos.filter(m => m.curso === state.cursoSeleccionado)
         : state.modulos;
+    
+    console.log('Módulos filtrados:', modulosFiltrados);
     
     modulosFiltrados.forEach(modulo => {
         const option = document.createElement('option');
@@ -180,6 +187,8 @@ function poblarSelectModulos() {
         option.textContent = modulo.nombre;
         elementos.selectModulo.appendChild(option);
     });
+    
+    console.log('Opciones agregadas al select:', elementos.selectModulo.children.length - 1); // -1 por la opción "Seleccione"
 }
 
 function poblarSelectRAs() {
