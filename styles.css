@@ -122,6 +122,7 @@ header p {
     padding: 25px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     margin-bottom: 25px;
+    overflow-x: hidden;
 }
 
 .tabla-container h2 {
@@ -133,7 +134,7 @@ header p {
 }
 
 .tabla-scroll {
-    overflow-x: auto;
+    overflow-x: hidden;
     overflow-y: auto;
     max-height: 600px;
 }
@@ -142,7 +143,7 @@ header p {
 table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 800px;
+    table-layout: fixed;
 }
 
 thead {
@@ -154,20 +155,25 @@ thead {
 }
 
 th {
-    padding: 12px 8px;
+    padding: 10px 5px;
     text-align: center;
     font-weight: 600;
     border: 1px solid var(--color-gris-claro);
     font-size: 0.9rem;
 }
 
-th.header-ra {
-    background-color: var(--color-secundario);
+th.header-numero {
+    width: 50px;
+    background-color: var(--color-primario);
 }
 
-th.header-valor {
+th.header-nombre {
+    width: 250px;
     background-color: var(--color-primario);
-    font-size: 1rem;
+}
+
+th.header-ra {
+    background-color: var(--color-secundario);
 }
 
 th.header-valor-num {
@@ -175,6 +181,7 @@ th.header-valor-num {
     font-size: 1.2rem;
     font-weight: bold;
     padding: 8px;
+    width: 15%;
 }
 
 th.header-minimo-num {
@@ -182,27 +189,31 @@ th.header-minimo-num {
     font-size: 1.2rem;
     font-weight: bold;
     padding: 8px;
+    width: 15%;
 }
 
-th.header-sub {
+th.header-sub-valor {
     background-color: var(--color-primario);
     font-size: 0.85rem;
     font-weight: 500;
 }
 
-th.header-oportunidad {
-    background-color: var(--color-gris-medio);
-    color: var(--color-blanco);
+th.header-sub-minimo {
+    background-color: var(--color-primario);
+    font-size: 0.85rem;
+    font-weight: 500;
 }
 
 th.header-total {
     background-color: var(--color-primario);
     font-weight: bold;
+    width: 80px;
 }
 
 /* Input para valor del RA en el encabezado */
 .input-valor-ra {
-    width: 60px;
+    width: 100%;
+    max-width: 70px;
     padding: 4px;
     border: 2px solid var(--color-blanco);
     border-radius: 4px;
@@ -242,7 +253,7 @@ tbody tr:hover {
 }
 
 td {
-    padding: 10px 8px;
+    padding: 8px 5px;
     text-align: center;
     border: 1px solid var(--color-gris-claro);
     font-size: 0.9rem;
@@ -255,11 +266,74 @@ td.nombre-estudiante {
     left: 0;
     background-color: inherit;
     z-index: 5;
+    padding-left: 10px;
 }
 
 td.numero {
     font-weight: 600;
     background-color: #f5f5f5;
+}
+
+/* Celda que contiene valor final y las 3 oportunidades */
+.celda-valor-final {
+    padding: 5px;
+}
+
+.valor-display {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    min-height: 20px;
+}
+
+.oportunidades-container {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+}
+
+/* Inputs de oportunidades compactos */
+.input-oportunidad-compacta {
+    width: 45px;
+    padding: 4px 2px;
+    border: 1px solid var(--color-gris-claro);
+    border-radius: 3px;
+    text-align: center;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.input-oportunidad-compacta::-webkit-outer-spin-button,
+.input-oportunidad-compacta::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input-oportunidad-compacta {
+    -moz-appearance: textfield;
+}
+
+.input-oportunidad-compacta:focus {
+    outline: none;
+    border-color: var(--color-secundario);
+    box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1);
+}
+
+.input-oportunidad-compacta.reprobado {
+    color: var(--color-reprobado);
+    font-weight: bold;
+    border-color: var(--color-reprobado);
+    background-color: #ffebee;
+}
+
+.input-oportunidad-compacta.aprobado {
+    color: var(--color-aprobado);
+    font-weight: bold;
+}
+
+.input-oportunidad-compacta::placeholder {
+    color: #ccc;
+    font-size: 0.75rem;
 }
 
 /* Inputs en tabla */
@@ -325,13 +399,13 @@ input[type="number"]:disabled {
 }
 
 .celda-vacia {
-    background-color: #f9f9f9;
+    background-color: #e8e8e8;
 }
 
 .celda-total {
     background-color: #e3f2fd;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 1.1rem;
 }
 
 /* Vista de Actividades */
@@ -473,16 +547,25 @@ input[type="number"]:disabled {
 
     .tabla-scroll {
         max-height: 400px;
+        overflow-x: auto;
     }
 
     th, td {
         font-size: 0.8rem;
-        padding: 8px 5px;
+        padding: 6px 3px;
+    }
+    
+    th.header-nombre {
+        width: 180px;
     }
 
-    input[type="number"] {
-        width: 50px;
-        font-size: 0.8rem;
+    .input-oportunidad-compacta {
+        width: 40px;
+        font-size: 0.75rem;
+    }
+    
+    .valor-display {
+        font-size: 0.95rem;
     }
 }
 
