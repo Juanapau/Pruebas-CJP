@@ -430,9 +430,9 @@ function generarTablaRegistro() {
             totalEstudiante += valorFinal;
             
             // SOLO 3 celdas: las 3 oportunidades
-            bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="1" value="${calificacion.op1 || ''}" min="0" max="${ra.valorTotal}"></td>`;
-            bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="2" value="${calificacion.op2 || ''}" min="0" max="${ra.valorTotal}"></td>`;
-            bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="3" value="${calificacion.op3 || ''}" min="0" max="${ra.valorTotal}"></td>`;
+            bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="1" value="${calificacion.op1 !== null && calificacion.op1 !== undefined ? calificacion.op1 : ''}" min="0" max="${ra.valorTotal}"></td>`;
+            bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="2" value="${calificacion.op2 !== null && calificacion.op2 !== undefined ? calificacion.op2 : ''}" min="0" max="${ra.valorTotal}"></td>`;
+            bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="3" value="${calificacion.op3 !== null && calificacion.op3 !== undefined ? calificacion.op3 : ''}" min="0" max="${ra.valorTotal}"></td>`;
         });
         
         bodyHTML += `<td class="celda-total">${totalEstudiante}</td>`;
@@ -478,7 +478,7 @@ function generarTablaActividades() {
         
         for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
             const valor = obtenerValorActividad(estudiante.id, i);
-            bodyHTML += `<td><input type="number" class="input-actividad" data-estudiante="${estudiante.id}" data-actividad="${i}" data-ra="${state.raSeleccionado}" value="${valor || ''}" min="0" max="10"></td>`;
+            bodyHTML += `<td><input type="number" class="input-actividad" data-estudiante="${estudiante.id}" data-actividad="${i}" data-ra="${state.raSeleccionado}" value="${valor !== null && valor !== undefined ? valor : ''}" min="0" max="10"></td>`;
             totalActividades += valor || 0;
         }
         
