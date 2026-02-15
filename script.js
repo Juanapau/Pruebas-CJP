@@ -265,29 +265,36 @@ function generarTablaRegistro() {
     headerHTML += '<th rowspan="3" class="header-nombre">Nombre</th>';
     
     state.ras.forEach(ra => {
-        headerHTML += `<th colspan="2" class="header-ra">%${ra.codigo}</th>`;
+        // Cada RA tiene 4 columnas: Valor, 70%, Op1, Op2, Op3
+        // Pero las agrupamos visualmente en 2: [Valor con 3 ops] y [70% vacía]
+        headerHTML += `<th colspan="4" class="header-ra">%${ra.codigo}</th>`;
     });
     
     headerHTML += '<th rowspan="3" class="header-total">Total</th>';
     headerHTML += '</tr>';
     
-    // Segunda fila del encabezado con valores numéricos (40 y 28 ocupan todo el ancho)
+    // Segunda fila del encabezado con valores numéricos
     headerHTML += '<tr>';
     
     state.ras.forEach(ra => {
         const minimo = calcularMinimo(ra.valorTotal || 0);
+        // Valor ocupa 1 columna, 70% ocupa 1 columna, y dejamos 2 vacías
         headerHTML += `<th class="header-valor-num"><input type="number" class="input-valor-ra" data-ra="${ra.id}" value="${ra.valorTotal || 0}" min="0" max="100"></th>`;
         headerHTML += `<th class="header-minimo-num">${minimo}</th>`;
+        headerHTML += `<th class="header-vacia"></th>`;
+        headerHTML += `<th class="header-vacia"></th>`;
     });
     
     headerHTML += '</tr>';
     
-    // Tercera fila con etiquetas Valor y 70% (ocupan todo el ancho)
+    // Tercera fila con etiquetas
     headerHTML += '<tr>';
     
     state.ras.forEach(ra => {
         headerHTML += `<th class="header-sub-valor">Valor</th>`;
         headerHTML += `<th class="header-sub-minimo">70%</th>`;
+        headerHTML += `<th class="header-vacia"></th>`;
+        headerHTML += `<th class="header-vacia"></th>`;
     });
     
     headerHTML += '</tr>';
@@ -311,19 +318,16 @@ function generarTablaRegistro() {
             const valorFinal = obtenerUltimoValor(calificacion);
             totalEstudiante += valorFinal;
             
-            // Columna completa para el RA con 2 celdas (Valor y las 3 oportunidades)
-            // Primera celda: muestra el valor final (calculado)
-            bodyHTML += `<td class="celda-valor-final" rowspan="1">`;
-            bodyHTML += `<div class="valor-display">${valorFinal || ''}</div>`;
-            bodyHTML += `<div class="oportunidades-container">`;
-            bodyHTML += `<input type="number" class="input-oportunidad-compacta" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="1" value="${calificacion.op1 || ''}" min="0" max="${ra.valorTotal}" placeholder="1">`;
-            bodyHTML += `<input type="number" class="input-oportunidad-compacta" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="2" value="${calificacion.op2 || ''}" min="0" max="${ra.valorTotal}" placeholder="2">`;
-            bodyHTML += `<input type="number" class="input-oportunidad-compacta" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="3" value="${calificacion.op3 || ''}" min="0" max="${ra.valorTotal}" placeholder="3">`;
-            bodyHTML += `</div>`;
-            bodyHTML += `</td>`;
+            // Celda 1: Valor calculado
+            bodyHTML += `<td class="celda-valor-calculado">${valorFinal || ''}</td>`;
             
-            // Segunda celda: vacía (para alinearse con 70%)
-            bodyHTML += `<td class="celda-vacia"></td>`;
+            // Celda 2: Vacía (70%)
+            bodyHTML += `<td class="celda-70-vacia"></td>`;
+            
+            // Celda 3, 4, 5: Las 3 oportunidades
+            bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="1" value="${calificacion.op1 || ''}" min="0" max="${ra.valorTotal}"></td>`;
+            bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="2" value="${calificacion.op2 || ''}" min="0" max="${ra.valorTotal}"></td>`;
+            bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="3" value="${calificacion.op3 || ''}" min="0" max="${ra.valorTotal}"></td>`;
         });
         
         bodyHTML += `<td class="celda-total">${totalEstudiante}</td>`;
@@ -438,8 +442,8 @@ function agregarEventosInputsRegistro() {
         });
     });
     
-    // Eventos para oportunidades compactas
-    document.querySelectorAll('.input-oportunidad-compacta').forEach(input => {
+    // Eventos para oportunidades simples
+    document.querySelectorAll('.input-oportunidad-simple').forEach(input => {
         // Permitir pegar desde Excel
         input.addEventListener('paste', function(e) {
             e.preventDefault();
@@ -548,14 +552,12 @@ function actualizarTotales() {
             const valorFinal = obtenerUltimoValor(calificacion);
             totalEstudiante += valorFinal;
             
-            // Actualizar el display del valor en la primera celda del RA
-            const celdaIndex = 2 + (raIndex * 2); // 2 iniciales (# y Nombre) + 2 celdas por RA
+            // Actualizar el valor calculado (primera celda de cada RA)
+            // 2 celdas iniciales (# y Nombre) + 4 celdas por RA anterior
+            const celdaIndex = 2 + (raIndex * 4);
             const celda = fila.cells[celdaIndex];
             if (celda) {
-                const valorDisplay = celda.querySelector('.valor-display');
-                if (valorDisplay) {
-                    valorDisplay.textContent = valorFinal || '';
-                }
+                celda.textContent = valorFinal || '';
             }
         });
         
