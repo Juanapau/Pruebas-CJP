@@ -1,7 +1,7 @@
 // Configuración
 const CONFIG = {
     // URL del Web App de Google Apps Script (reemplazar con tu URL)
-    GOOGLE_SCRIPT_URL: 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI',
+    GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw3CURWoHl3tsZd8wflU0z4C_lvU1V55RcUldl2kIzQqIc3l1JsUOlR8R8qxWvsDOtl/exec',
     NUM_ACTIVIDADES: 15,
     PORCENTAJE_APROBATORIO: 70
 };
