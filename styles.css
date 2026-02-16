@@ -1134,7 +1134,7 @@ body.dark-mode .filtro-grupo:nth-child(1) {
     background: linear-gradient(135deg, #1E3A5F 0%, #2C5F8D 100%);
 }
 
-/* Select de Curso con fondo verde */
+/* Select de Curso con fondo verde y hover cyan */
 body.dark-mode .filtro-grupo:nth-child(1) select {
     background-color: #079b6d;
     color: #FFFFFF;
@@ -1142,19 +1142,19 @@ body.dark-mode .filtro-grupo:nth-child(1) select {
 }
 
 body.dark-mode .filtro-grupo:nth-child(1) select:hover {
-    background-color: #064e3b;
+    background-color: #07afcd; /* ✅ Cyan */
 }
 
 body.dark-mode .filtro-grupo:nth-child(1) select:focus {
-    background-color: #064e3b;
-    border-color: #10b981;
+    background-color: #07afcd; /* Cyan al hacer clic */
+    border-color: #0ea5e9;
 }
 
 body.dark-mode .filtro-grupo:nth-child(2) {
     background: linear-gradient(135deg, #5D4E37 0%, #6F5E47 100%);
 }
 
-/* Select de Módulo con fondo verde */
+/* Select de Módulo con fondo verde y hover naranja */
 body.dark-mode .filtro-grupo:nth-child(2) select {
     background-color: #079b6d;
     color: #FFFFFF;
@@ -1162,19 +1162,19 @@ body.dark-mode .filtro-grupo:nth-child(2) select {
 }
 
 body.dark-mode .filtro-grupo:nth-child(2) select:hover {
-    background-color: #064e3b;
+    background-color: #f0970a; /* ✅ Naranja */
 }
 
 body.dark-mode .filtro-grupo:nth-child(2) select:focus {
-    background-color: #064e3b;
-    border-color: #10b981;
+    background-color: #f0970a; /* Naranja al hacer clic */
+    border-color: #fb923c;
 }
 
 body.dark-mode .filtro-grupo:nth-child(3) {
     background: linear-gradient(135deg, #2E5339 0%, #3D6B4A 100%);
 }
 
-/* Select de Actividades por RA con fondo verde */
+/* Select de Actividades por RA con fondo verde y hover verde oscuro */
 body.dark-mode .filtro-grupo:nth-child(3) select {
     background-color: #079b6d;
     color: #FFFFFF;
@@ -1182,7 +1182,7 @@ body.dark-mode .filtro-grupo:nth-child(3) select {
 }
 
 body.dark-mode .filtro-grupo:nth-child(3) select:hover {
-    background-color: #064e3b;
+    background-color: #064e3b; /* Verde oscuro */
 }
 
 body.dark-mode .filtro-grupo:nth-child(3) select:focus {
