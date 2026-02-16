@@ -1,9 +1,8 @@
-/* Variables de color institucionales PNSA - Modo Claro */
+/* Variables de color institucionales PNSA - Usando colores de filtros */
 :root {
     --color-primario: #5C6BC0;
     --color-secundario: #EF5350;
     --color-texto: #333333;
-    --color-texto-secundario: #666666;
     --color-fondo: #f5f5f5;
     --color-blanco: #ffffff;
     --color-gris-claro: #e0e0e0;
@@ -13,45 +12,11 @@
     --color-reprobado: #EF5350;
     --color-advertencia: #FFA726;
     
-    /* Colores de la tabla */
-    --color-header-principal: #bbdefb;
-    --color-header-ra: #ffecb3;
-    --color-header-valor: #c8e6c9;
-    --color-header-70: #e0e0e0;
-    
-    /* Sombras */
-    --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.1);
-    --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Variables de color - Modo Oscuro - Paleta Elegante */
-body.dark-mode {
-    --color-primario: #64B5F6;
-    --color-secundario: #EF5350;
-    --color-texto: #E8EAED;
-    --color-texto-secundario: #9AA0A6;
-    --color-fondo: #1F1F1F;
-    --color-blanco: #2D2D2D;
-    --color-gris-claro: #3C3C3C;
-    --color-gris-medio: #4A4A4A;
-    --color-gris-oscuro: #5A5A5A;
-    --color-aprobado: #81C784;
-    --color-reprobado: #E57373;
-    --color-advertencia: #FFB74D;
-    
-    /* Colores de la tabla - Oscuros profesionales */
-    --color-header-principal: #64748b;  /* Azul grisáceo para # y Nombre */
-    --color-header-ra: #5D4E37;
-    --color-header-valor: #2E5339;
-    --color-header-70: #424242;
-    
-    /* Efectos de hover */
-    --color-fila-hover: #37474F;
-    --color-celda-hover: #455A64;
-    
-    /* Sombras más fuertes */
-    --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.5);
-    --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.7);
+    /* Colores de la tabla - Usando los mismos de los filtros */
+    --color-header-principal: #bbdefb;  /* Azul claro como caja Curso */
+    --color-header-ra: #ffecb3;         /* Amarillo claro como caja Módulo */
+    --color-header-valor: #c8e6c9;      /* Verde claro como caja Actividades */
+    --color-header-70: #e0e0e0;         /* Gris claro neutro */
 }
 
 * {
@@ -65,17 +30,12 @@ body {
     background-color: var(--color-fondo);
     color: var(--color-texto);
     line-height: 1.6;
-    overflow-x: hidden;
-    width: 100%;
 }
 
 .container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
-    width: 100%;
-    box-sizing: border-box;
-    overflow-x: hidden;
 }
 
 /* Header */
@@ -107,10 +67,6 @@ header p {
     padding: 25px;
     margin-bottom: 25px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
 }
 
 .filtro-header {
@@ -130,10 +86,8 @@ header p {
 
 .filtros-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
-    width: 100%;
-    max-width: 100%;
 }
 
 .filtro-grupo {
@@ -144,8 +98,6 @@ header p {
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    max-width: 100%;
-    min-width: 0;
 }
 
 .filtro-grupo:hover {
@@ -193,8 +145,6 @@ header p {
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 500;
-    width: 100%;
-    max-width: 100%;
 }
 
 .filtro-grupo select:hover {
@@ -289,16 +239,6 @@ table {
     border-spacing: 0;
 }
 
-/* Distribución equitativa de columnas de oportunidades */
-table td.celda-oportunidad,
-table th.header-valor-num,
-table th.header-minimo-num,
-table th.header-label-valor,
-table th.header-label-70 {
-    width: 1%;
-    white-space: nowrap;
-}
-
 thead {
     position: sticky;
     top: 0;
@@ -323,10 +263,13 @@ th.header-numero {
 
 th.header-nombre {
     width: 280px;
+    min-width: 280px;
+    max-width: 280px;
     background-color: var(--color-header-principal);
     text-align: left;
     padding-left: 15px;
     color: var(--color-texto);
+    white-space: nowrap;
 }
 
 th.header-ra {
@@ -340,9 +283,6 @@ th.header-valor-num {
     font-weight: bold;
     padding: 8px 2px;
     color: var(--color-texto);
-    width: auto;
-    min-width: 50px;
-    max-width: 80px;
 }
 
 th.header-minimo-num {
@@ -351,9 +291,6 @@ th.header-minimo-num {
     font-weight: bold;
     padding: 8px 2px;
     color: var(--color-texto);
-    width: auto;
-    min-width: 50px;
-    max-width: 80px;
 }
 
 th.header-vacia {
@@ -381,9 +318,6 @@ th.header-label-valor {
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--color-texto);
-    width: auto;
-    min-width: 50px;
-    max-width: 80px;
 }
 
 th.header-label-70 {
@@ -391,9 +325,6 @@ th.header-label-70 {
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--color-texto);
-    width: auto;
-    min-width: 50px;
-    max-width: 80px;
 }
 
 th.header-total {
@@ -461,6 +392,10 @@ td.nombre-estudiante {
     font-weight: 500;
     padding-left: 15px;
     padding-right: 10px;
+    width: 280px;
+    min-width: 280px;
+    max-width: 280px;
+    white-space: nowrap;
 }
 
 td.numero {
@@ -482,9 +417,6 @@ td.numero {
 
 /* Celdas de oportunidades - ligero espacio entre ellas */
 .celda-oportunidad {
-    width: auto;
-    min-width: 50px;
-    max-width: 80px;
     padding: 6px 2px !important;
     margin: 0 !important;
     border-left: 0 !important;
@@ -756,53 +688,12 @@ input[type="number"]:disabled {
 
 /* Responsive */
 @media (max-width: 768px) {
-    body {
-        font-size: 14px;
-    }
-    
-    .container {
-        padding: 10px;
-        width: 100%;
-        max-width: 100%;
-        overflow-x: hidden;
-    }
-    
-    h1 {
+    header h1 {
         font-size: 1.5rem;
     }
-    
-    /* Filtros en columna única */
+
     .filtros-container {
-        grid-template-columns: 1fr !important;
-        gap: 15px;
-        width: 100%;
-        max-width: 100%;
-    }
-    
-    .filtro-grupo {
-        width: 100%;
-        max-width: 100%;
-        padding: 15px;
-        box-sizing: border-box;
-    }
-    
-    .filtro-grupo select {
-        width: 100%;
-        max-width: 100%;
-        font-size: 16px; /* Evita zoom en iOS */
-    }
-    
-    /* Filtros seccion */
-    .filtros-seccion {
-        width: 100%;
-        max-width: 100%;
-        overflow: hidden;
-    }
-    
-    /* Botones más grandes para touch */
-    select, button {
-        min-height: 44px;
-        font-size: 16px;
+        grid-template-columns: 1fr;
     }
 
     .tabla-scroll {
@@ -935,355 +826,70 @@ input[type="number"]:disabled {
     display: inline-block;
 }
 
-/* Móviles pequeños (max 480px) - Ajuste crítico */
-@media (max-width: 480px) {
-    body {
-        font-size: 13px;
-        overflow-x: hidden;
-        width: 100vw;
-    }
-    
-    .container {
-        padding: 8px;
-        width: 100%;
-        max-width: 100vw;
-    }
-    
-    h1 {
-        font-size: 1.3rem;
-        padding: 12px;
-    }
-    
-    /* Filtros aún más compactos */
-    .filtros-seccion {
-        padding: 12px;
-        width: 100%;
-        max-width: 100%;
-    }
-    
-    .filtro-header {
-        padding: 10px 12px;
-    }
-    
-    .filtro-header h2 {
-        font-size: 1.1rem;
-    }
-    
-    .filtros-container {
-        gap: 12px;
-        width: 100%;
-    }
-    
-    .filtro-grupo {
-        padding: 12px;
-        width: 100%;
-        max-width: 100%;
-    }
-    
-    .filtro-grupo label {
-        font-size: 0.85rem;
-    }
-    
-    .filtro-grupo select {
-        padding: 10px;
-        font-size: 16px;
-        width: 100%;
-    }
-}
-
-/* Ajuste universal para todos los elementos */
-* {
-    max-width: 100%;
-}
-
-html {
-    overflow-x: hidden;
-}
-
 /* ==========================================
-   BOTÓN MODO OSCURO FLOTANTE
+   BARRAS DE NAVEGACIÓN VERTICAL FLOTANTES
    ========================================== */
 
-.btn-modo-oscuro {
+.scroll-nav-buttons {
     position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: var(--color-primario);
-    border: none;
-    cursor: pointer;
-    box-shadow: var(--sombra-media);
+    top: 50%;
+    transform: translateY(-50%);
     z-index: 1000;
+}
+
+.scroll-nav-left {
+    left: 0;
+}
+
+.scroll-nav-right {
+    right: 0;
+}
+
+.scroll-nav-btn {
+    background: linear-gradient(90deg, rgba(92, 107, 192, 0.95) 0%, rgba(92, 107, 192, 0.85) 100%);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 150px;
+    cursor: pointer;
+    font-size: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
 }
 
-.btn-modo-oscuro:hover {
-    transform: scale(1.1) rotate(15deg);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+.scroll-nav-right .scroll-nav-btn {
+    border-radius: 8px 0 0 8px;
 }
 
-.btn-modo-oscuro:active {
-    transform: scale(0.95);
+.scroll-nav-left .scroll-nav-btn {
+    border-radius: 0 8px 8px 0;
 }
 
-/* Mostrar/ocultar iconos según el modo */
-body:not(.dark-mode) .icono-luna {
-    display: none;
+.scroll-nav-btn.visible {
+    opacity: 0.9;
+    pointer-events: all;
 }
 
-body.dark-mode .icono-sol {
-    display: none;
+.scroll-nav-btn:hover {
+    opacity: 1;
+    width: 50px;
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
 }
 
-/* ==========================================
-   AJUSTES MODO OSCURO - Estilos Específicos
-   ========================================== */
-
-/* Inputs en modo oscuro */
-body.dark-mode input[type="number"],
-body.dark-mode select,
-body.dark-mode textarea {
-    background-color: #3C3C3C;
-    color: #E8EAED;
-    border-color: #5A5A5A;
+.scroll-nav-btn:active {
+    width: 45px;
 }
 
-body.dark-mode input[type="number"]:focus,
-body.dark-mode select:focus,
-body.dark-mode textarea:focus {
-    background-color: #424242;
-    border-color: var(--color-primario);
-    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+/* Modo oscuro */
+body.dark-mode .scroll-nav-btn {
+    background: linear-gradient(90deg, rgba(100, 181, 246, 0.95) 0%, rgba(100, 181, 246, 0.85) 100%);
 }
 
-/* Options de select en modo oscuro */
-body.dark-mode select option {
-    background-color: #3C3C3C;
-    color: #E8EAED;
-}
-
-/* Tablas en modo oscuro */
-body.dark-mode table {
-    background-color: var(--color-blanco);
-    color: var(--color-texto);
-}
-
-body.dark-mode th {
-    color: #FFFFFF;
-}
-
-body.dark-mode td {
-    border-color: var(--color-gris-claro);
-}
-
-body.dark-mode tbody tr {
-    background-color: var(--color-blanco); /* Todas iguales - #2D2D2D */
-    transition: background-color 0.2s ease;
-}
-
-body.dark-mode tbody tr:nth-child(even) {
-    background-color: var(--color-blanco); /* Mismo color que impares */
-}
-
-body.dark-mode tbody tr:hover {
-    background-color: var(--color-fila-hover); /* #37474F - Fila completa resaltada */
-}
-
-/* Resaltar celda individual en hover */
-body.dark-mode tbody tr:hover td:hover {
-    background-color: var(--color-celda-hover); /* #455A64 - Celda específica más clara */
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-}
-
-/* Inputs en hover también se resaltan */
-body.dark-mode tbody tr:hover td:hover input {
-    background-color: var(--color-celda-hover);
-}
-
-/* Headers de tabla en modo oscuro con buen contraste */
-body.dark-mode .header-numero,
-body.dark-mode .header-nombre,
-body.dark-mode .header-ra {
-    color: #FFFFFF;
-}
-
-body.dark-mode .header-valor-num,
-body.dark-mode .header-minimo-num,
-body.dark-mode .header-label-valor,
-body.dark-mode .header-label-70 {
-    color: #FFFFFF;
-}
-
-/* Botones en modo oscuro */
-body.dark-mode .btn-guardar {
-    background-color: #1976D2;
-    color: #FFFFFF;
-}
-
-body.dark-mode .btn-guardar:hover {
-    background-color: #1565C0;
-}
-
-body.dark-mode .btn-volver-nuevo {
-    background-color: #1976D2;
-    color: #FFFFFF;
-}
-
-body.dark-mode .btn-volver-nuevo:hover {
-    background-color: #1565C0;
-}
-
-/* Filtros en modo oscuro */
-body.dark-mode .filtro-header {
-    background: linear-gradient(135deg, #1E3A5F 0%, #2C5F8D 100%);
-    color: #FFFFFF;
-}
-
-body.dark-mode .filtro-header h2 {
-    color: #FFFFFF;
-}
-
-body.dark-mode .filtro-grupo {
-    background: linear-gradient(135deg, #2D2D2D 0%, #3C3C3C 100%);
-    border-left-color: var(--color-primario);
-}
-
-body.dark-mode .filtro-grupo:nth-child(1) {
-    background: linear-gradient(135deg, #1E3A5F 0%, #2C5F8D 100%);
-}
-
-/* Select de Curso con fondo verde y hover cyan */
-body.dark-mode .filtro-grupo:nth-child(1) select {
-    background-color: #079b6d;
-    color: #FFFFFF;
-    border-color: #047857;
-}
-
-body.dark-mode .filtro-grupo:nth-child(1) select:hover {
-    background-color: #07afcd; /* ✅ Cyan */
-}
-
-body.dark-mode .filtro-grupo:nth-child(1) select:focus {
-    background-color: #07afcd; /* Cyan al hacer clic */
-    border-color: #0ea5e9;
-}
-
-body.dark-mode .filtro-grupo:nth-child(2) {
-    background: linear-gradient(135deg, #5D4E37 0%, #6F5E47 100%);
-}
-
-/* Select de Módulo con fondo verde y hover naranja */
-body.dark-mode .filtro-grupo:nth-child(2) select {
-    background-color: #079b6d;
-    color: #FFFFFF;
-    border-color: #047857;
-}
-
-body.dark-mode .filtro-grupo:nth-child(2) select:hover {
-    background-color: #f0970a; /* ✅ Naranja */
-}
-
-body.dark-mode .filtro-grupo:nth-child(2) select:focus {
-    background-color: #f0970a; /* Naranja al hacer clic */
-    border-color: #fb923c;
-}
-
-body.dark-mode .filtro-grupo:nth-child(3) {
-    background: linear-gradient(135deg, #2E5339 0%, #3D6B4A 100%);
-}
-
-/* Select de Actividades por RA con fondo verde y hover verde oscuro */
-body.dark-mode .filtro-grupo:nth-child(3) select {
-    background-color: #079b6d;
-    color: #FFFFFF;
-    border-color: #047857;
-}
-
-body.dark-mode .filtro-grupo:nth-child(3) select:hover {
-    background-color: #064e3b; /* Verde oscuro */
-}
-
-body.dark-mode .filtro-grupo:nth-child(3) select:focus {
-    background-color: #064e3b;
-    border-color: #10b981;
-}
-
-body.dark-mode .filtro-grupo label {
-    color: var(--color-texto);
-}
-
-/* Fondo de sección de filtros en modo oscuro */
-body.dark-mode .filtros-seccion {
-    background: #334155;
-}
-
-/* Caja verde de descripción RA */
-body.dark-mode .ra-descripcion-box {
-    background: #334155;
-    border-color: rgba(129, 199, 132, 0.3);
-}
-
-body.dark-mode .ra-descripcion-header h3 {
-    color: #FFFFFF;
-}
-
-body.dark-mode .ra-descripcion-textarea {
-    background-color: #2C2C2C;
-    color: var(--color-texto);
-    border-color: rgba(129, 199, 132, 0.5);
-}
-
-/* Módulo info en modo oscuro */
-body.dark-mode .modulo-info {
-    color: #81C784;
-}
-
-/* Fondo de contenedor de tabla en modo oscuro */
-body.dark-mode .tabla-container {
-    background: #334155;
-}
-
-/* Loading en modo oscuro */
-body.dark-mode #loading {
-    background-color: rgba(18, 18, 18, 0.95);
-    color: var(--color-texto);
-}
-
-/* Celdas de total en modo oscuro */
-body.dark-mode .celda-total {
-    background-color: #2C2C2C;
-    color: var(--color-texto);
-}
-
-/* Validación de colores en modo oscuro */
-body.dark-mode .input-aprobado {
-    background-color: #2E5339;
-    color: #A5D6A7;
-    border-color: #4CAF50;
-}
-
-body.dark-mode .input-reprobado {
-    background-color: #5D2E2E;
-    color: #EF9A9A;
-    border-color: #EF5350;
-}
-
-/* Transición suave al cambiar modo */
-body,
-.container,
-input,
-select,
-textarea,
-button,
-table,
-th,
-td {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+body.dark-mode .scroll-nav-btn:hover {
+    background: linear-gradient(90deg, rgba(66, 165, 245, 0.95) 0%, rgba(66, 165, 245, 0.9) 100%);
 }
