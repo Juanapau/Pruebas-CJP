@@ -48,9 +48,10 @@ const elementos = {
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
+    cargarPreferenciaModoOscuro();
     inicializarEventos();
-    inicializarModoOscuro();
     cargarDatosIniciales();
+    optimizarParaMovil();
 });
 
 function inicializarEventos() {
@@ -60,6 +61,12 @@ function inicializarEventos() {
     elementos.btnVolverRegistro.addEventListener('click', volverARegistro);
     elementos.btnGuardarRegistro.addEventListener('click', guardarTodoElRegistro);
     elementos.btnGuardarActividades.addEventListener('click', guardarTodasLasActividades);
+    
+    // Modo oscuro
+    const btnModoOscuro = document.getElementById('btnModoOscuro');
+    if (btnModoOscuro) {
+        btnModoOscuro.addEventListener('click', toggleModoOscuro);
+    }
 }
 
 // Funciones de carga de datos
@@ -1337,12 +1344,6 @@ function toggleModoOscuro() {
     console.log(esModoOscuro ? '🌙 Modo oscuro activado' : '☀️ Modo claro activado');
 }
 
-// Inicializar evento del botón
-function inicializarModoOscuro() {
-    const btnModoOscuro = document.getElementById('btnModoOscuro');
-    if (btnModoOscuro) {
-        btnModoOscuro.addEventListener('click', toggleModoOscuro);
-    }
-}
+// Modo oscuro se inicializa en inicializarEventos()
 
 // Modo oscuro se carga automáticamente en el DOMContentLoaded principal
