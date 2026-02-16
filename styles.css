@@ -24,30 +24,34 @@
     --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Variables de color - Modo Oscuro */
+/* Variables de color - Modo Oscuro - Paleta Elegante */
 body.dark-mode {
-    --color-primario: #7986CB;
+    --color-primario: #64B5F6;
     --color-secundario: #EF5350;
-    --color-texto: #E0E0E0;
-    --color-texto-secundario: #B0B0B0;
-    --color-fondo: #121212;
-    --color-blanco: #1E1E1E;
-    --color-gris-claro: #2C2C2C;
-    --color-gris-medio: #404040;
-    --color-gris-oscuro: #505050;
+    --color-texto: #E8EAED;
+    --color-texto-secundario: #9AA0A6;
+    --color-fondo: #1F1F1F;
+    --color-blanco: #2D2D2D;
+    --color-gris-claro: #3C3C3C;
+    --color-gris-medio: #4A4A4A;
+    --color-gris-oscuro: #5A5A5A;
     --color-aprobado: #81C784;
     --color-reprobado: #E57373;
     --color-advertencia: #FFB74D;
     
-    /* Colores de la tabla - Oscuros con buen contraste */
-    --color-header-principal: #1565C0;
-    --color-header-ra: #F57F17;
-    --color-header-valor: #2E7D32;
+    /* Colores de la tabla - Oscuros profesionales */
+    --color-header-principal: #1E3A5F;
+    --color-header-ra: #5D4E37;
+    --color-header-valor: #2E5339;
     --color-header-70: #424242;
     
+    /* Efectos de hover */
+    --color-fila-hover: #37474F;
+    --color-celda-hover: #455A64;
+    
     /* Sombras más fuertes */
-    --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.4);
-    --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.6);
+    --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.5);
+    --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.7);
 }
 
 * {
@@ -1020,22 +1024,23 @@ body.dark-mode .icono-sol {
 body.dark-mode input[type="number"],
 body.dark-mode select,
 body.dark-mode textarea {
-    background-color: #2C2C2C;
-    color: var(--color-texto);
-    border-color: var(--color-gris-medio);
+    background-color: #3C3C3C;
+    color: #E8EAED;
+    border-color: #5A5A5A;
 }
 
 body.dark-mode input[type="number"]:focus,
 body.dark-mode select:focus,
 body.dark-mode textarea:focus {
-    background-color: #333333;
+    background-color: #424242;
     border-color: var(--color-primario);
+    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
 }
 
 /* Options de select en modo oscuro */
 body.dark-mode select option {
-    background-color: #2C2C2C;
-    color: #E0E0E0;
+    background-color: #3C3C3C;
+    color: #E8EAED;
 }
 
 /* Tablas en modo oscuro */
@@ -1053,7 +1058,8 @@ body.dark-mode td {
 }
 
 body.dark-mode tbody tr {
-    background-color: var(--color-blanco); /* Todas iguales - gris oscuro */
+    background-color: var(--color-blanco); /* Todas iguales - #2D2D2D */
+    transition: background-color 0.2s ease;
 }
 
 body.dark-mode tbody tr:nth-child(even) {
@@ -1061,7 +1067,19 @@ body.dark-mode tbody tr:nth-child(even) {
 }
 
 body.dark-mode tbody tr:hover {
-    background-color: #2C2C2C; /* Un poco más claro al hover */
+    background-color: var(--color-fila-hover); /* #37474F - Fila completa resaltada */
+}
+
+/* Resaltar celda individual en hover */
+body.dark-mode tbody tr:hover td:hover {
+    background-color: var(--color-celda-hover); /* #455A64 - Celda específica más clara */
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+/* Inputs en hover también se resaltan */
+body.dark-mode tbody tr:hover td:hover input {
+    background-color: var(--color-celda-hover);
 }
 
 /* Headers de tabla en modo oscuro con buen contraste */
@@ -1099,7 +1117,7 @@ body.dark-mode .btn-volver-nuevo:hover {
 
 /* Filtros en modo oscuro */
 body.dark-mode .filtro-header {
-    background: linear-gradient(135deg, #2E7D32 0%, #388E3C 100%);
+    background: linear-gradient(135deg, #1E3A5F 0%, #2C5F8D 100%);
     color: #FFFFFF;
 }
 
@@ -1108,8 +1126,20 @@ body.dark-mode .filtro-header h2 {
 }
 
 body.dark-mode .filtro-grupo {
-    background-color: #2C2C2C;
+    background: linear-gradient(135deg, #2D2D2D 0%, #3C3C3C 100%);
     border-left-color: var(--color-primario);
+}
+
+body.dark-mode .filtro-grupo:nth-child(1) {
+    background: linear-gradient(135deg, #1E3A5F 0%, #2C5F8D 100%);
+}
+
+body.dark-mode .filtro-grupo:nth-child(2) {
+    background: linear-gradient(135deg, #5D4E37 0%, #6F5E47 100%);
+}
+
+body.dark-mode .filtro-grupo:nth-child(3) {
+    background: linear-gradient(135deg, #2E5339 0%, #3D6B4A 100%);
 }
 
 body.dark-mode .filtro-grupo label {
@@ -1151,13 +1181,13 @@ body.dark-mode .celda-total {
 
 /* Validación de colores en modo oscuro */
 body.dark-mode .input-aprobado {
-    background-color: #1B5E20;
+    background-color: #2E5339;
     color: #A5D6A7;
-    border-color: #66BB6A;
+    border-color: #4CAF50;
 }
 
 body.dark-mode .input-reprobado {
-    background-color: #B71C1C;
+    background-color: #5D2E2E;
     color: #EF9A9A;
     border-color: #EF5350;
 }
