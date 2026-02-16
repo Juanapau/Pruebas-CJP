@@ -451,7 +451,7 @@ th.header-total {
 
 /* Celdas del cuerpo */
 td {
-    padding: 8px;
+    padding: 4px 8px;
     text-align: center;
     border: 1px solid var(--color-gris-claro);
     background-color: var(--color-blanco);
