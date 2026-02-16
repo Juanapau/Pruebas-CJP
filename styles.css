@@ -289,6 +289,16 @@ table {
     border-spacing: 0;
 }
 
+/* Distribución equitativa de columnas de oportunidades */
+table td.celda-oportunidad,
+table th.header-valor-num,
+table th.header-minimo-num,
+table th.header-label-valor,
+table th.header-label-70 {
+    width: 1%;
+    white-space: nowrap;
+}
+
 thead {
     position: sticky;
     top: 0;
@@ -330,9 +340,9 @@ th.header-valor-num {
     font-weight: bold;
     padding: 8px 2px;
     color: var(--color-texto);
-    width: 70px;
-    min-width: 70px;
-    max-width: 70px;
+    width: auto;
+    min-width: 50px;
+    max-width: 80px;
 }
 
 th.header-minimo-num {
@@ -341,9 +351,9 @@ th.header-minimo-num {
     font-weight: bold;
     padding: 8px 2px;
     color: var(--color-texto);
-    width: 70px;
-    min-width: 70px;
-    max-width: 70px;
+    width: auto;
+    min-width: 50px;
+    max-width: 80px;
 }
 
 th.header-vacia {
@@ -371,9 +381,9 @@ th.header-label-valor {
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--color-texto);
-    width: 70px;
-    min-width: 70px;
-    max-width: 70px;
+    width: auto;
+    min-width: 50px;
+    max-width: 80px;
 }
 
 th.header-label-70 {
@@ -381,9 +391,9 @@ th.header-label-70 {
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--color-texto);
-    width: 70px;
-    min-width: 70px;
-    max-width: 70px;
+    width: auto;
+    min-width: 50px;
+    max-width: 80px;
 }
 
 th.header-total {
@@ -472,9 +482,9 @@ td.numero {
 
 /* Celdas de oportunidades - ligero espacio entre ellas */
 .celda-oportunidad {
-    width: 70px;
-    min-width: 70px;
-    max-width: 70px;
+    width: auto;
+    min-width: 50px;
+    max-width: 80px;
     padding: 6px 2px !important;
     margin: 0 !important;
     border-left: 0 !important;
