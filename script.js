@@ -52,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     inicializarEventos();
     cargarDatosIniciales();
     optimizarParaMovil();
+    inicializarNavegacionHorizontal();
 });
 
 function inicializarEventos() {
@@ -454,6 +455,9 @@ function generarTablaRegistro() {
     
     // Aplicar validación de colores a TODOS los inputs (incluyendo los cargados de BD)
     aplicarValidacionColoresATodos();
+    
+    // Actualizar botones de navegación
+    actualizarNavegacionTablas();
 }
 
 
@@ -498,6 +502,9 @@ function generarTablaActividades() {
     
     // Agregar eventos
     agregarEventosInputsActividades();
+    
+    // Actualizar botones de navegación
+    actualizarNavegacionTablas();
 }
 
 // Funciones auxiliares
@@ -1347,3 +1354,94 @@ function toggleModoOscuro() {
 // Modo oscuro se inicializa en inicializarEventos()
 
 // Modo oscuro se carga automáticamente en el DOMContentLoaded principal
+
+// ==========================================
+// NAVEGACIÓN HORIZONTAL CON BOTONES FLOTANTES
+// ==========================================
+
+function inicializarNavegacionHorizontal() {
+    // Configurar para ambas tablas
+    configurarNavegacion('tablaScrollRegistro', 'scrollLeftRegistro', 'scrollRightRegistro');
+    configurarNavegacion('tablaScrollActividades', 'scrollLeftActividades', 'scrollRightActividades');
+}
+
+function configurarNavegacion(contenedorId, btnLeftId, btnRightId) {
+    const contenedor = document.getElementById(contenedorId);
+    const btnLeft = document.getElementById(btnLeftId);
+    const btnRight = document.getElementById(btnRightId);
+    
+    if (!contenedor || !btnLeft || !btnRight) return;
+    
+    // Función para actualizar visibilidad de botones
+    function actualizarBotones() {
+        const scrollLeft = contenedor.scrollLeft;
+        const scrollWidth = contenedor.scrollWidth;
+        const clientWidth = contenedor.clientWidth;
+        const maxScroll = scrollWidth - clientWidth;
+        
+        // Mostrar botón izquierdo si hay scroll a la izquierda
+        if (scrollLeft > 10) {
+            btnLeft.classList.add('visible');
+        } else {
+            btnLeft.classList.remove('visible');
+        }
+        
+        // Mostrar botón derecho si hay contenido oculto a la derecha
+        if (scrollLeft < maxScroll - 10) {
+            btnRight.classList.add('visible');
+        } else {
+            btnRight.classList.remove('visible');
+        }
+    }
+    
+    // Función para scroll suave
+    function scrollSuave(direccion) {
+        const distancia = 300; // px
+        const inicio = contenedor.scrollLeft;
+        const destino = direccion === 'left' 
+            ? Math.max(0, inicio - distancia)
+            : Math.min(contenedor.scrollWidth - contenedor.clientWidth, inicio + distancia);
+        
+        contenedor.scrollTo({
+            left: destino,
+            behavior: 'smooth'
+        });
+    }
+    
+    // Event listeners
+    btnLeft.addEventListener('click', () => scrollSuave('left'));
+    btnRight.addEventListener('click', () => scrollSuave('right'));
+    contenedor.addEventListener('scroll', actualizarBotones);
+    
+    // Actualizar al cambiar tamaño de ventana
+    window.addEventListener('resize', actualizarBotones);
+    
+    // Observer para detectar cambios en el contenido de la tabla
+    const observer = new MutationObserver(() => {
+        setTimeout(actualizarBotones, 100);
+    });
+    
+    observer.observe(contenedor, {
+        childList: true,
+        subtree: true,
+        attributes: true
+    });
+    
+    // Actualizar inicialmente
+    setTimeout(actualizarBotones, 100);
+}
+
+// Llamar después de generar tablas
+function actualizarNavegacionTablas() {
+    setTimeout(() => {
+        const contenedorRegistro = document.getElementById('tablaScrollRegistro');
+        const contenedorActividades = document.getElementById('tablaScrollActividades');
+        
+        if (contenedorRegistro) {
+            contenedorRegistro.dispatchEvent(new Event('scroll'));
+        }
+        if (contenedorActividades) {
+            contenedorActividades.dispatchEvent(new Event('scroll'));
+        }
+    }, 200);
+}
