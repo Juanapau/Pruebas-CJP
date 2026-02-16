@@ -49,6 +49,7 @@ const elementos = {
 // Inicialización
 document.addEventListener('DOMContentLoaded', () => {
     inicializarEventos();
+    inicializarModoOscuro();
     cargarDatosIniciales();
 });
 
@@ -1312,3 +1313,38 @@ window.addEventListener('orientationchange', function() {
         });
     }, 100);
 });
+
+// ==========================================
+// MODO OSCURO
+// ==========================================
+
+// Cargar preferencia guardada al iniciar
+function cargarPreferenciaModoOscuro() {
+    const modoOscuro = localStorage.getItem('modoOscuro') === 'true';
+    if (modoOscuro) {
+        document.body.classList.add('dark-mode');
+    }
+}
+
+// Cambiar modo oscuro
+function toggleModoOscuro() {
+    document.body.classList.toggle('dark-mode');
+    const esModoOscuro = document.body.classList.contains('dark-mode');
+    
+    // Guardar preferencia
+    localStorage.setItem('modoOscuro', esModoOscuro);
+    
+    // Log
+    console.log(esModoOscuro ? '🌙 Modo oscuro activado' : '☀️ Modo claro activado');
+}
+
+// Inicializar evento del botón
+function inicializarModoOscuro() {
+    const btnModoOscuro = document.getElementById('btnModoOscuro');
+    if (btnModoOscuro) {
+        btnModoOscuro.addEventListener('click', toggleModoOscuro);
+    }
+}
+
+// Cargar al iniciar
+cargarPreferenciaModoOscuro();
