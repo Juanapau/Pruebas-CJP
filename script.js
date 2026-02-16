@@ -1257,3 +1257,58 @@ document.addEventListener('paste', function(e) {
     
     console.log('✅ Datos pegados correctamente');
 });
+
+// ==========================================
+// OPTIMIZACIONES PARA MÓVIL
+// ==========================================
+
+// Detectar dispositivo móvil
+function esDispositivoMovil() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// Ajustar interfaz según dispositivo
+function optimizarParaMovil() {
+    if (esDispositivoMovil()) {
+        document.body.classList.add('mobile-device');
+        console.log('📱 Modo móvil activado');
+        
+        // Agregar indicador de scroll en tablas
+        const tablas = document.querySelectorAll('.tabla-scroll');
+        tablas.forEach(tabla => {
+            tabla.addEventListener('scroll', function() {
+                if (this.scrollLeft > 10) {
+                    this.classList.add('scrolled');
+                } else {
+                    this.classList.remove('scrolled');
+                }
+            });
+        });
+    }
+}
+
+// Prevenir zoom accidental en iOS al hacer doble tap
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function(event) {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
+
+// Optimizar al cargar
+document.addEventListener('DOMContentLoaded', () => {
+    optimizarParaMovil();
+});
+
+// Manejar cambios de orientación
+window.addEventListener('orientationchange', function() {
+    setTimeout(() => {
+        // Reajustar tablas después de cambio de orientación
+        const tablas = document.querySelectorAll('table');
+        tablas.forEach(tabla => {
+            tabla.style.minWidth = window.innerWidth < 768 ? '800px' : '100%';
+        });
+    }, 100);
+});
