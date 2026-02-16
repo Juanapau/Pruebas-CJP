@@ -1146,9 +1146,14 @@ body.dark-mode .filtro-grupo label {
     color: var(--color-texto);
 }
 
+/* Fondo de sección de filtros en modo oscuro */
+body.dark-mode .filtros-seccion {
+    background: #334155;
+}
+
 /* Caja verde de descripción RA */
 body.dark-mode .ra-descripcion-box {
-    background: #1B5E20;
+    background: #334155;
     border-color: rgba(129, 199, 132, 0.3);
 }
 
@@ -1165,6 +1170,11 @@ body.dark-mode .ra-descripcion-textarea {
 /* Módulo info en modo oscuro */
 body.dark-mode .modulo-info {
     color: #81C784;
+}
+
+/* Fondo de contenedor de tabla en modo oscuro */
+body.dark-mode .tabla-container {
+    background: #334155;
 }
 
 /* Loading en modo oscuro */
