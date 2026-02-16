@@ -766,16 +766,22 @@ body.dark-mode tbody tr:hover {
     background-color: var(--color-fila-hover);
 }
 
-/* Resaltar celda individual en hover */
+/* TODAS las celdas de la fila hover heredan el color */
+body.dark-mode tbody tr:hover td {
+    background-color: var(--color-fila-hover);
+}
+
+/* Celda específica donde está el mouse - NEGRA */
 body.dark-mode tbody tr:hover td:hover {
-    background-color: var(--color-celda-hover);
+    background-color: #000000;
     cursor: pointer;
     transition: background-color 0.15s ease;
 }
 
-/* Inputs en hover también se resaltan */
+/* Input dentro de la celda hover también negro */
 body.dark-mode tbody tr:hover td:hover input {
-    background-color: var(--color-celda-hover);
+    background-color: #000000;
+    color: #FFFFFF;
 }
 
 /* Columnas sticky en modo oscuro */
