@@ -1300,10 +1300,9 @@ document.addEventListener('touchend', function(event) {
 
 // Optimizar al cargar
 document.addEventListener('DOMContentLoaded', () => {
+    cargarPreferenciaModoOscuro();
     optimizarParaMovil();
 });
-
-// Manejar cambios de orientación
 window.addEventListener('orientationchange', function() {
     setTimeout(() => {
         // Reajustar tablas después de cambio de orientación
@@ -1346,5 +1345,4 @@ function inicializarModoOscuro() {
     }
 }
 
-// Cargar al iniciar
-cargarPreferenciaModoOscuro();
+// Modo oscuro se carga automáticamente en el DOMContentLoaded principal
