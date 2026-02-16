@@ -330,6 +330,9 @@ th.header-valor-num {
     font-weight: bold;
     padding: 8px 2px;
     color: var(--color-texto);
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
 }
 
 th.header-minimo-num {
@@ -338,6 +341,9 @@ th.header-minimo-num {
     font-weight: bold;
     padding: 8px 2px;
     color: var(--color-texto);
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
 }
 
 th.header-vacia {
@@ -365,6 +371,9 @@ th.header-label-valor {
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--color-texto);
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
 }
 
 th.header-label-70 {
@@ -372,6 +381,9 @@ th.header-label-70 {
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--color-texto);
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
 }
 
 th.header-total {
@@ -460,6 +472,9 @@ td.numero {
 
 /* Celdas de oportunidades - ligero espacio entre ellas */
 .celda-oportunidad {
+    width: 70px;
+    min-width: 70px;
+    max-width: 70px;
     padding: 6px 2px !important;
     margin: 0 !important;
     border-left: 0 !important;
