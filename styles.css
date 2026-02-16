@@ -1,8 +1,14 @@
-/* Variables de color institucionales PNSA - Usando colores de filtros */
+/* ==========================================
+   SISTEMA DE CALIFICACIONES PNSA
+   Variables y Estilos Completos
+   ========================================== */
+
+/* Variables de color - Modo Claro */
 :root {
     --color-primario: #5C6BC0;
     --color-secundario: #EF5350;
     --color-texto: #333333;
+    --color-texto-secundario: #666666;
     --color-fondo: #f5f5f5;
     --color-blanco: #ffffff;
     --color-gris-claro: #e0e0e0;
@@ -12,11 +18,45 @@
     --color-reprobado: #EF5350;
     --color-advertencia: #FFA726;
     
-    /* Colores de la tabla - Usando los mismos de los filtros */
-    --color-header-principal: #bbdefb;  /* Azul claro como caja Curso */
-    --color-header-ra: #ffecb3;         /* Amarillo claro como caja Módulo */
-    --color-header-valor: #c8e6c9;      /* Verde claro como caja Actividades */
-    --color-header-70: #e0e0e0;         /* Gris claro neutro */
+    /* Colores de la tabla */
+    --color-header-principal: #bbdefb;
+    --color-header-ra: #ffecb3;
+    --color-header-valor: #c8e6c9;
+    --color-header-70: #e0e0e0;
+    
+    /* Sombras */
+    --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Variables de color - Modo Oscuro */
+body.dark-mode {
+    --color-primario: #64B5F6;
+    --color-secundario: #EF5350;
+    --color-texto: #E8EAED;
+    --color-texto-secundario: #9AA0A6;
+    --color-fondo: #1F1F1F;
+    --color-blanco: #2D2D2D;
+    --color-gris-claro: #3C3C3C;
+    --color-gris-medio: #4A4A4A;
+    --color-gris-oscuro: #5A5A5A;
+    --color-aprobado: #81C784;
+    --color-reprobado: #E57373;
+    --color-advertencia: #FFB74D;
+    
+    /* Colores de la tabla - Oscuros profesionales */
+    --color-header-principal: #64748b;
+    --color-header-ra: #5D4E37;
+    --color-header-valor: #2E5339;
+    --color-header-70: #424242;
+    
+    /* Efectos de hover */
+    --color-fila-hover: #37474F;
+    --color-celda-hover: #455A64;
+    
+    /* Sombras más fuertes */
+    --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.5);
+    --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.7);
 }
 
 * {
@@ -30,12 +70,17 @@ body {
     background-color: var(--color-fondo);
     color: var(--color-texto);
     line-height: 1.6;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 .container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 /* Header */
@@ -60,6 +105,47 @@ header p {
     color: var(--color-gris-claro);
 }
 
+/* ==========================================
+   BOTÓN MODO OSCURO FLOTANTE
+   ========================================== */
+
+.btn-modo-oscuro {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-primario);
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--sombra-media);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.btn-modo-oscuro:hover {
+    transform: scale(1.1) rotate(15deg);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.btn-modo-oscuro:active {
+    transform: scale(0.95);
+}
+
+/* Mostrar/ocultar iconos según el modo */
+body:not(.dark-mode) .icono-luna {
+    display: none;
+}
+
+body.dark-mode .icono-sol {
+    display: none;
+}
+
 /* Filtros Section */
 .filtros-seccion {
     background: var(--color-blanco);
@@ -67,27 +153,33 @@ header p {
     padding: 25px;
     margin-bottom: 25px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
 }
 
 .filtro-header {
-    background: linear-gradient(135deg, #66bb6a 0%, #81c784 100%);  /* Verde agradable */
-    border-radius: 10px;
+    background: linear-gradient(135deg, #66bb6a 0%, #81c784 100%);
+    color: white;
     padding: 15px 25px;
+    border-radius: 10px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(102, 187, 106, 0.2);
+    box-shadow: 0 2px 6px rgba(102, 187, 106, 0.3);
 }
 
 .filtro-header h2 {
-    color: white;  /* Texto blanco sobre verde */
-    margin: 0;
     font-size: 1.5rem;
     font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .filtros-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: 20px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .filtro-grupo {
@@ -162,39 +254,26 @@ header p {
 .tabla-container {
     background: var(--color-blanco);
     border-radius: 10px;
-    padding: 25px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 25px;
-    overflow-x: hidden;
-}
-
-.tabla-container h2 {
-    color: var(--color-primario);
+    padding: 20px;
     margin-bottom: 20px;
-    font-size: 1.5rem;
-    border-bottom: 3px solid var(--color-secundario);
-    padding-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Header con botón */
 .tabla-header-con-boton {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .tabla-header-con-boton h2 {
-    margin-bottom: 0;
-    border-bottom: 3px solid var(--color-secundario);
-    padding-bottom: 10px;
-    flex: 1;
+    color: var(--color-primario);
+    font-size: 1.5rem;
 }
 
-/* Botón Guardar */
 .btn-guardar {
-    background-color: #bbdefb;
-    color: var(--color-texto);
+    background-color: #42A5F5;
+    color: white;
     border: none;
     padding: 12px 24px;
     border-radius: 8px;
@@ -202,33 +281,28 @@ header p {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 6px rgba(66, 165, 245, 0.3);
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
 .btn-guardar:hover {
-    background-color: #90CAF9;
+    background-color: #1E88E5;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(66, 165, 245, 0.4);
 }
 
 .btn-guardar:active {
     transform: translateY(0);
 }
 
-.btn-guardar:disabled {
-    background-color: #e0e0e0;
-    color: #999;
-    cursor: not-allowed;
-    transform: none;
-}
-
 .tabla-scroll {
-    overflow-x: hidden;
+    overflow-x: auto;
     overflow-y: auto;
     max-height: 600px;
+    border-radius: 8px;
+    position: relative;
 }
 
 /* Tablas */
@@ -239,20 +313,30 @@ table {
     border-spacing: 0;
 }
 
+/* Distribución equitativa de columnas de oportunidades */
+table td.celda-oportunidad,
+table th.header-valor-num,
+table th.header-minimo-num,
+table th.header-label-valor,
+table th.header-label-70 {
+    width: 1%;
+    white-space: nowrap;
+}
+
 thead {
     position: sticky;
     top: 0;
     background-color: var(--color-header-principal);
-    color: var(--color-texto);
     z-index: 10;
 }
 
 th {
-    padding: 10px 1px;
+    padding: 12px 8px;
     text-align: center;
     font-weight: 600;
     border: 1px solid var(--color-gris-claro);
-    font-size: 0.9rem;
+    background-color: var(--color-header-principal);
+    color: var(--color-texto);
 }
 
 th.header-numero {
@@ -283,6 +367,9 @@ th.header-valor-num {
     font-weight: bold;
     padding: 8px 2px;
     color: var(--color-texto);
+    width: auto;
+    min-width: 50px;
+    max-width: 80px;
 }
 
 th.header-minimo-num {
@@ -291,6 +378,9 @@ th.header-minimo-num {
     font-weight: bold;
     padding: 8px 2px;
     color: var(--color-texto);
+    width: auto;
+    min-width: 50px;
+    max-width: 80px;
 }
 
 th.header-vacia {
@@ -318,6 +408,9 @@ th.header-label-valor {
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--color-texto);
+    width: auto;
+    min-width: 50px;
+    max-width: 80px;
 }
 
 th.header-label-70 {
@@ -325,6 +418,9 @@ th.header-label-70 {
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--color-texto);
+    width: auto;
+    min-width: 50px;
+    max-width: 80px;
 }
 
 th.header-total {
@@ -336,55 +432,27 @@ th.header-total {
 
 /* Input para valor del RA en el encabezado */
 .input-valor-ra {
-    width: 100% !important;
-    max-width: 70px !important;
-    padding: 4px !important;
-    border: 0 !important;
-    outline: 0 !important;
-    border-radius: 0 !important;
-    text-align: center !important;
-    font-size: 1.1rem !important;
-    font-weight: bold !important;
-    background-color: var(--color-header-principal) !important;
-    color: var(--color-texto) !important;
-    box-shadow: none !important;
-}
-
-.input-valor-ra::-webkit-outer-spin-button,
-.input-valor-ra::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.input-valor-ra {
-    -moz-appearance: textfield;
-}
-
-.input-valor-ra:focus {
-    outline: 0 !important;
-    border: 0 !important;
-    background-color: #90CAF9 !important;
-    box-shadow: none !important;
-}
-
-tbody tr {
-    transition: background-color 0.2s ease;
-}
-
-tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tbody tr:hover {
-    background-color: #B2EBF2;
-}
-
-td {
-    padding: 8px 0px;
+    width: 60px;
+    padding: 4px;
     text-align: center;
     border: 1px solid var(--color-gris-claro);
-    font-size: 0.9rem;
-    vertical-align: middle;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+/* Celdas del cuerpo */
+td {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid var(--color-gris-claro);
+    background-color: var(--color-blanco);
+    color: var(--color-texto);
+}
+
+td.numero {
+    font-weight: 600;
+    background-color: #f5f5f5;
 }
 
 td.nombre-estudiante {
@@ -398,32 +466,31 @@ td.nombre-estudiante {
     white-space: nowrap;
 }
 
-td.numero {
-    font-weight: 600;
-    background-color: #f5f5f5;
-}
-
-/* Celda con valor calculado */
-.celda-valor-calculado {
-    font-weight: bold;
-    font-size: 1rem;
+tbody tr:nth-child(even) {
     background-color: #f9f9f9;
 }
 
-/* Celda vacía del 70% */
-.celda-70-vacia {
-    background-color: #e8e8e8;
+tbody tr:hover {
+    background-color: #B2EBF2;
 }
 
-/* Celdas de oportunidades - ligero espacio entre ellas */
+.celda-total {
+    font-weight: bold;
+    font-size: 1.1rem;
+    background-color: #E3F2FD;
+}
+
 .celda-oportunidad {
+    width: auto;
+    min-width: 50px;
+    max-width: 80px;
     padding: 6px 2px !important;
     margin: 0 !important;
     border-left: 0 !important;
     border-right: 0 !important;
 }
 
-/* Input simple de oportunidad - compacto con espacio */
+/* Input simple de oportunidad */
 .input-oportunidad-simple {
     width: 100% !important;
     max-width: 100% !important;
@@ -450,125 +517,71 @@ td.numero {
 .input-oportunidad-simple:focus {
     outline: none;
     border-color: var(--color-secundario);
-    box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1);
+    background-color: #fff3e0;
 }
 
+/* Validación de colores */
 .input-oportunidad-simple.reprobado {
-    color: var(--color-reprobado);
-    font-weight: bold;
-    border-color: var(--color-reprobado);
     background-color: #ffebee;
+    border-color: var(--color-reprobado);
+    color: var(--color-reprobado);
+    font-weight: 600;
 }
 
 .input-oportunidad-simple.aprobado {
+    background-color: #e8f5e9;
+    border-color: var(--color-aprobado);
     color: var(--color-aprobado);
-    font-weight: bold;
+    font-weight: 600;
 }
 
-/* Inputs en tabla */
-input[type="number"] {
-    width: 70px;
-    padding: 8px;
-    border: 2px solid var(--color-gris-claro);
-    border-radius: 4px;
-    text-align: center;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-}
-
-/* Remover flechas de número en inputs */
-input[type="number"]::-webkit-outer-spin-button,
-input[type="number"]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type="number"] {
-    -moz-appearance: textfield;
-}
-
-input[type="number"]:focus {
-    outline: none;
-    border-color: var(--color-secundario);
-    box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1);
-}
-
-input[type="number"].reprobado {
-    color: var(--color-reprobado);
-    font-weight: bold;
-    border-color: var(--color-reprobado);
-    background-color: #ffebee;
-}
-
-input[type="number"].aprobado {
-    color: var(--color-aprobado);
-    font-weight: bold;
-}
-
-input[type="number"]:disabled {
-    background-color: var(--color-gris-claro);
-    cursor: not-allowed;
-}
-
-.input-calificacion {
-    width: 70px;
-}
-
-.celda-minimo {
-    background-color: var(--color-gris-oscuro);
-    color: var(--color-blanco);
-    font-weight: bold;
-}
-
-.celda-valor {
-    background-color: #f5f5f5;
-    font-weight: bold;
-    font-size: 1rem;
-    text-align: center;
-}
-
-.celda-vacia {
-    background-color: #e8e8e8;
-}
-
-.celda-total {
-    background-color: #e3f2fd;
-    font-weight: bold;
-    font-size: 1.1rem;
+/* Loading */
+#loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    color: var(--color-primario);
+    z-index: 9999;
 }
 
 /* Vista de Actividades */
 .vista-actividades {
-    animation: fadeIn 0.3s ease;
+    display: none;
 }
 
-/* Caja de descripción del RA - Diseño compacto y bonito */
 .ra-descripcion-box {
-    background: var(--color-header-valor);  /* Verde claro - mismo de "Actividades por RA" */
-    border-radius: 10px;
+    background: #c8e6c9;
     padding: 20px;
+    border-radius: 10px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border: 1px solid rgba(46, 125, 50, 0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(129, 199, 132, 0.5);
 }
 
 .ra-descripcion-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 
 .ra-descripcion-header h3 {
-    color: var(--color-primario);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2e7d32;
     margin: 0;
-    font-size: 1.5rem;  /* Igual que "Actividades del RA" */
-    font-weight: 700;   /* Negrita igual */
 }
 
 .btn-volver-nuevo {
-    background-color: #bbdefb;  /* Mismo azul del botón guardar */
-    color: var(--color-texto);
+    background-color: #42A5F5;
+    color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
@@ -576,284 +589,70 @@ input[type="number"]:disabled {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-volver-nuevo:hover {
-    background-color: #90CAF9;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.btn-volver-nuevo:active {
-    transform: translateY(0);
+    background-color: #1E88E5;
 }
 
 .ra-descripcion-textarea {
     width: 100%;
-    padding: 10px 12px;
-    border: 2px solid rgba(46, 125, 50, 0.2);
-    border-radius: 6px;
+    min-height: 60px;
+    padding: 12px;
+    border: 2px solid rgba(129, 199, 132, 0.7);
+    border-radius: 8px;
+    font-size: 1rem;
     font-family: inherit;
-    font-size: 1rem;  /* Más grande (antes 0.9rem) */
     resize: vertical;
-    min-height: 50px;
-    transition: all 0.3s ease;
     background-color: white;
 }
 
 .ra-descripcion-textarea:focus {
     outline: none;
-    border-color: var(--color-primario);
-    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+    border-color: #66bb6a;
+    box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.1);
 }
 
-.ra-descripcion-textarea::placeholder {
-    color: #999;
-    font-style: italic;
-}
-
-/* Estilos antiguos removidos */
-
-/* Tooltip para actividades */
-.actividad-header {
-    position: relative;
-    cursor: help;
-}
-
-.tooltip {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: var(--color-primario);
-    color: var(--color-blanco);
-    padding: 8px 12px;
-    border-radius: 5px;
-    font-size: 0.85rem;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    z-index: 100;
-    margin-bottom: 5px;
-}
-
-.tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 5px solid transparent;
-    border-top-color: var(--color-primario);
-}
-
-.actividad-header:hover .tooltip {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Loading */
-.loading {
-    text-align: center;
-    padding: 40px;
-}
-
-.spinner {
-    border: 4px solid var(--color-gris-claro);
-    border-top: 4px solid var(--color-secundario);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 20px;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    header h1 {
-        font-size: 1.5rem;
-    }
-
-    .filtros-container {
-        grid-template-columns: 1fr;
-    }
-
-    .tabla-scroll {
-        max-height: 400px;
-        overflow-x: auto;
-    }
-
-    th, td {
-        font-size: 0.8rem;
-        padding: 6px 3px;
-    }
-    
-    th.header-nombre {
-        width: 150px;
-    }
-
-    .input-oportunidad-simple {
-        max-width: 50px;
-        font-size: 0.8rem;
-    }
-    
-    .celda-valor-calculado {
-        font-size: 0.9rem;
-    }
-}
-
-/* Estilos adicionales para mejorar UX */
-.actualizado {
-    animation: highlight 0.5s ease;
-}
-
-@keyframes highlight {
-    0%, 100% {
-        background-color: transparent;
-    }
-    50% {
-        background-color: #fff3cd;
-    }
-}
-
-/* Estilos para edición de descripciones de actividades */
-.actividad-header {
-    position: relative;
-    cursor: pointer;
-    user-select: none;
-}
-
-.actividad-titulo {
-    display: inline-block;
-    cursor: pointer;
-    padding: 2px 4px;
-    border-radius: 3px;
-    transition: background-color 0.2s ease;
-}
-
-.actividad-titulo:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.icono-nota {
-    font-size: 0.7rem;
-    margin-left: 2px;
-    opacity: 0.8;
-}
-
-.tooltip-descripcion {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-top: 5px;
-    padding: 8px 12px;
-    background-color: #333;
-    color: white;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    font-weight: normal;
-    white-space: normal;
-    max-width: 250px;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    pointer-events: none;
-}
-
-.tooltip-descripcion::before {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-bottom-color: #333;
-}
-
-.actividad-header:hover .tooltip-descripcion {
-    display: block;
-}
-
-.input-descripcion {
-    width: 200px;
-    min-height: 60px;
-    padding: 8px;
-    border: 2px solid var(--color-secundario);
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-family: inherit;
-    resize: vertical;
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-top: 5px;
-    background-color: white;
-    z-index: 1001;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.input-descripcion:focus {
-    outline: none;
-    border-color: var(--color-primario);
-}
-
-/* Información del módulo en título de actividades */
+/* Módulo info en título de actividades */
 .modulo-info {
-    font-size: 1.5rem;  /* Mismo tamaño que el título */
-    font-weight: 600;   /* Mismo peso que el título */
-    color: #66bb6a;     /* Verde agradable del sistema */
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #66bb6a;
     margin-left: 15px;
     display: inline-block;
 }
 
 /* ==========================================
-   BARRAS DE NAVEGACIÓN VERTICAL FLOTANTES
+   NAVEGACIÓN HORIZONTAL CON BOTONES
    ========================================== */
 
 .scroll-nav-buttons {
-    position: fixed;
+    position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 1000;
+    z-index: 100;
+    pointer-events: none;
 }
 
 .scroll-nav-left {
     left: 0;
+    pointer-events: all;
 }
 
 .scroll-nav-right {
     right: 0;
+    pointer-events: all;
 }
 
 .scroll-nav-btn {
-    background: linear-gradient(90deg, rgba(92, 107, 192, 0.95) 0%, rgba(92, 107, 192, 0.85) 100%);
+    background: linear-gradient(135deg, var(--color-primario) 0%, #5C6BC0 100%);
     color: white;
     border: none;
-    width: 40px;
-    height: 150px;
+    width: 50px;
+    height: 80px;
     cursor: pointer;
-    font-size: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    font-size: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
@@ -862,34 +661,532 @@ input[type="number"]:disabled {
     pointer-events: none;
 }
 
-.scroll-nav-right .scroll-nav-btn {
-    border-radius: 8px 0 0 8px;
+.scroll-nav-btn.visible {
+    opacity: 0.8;
+    pointer-events: all;
+}
+
+.scroll-nav-btn:hover {
+    opacity: 1;
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.scroll-nav-btn:active {
+    transform: scale(0.95);
 }
 
 .scroll-nav-left .scroll-nav-btn {
     border-radius: 0 8px 8px 0;
 }
 
-.scroll-nav-btn.visible {
-    opacity: 0.9;
-    pointer-events: all;
+.scroll-nav-right .scroll-nav-btn {
+    border-radius: 8px 0 0 8px;
 }
 
-.scroll-nav-btn:hover {
-    opacity: 1;
-    width: 50px;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+.tabla-scroll {
+    position: relative;
 }
 
-.scroll-nav-btn:active {
-    width: 45px;
+/* ==========================================
+   MODO OSCURO - ESTILOS ESPECÍFICOS
+   ========================================== */
+
+/* Fondo de sección de filtros en modo oscuro */
+body.dark-mode .filtros-seccion {
+    background: #334155;
 }
 
-/* Modo oscuro */
+/* Inputs en modo oscuro */
+body.dark-mode input[type="number"],
+body.dark-mode select,
+body.dark-mode textarea {
+    background-color: #3C3C3C;
+    color: #E8EAED;
+    border-color: #5A5A5A;
+}
+
+body.dark-mode input[type="number"]:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+    background-color: #424242;
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+}
+
+/* Options de select en modo oscuro */
+body.dark-mode select option {
+    background-color: #3C3C3C;
+    color: #E8EAED;
+}
+
+/* Tablas en modo oscuro */
+body.dark-mode table {
+    background-color: var(--color-blanco);
+    color: var(--color-texto);
+}
+
+body.dark-mode th {
+    color: #FFFFFF;
+}
+
+body.dark-mode td {
+    border-color: var(--color-gris-claro);
+}
+
+body.dark-mode tbody tr {
+    background-color: var(--color-blanco);
+    transition: background-color 0.2s ease;
+}
+
+body.dark-mode tbody tr:nth-child(even) {
+    background-color: var(--color-blanco);
+}
+
+body.dark-mode tbody tr:hover {
+    background-color: var(--color-fila-hover);
+}
+
+/* Resaltar celda individual en hover */
+body.dark-mode tbody tr:hover td:hover {
+    background-color: var(--color-celda-hover);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+/* Inputs en hover también se resaltan */
+body.dark-mode tbody tr:hover td:hover input {
+    background-color: var(--color-celda-hover);
+}
+
+/* Headers de tabla en modo oscuro */
+body.dark-mode .header-numero,
+body.dark-mode .header-nombre,
+body.dark-mode .header-ra {
+    color: #FFFFFF;
+}
+
+body.dark-mode .header-valor-num,
+body.dark-mode .header-minimo-num,
+body.dark-mode .header-label-valor,
+body.dark-mode .header-label-70 {
+    color: #FFFFFF;
+}
+
+/* Botones en modo oscuro */
+body.dark-mode .btn-guardar {
+    background-color: #1976D2;
+    color: #FFFFFF;
+}
+
+body.dark-mode .btn-guardar:hover {
+    background-color: #1565C0;
+}
+
+body.dark-mode .btn-volver-nuevo {
+    background-color: #1976D2;
+    color: #FFFFFF;
+}
+
+body.dark-mode .btn-volver-nuevo:hover {
+    background-color: #1565C0;
+}
+
+/* Filtros en modo oscuro */
+body.dark-mode .filtro-header {
+    background: linear-gradient(135deg, #1E3A5F 0%, #2C5F8D 100%);
+    color: #FFFFFF;
+}
+
+body.dark-mode .filtro-header h2 {
+    color: #FFFFFF;
+}
+
+body.dark-mode .filtro-grupo {
+    background: linear-gradient(135deg, #2D2D2D 0%, #3C3C3C 100%);
+    border-left-color: var(--color-primario);
+}
+
+body.dark-mode .filtro-grupo:nth-child(1) {
+    background: linear-gradient(135deg, #1E3A5F 0%, #2C5F8D 100%);
+}
+
+/* Select de Curso con hover cyan */
+body.dark-mode .filtro-grupo:nth-child(1) select {
+    background-color: #079b6d;
+    color: #FFFFFF;
+    border-color: #047857;
+}
+
+body.dark-mode .filtro-grupo:nth-child(1) select:hover {
+    background-color: #07afcd;
+}
+
+body.dark-mode .filtro-grupo:nth-child(1) select:focus {
+    background-color: #07afcd;
+    border-color: #0ea5e9;
+}
+
+body.dark-mode .filtro-grupo:nth-child(2) {
+    background: linear-gradient(135deg, #5D4E37 0%, #6F5E47 100%);
+}
+
+/* Select de Módulo con hover naranja */
+body.dark-mode .filtro-grupo:nth-child(2) select {
+    background-color: #079b6d;
+    color: #FFFFFF;
+    border-color: #047857;
+}
+
+body.dark-mode .filtro-grupo:nth-child(2) select:hover {
+    background-color: #f0970a;
+}
+
+body.dark-mode .filtro-grupo:nth-child(2) select:focus {
+    background-color: #f0970a;
+    border-color: #fb923c;
+}
+
+body.dark-mode .filtro-grupo:nth-child(3) {
+    background: linear-gradient(135deg, #2E5339 0%, #3D6B4A 100%);
+}
+
+/* Select de Actividades con hover verde oscuro */
+body.dark-mode .filtro-grupo:nth-child(3) select {
+    background-color: #079b6d;
+    color: #FFFFFF;
+    border-color: #047857;
+}
+
+body.dark-mode .filtro-grupo:nth-child(3) select:hover {
+    background-color: #064e3b;
+}
+
+body.dark-mode .filtro-grupo:nth-child(3) select:focus {
+    background-color: #064e3b;
+    border-color: #10b981;
+}
+
+body.dark-mode .filtro-grupo label {
+    color: var(--color-texto);
+}
+
+/* Caja de descripción RA */
+body.dark-mode .ra-descripcion-box {
+    background: #334155;
+    border-color: rgba(129, 199, 132, 0.3);
+}
+
+body.dark-mode .ra-descripcion-header h3 {
+    color: #FFFFFF;
+}
+
+body.dark-mode .ra-descripcion-textarea {
+    background-color: #2C2C2C;
+    color: var(--color-texto);
+    border-color: rgba(129, 199, 132, 0.5);
+}
+
+/* Módulo info en modo oscuro */
+body.dark-mode .modulo-info {
+    color: #81C784;
+}
+
+/* Fondo de contenedor de tabla en modo oscuro */
+body.dark-mode .tabla-container {
+    background: #334155;
+}
+
+/* Loading en modo oscuro */
+body.dark-mode #loading {
+    background-color: rgba(18, 18, 18, 0.95);
+    color: var(--color-texto);
+}
+
+/* Celdas de total en modo oscuro */
+body.dark-mode .celda-total {
+    background-color: #2C2C2C;
+    color: var(--color-texto);
+}
+
+/* Validación de colores en modo oscuro */
+body.dark-mode .input-aprobado {
+    background-color: #2E5339;
+    color: #A5D6A7;
+    border-color: #4CAF50;
+}
+
+body.dark-mode .input-reprobado {
+    background-color: #5D2E2E;
+    color: #EF9A9A;
+    border-color: #EF5350;
+}
+
+/* Botones de navegación en modo oscuro */
 body.dark-mode .scroll-nav-btn {
-    background: linear-gradient(90deg, rgba(100, 181, 246, 0.95) 0%, rgba(100, 181, 246, 0.85) 100%);
+    background: linear-gradient(135deg, #64B5F6 0%, #42A5F5 100%);
 }
 
 body.dark-mode .scroll-nav-btn:hover {
-    background: linear-gradient(90deg, rgba(66, 165, 245, 0.95) 0%, rgba(66, 165, 245, 0.9) 100%);
+    background: linear-gradient(135deg, #42A5F5 0%, #2196F3 100%);
+}
+
+/* Transición suave al cambiar modo */
+body,
+.container,
+input,
+select,
+textarea,
+button,
+table,
+th,
+td {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ==========================================
+   RESPONSIVE - TABLETS Y MÓVILES
+   ========================================== */
+
+@media (max-width: 1024px) {
+    .container {
+        padding: 15px;
+        max-width: 100%;
+    }
+    
+    .filtros-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .tabla-scroll {
+        max-height: 500px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+        overflow-x: hidden;
+    }
+    
+    .container {
+        padding: 10px;
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    /* Filtros en columna */
+    .filtros-seccion {
+        padding: 15px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+    
+    .filtros-container {
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .filtro-grupo {
+        width: 100%;
+        max-width: 100%;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+    
+    .filtro-grupo select {
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    /* Botones más grandes para touch */
+    select, button {
+        min-height: 44px;
+        font-size: 16px;
+    }
+    
+    /* Tabla responsive */
+    .tabla-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-height: 60vh;
+    }
+    
+    table {
+        min-width: 800px;
+    }
+    
+    th, td {
+        padding: 8px 6px;
+        font-size: 0.85rem;
+    }
+    
+    .nombre-estudiante {
+        min-width: 150px;
+        font-size: 0.8rem;
+    }
+    
+    /* Inputs más grandes para móvil */
+    input[type="number"] {
+        min-height: 40px;
+        font-size: 16px;
+        padding: 8px;
+    }
+    
+    /* Header con botón en móvil */
+    .tabla-header-con-boton {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .tabla-header-con-boton h2 {
+        font-size: 1.3rem;
+        text-align: center;
+    }
+    
+    .btn-guardar {
+        width: 100%;
+        padding: 14px;
+    }
+    
+    /* Descripción del RA en móvil */
+    .ra-descripcion-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .btn-volver-nuevo {
+        width: 100%;
+        order: -1;
+    }
+    
+    .ra-descripcion-textarea {
+        font-size: 16px;
+    }
+    
+    /* Módulo info más pequeño */
+    .modulo-info {
+        font-size: 1rem;
+        display: block;
+        margin-left: 0;
+        margin-top: 8px;
+    }
+    
+    /* Filtro header */
+    .filtro-header {
+        padding: 12px 15px;
+    }
+    
+    .filtro-header h2 {
+        font-size: 1.2rem;
+    }
+    
+    /* Headers sticky móvil */
+    thead {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: var(--color-blanco);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    tbody td:first-child,
+    thead th:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 5;
+        background: var(--color-blanco);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    }
+    
+    tbody td:nth-child(2),
+    thead th:nth-child(2) {
+        position: sticky;
+        left: 40px;
+        z-index: 5;
+        background: var(--color-blanco);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+    }
+    
+    body.dark-mode tbody td:first-child,
+    body.dark-mode thead th:first-child,
+    body.dark-mode tbody td:nth-child(2),
+    body.dark-mode thead th:nth-child(2) {
+        background: var(--color-blanco);
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        font-size: 13px;
+    }
+    
+    h1 {
+        font-size: 1.3rem;
+        padding: 12px;
+    }
+    
+    .container {
+        padding: 8px;
+    }
+    
+    th, td {
+        padding: 6px 4px;
+        font-size: 0.75rem;
+    }
+    
+    .numero {
+        min-width: 30px;
+    }
+    
+    .nombre-estudiante {
+        min-width: 120px;
+        font-size: 0.75rem;
+    }
+    
+    input[type="number"] {
+        min-width: 50px;
+        padding: 6px;
+    }
+    
+    .btn-guardar {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Touch devices */
+@media (hover: none) and (pointer: coarse) {
+    button, select, input {
+        cursor: pointer;
+    }
+    
+    .filtro-grupo {
+        margin-bottom: 20px;
+    }
+    
+    input[type="number"]:focus {
+        transform: scale(1.05);
+        transition: transform 0.2s;
+    }
+}
+
+/* Ajuste universal */
+* {
+    max-width: 100%;
+}
+
+html {
+    overflow-x: hidden;
 }
