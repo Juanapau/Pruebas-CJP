@@ -709,9 +709,9 @@ body.dark-mode .filtros-seccion {
 body.dark-mode input[type="number"],
 body.dark-mode select,
 body.dark-mode textarea {
-    background-color: #3C3C3C;
+    background-color: transparent;
     color: #E8EAED;
-    border-color: #5A5A5A;
+    border-color: #3C3C3C;
 }
 
 body.dark-mode input[type="number"]:focus,
@@ -739,16 +739,18 @@ body.dark-mode th {
 }
 
 body.dark-mode td {
-    border-color: var(--color-gris-claro);
+    border-color: #3C3C3C;
+    border-width: 1px;
+    border-style: solid;
 }
 
 body.dark-mode tbody tr {
-    background-color: var(--color-blanco);
+    background-color: #1E1E1E;
     transition: background-color 0.2s ease;
 }
 
 body.dark-mode tbody tr:nth-child(even) {
-    background-color: var(--color-blanco);
+    background-color: #2D2D2D;
 }
 
 body.dark-mode tbody tr:hover {
@@ -773,8 +775,16 @@ body.dark-mode td.numero {
     color: #FFFFFF;
 }
 
-body.dark-mode td.nombre-estudiante {
-    background-color: var(--color-blanco);
+body.dark-mode tbody tr td.nombre-estudiante {
+    background-color: inherit;
+}
+
+body.dark-mode tbody tr:nth-child(odd) td.nombre-estudiante {
+    background-color: #1E1E1E;
+}
+
+body.dark-mode tbody tr:nth-child(even) td.nombre-estudiante {
+    background-color: #2D2D2D;
 }
 
 body.dark-mode th.header-numero,
