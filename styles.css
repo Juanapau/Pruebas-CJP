@@ -40,7 +40,7 @@ body.dark-mode {
     --color-advertencia: #FFB74D;
     
     /* Colores de la tabla - Oscuros profesionales */
-    --color-header-principal: #1E3A5F;
+    --color-header-principal: #64748b;  /* Azul grisáceo para # y Nombre */
     --color-header-ra: #5D4E37;
     --color-header-valor: #2E5339;
     --color-header-70: #424242;
@@ -1140,6 +1140,22 @@ body.dark-mode .filtro-grupo:nth-child(2) {
 
 body.dark-mode .filtro-grupo:nth-child(3) {
     background: linear-gradient(135deg, #2E5339 0%, #3D6B4A 100%);
+}
+
+/* Select de Actividades por RA con fondo verde */
+body.dark-mode .filtro-grupo:nth-child(3) select {
+    background-color: #079b6d;
+    color: #FFFFFF;
+    border-color: #047857;
+}
+
+body.dark-mode .filtro-grupo:nth-child(3) select:hover {
+    background-color: #064e3b;
+}
+
+body.dark-mode .filtro-grupo:nth-child(3) select:focus {
+    background-color: #064e3b;
+    border-color: #10b981;
 }
 
 body.dark-mode .filtro-grupo label {
