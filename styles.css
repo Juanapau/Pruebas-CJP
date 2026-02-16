@@ -308,9 +308,9 @@ body.dark-mode .icono-sol {
 /* Tablas */
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
     table-layout: auto;
-    border-spacing: 0;
+    border-spacing: 4px;
 }
 
 /* Distribución equitativa de columnas de oportunidades */
@@ -331,12 +331,14 @@ thead {
 }
 
 th {
-    padding: 8px;
+    padding: 12px 8px;
     text-align: center;
     font-weight: 600;
     border: 1px solid var(--color-gris-claro);
     background-color: var(--color-header-principal);
     color: var(--color-texto);
+    height: 45px;
+    border-radius: 8px;
 }
 
 th.header-numero {
@@ -451,11 +453,13 @@ th.header-total {
 
 /* Celdas del cuerpo */
 td {
-    padding: 8px;
+    padding: 12px 8px;
     text-align: center;
     border: 1px solid var(--color-gris-claro);
     background-color: var(--color-blanco);
     color: var(--color-texto);
+    height: 45px;
+    border-radius: 8px;
 }
 
 td.numero {
