@@ -344,6 +344,9 @@ th.header-numero {
     min-width: 60px;
     background-color: var(--color-header-principal);
     color: var(--color-texto);
+    position: sticky;
+    left: 0;
+    z-index: 20;
 }
 
 th.header-nombre {
@@ -355,6 +358,9 @@ th.header-nombre {
     padding-left: 15px;
     color: var(--color-texto);
     white-space: nowrap;
+    position: sticky;
+    left: 60px;
+    z-index: 20;
 }
 
 th.header-ra {
@@ -454,7 +460,11 @@ td {
 
 td.numero {
     font-weight: 600;
-    background-color: #f5f5f5;
+    background-color: var(--color-header-principal);
+    color: var(--color-texto);
+    position: sticky;
+    left: 0;
+    z-index: 15;
 }
 
 td.nombre-estudiante {
@@ -466,6 +476,10 @@ td.nombre-estudiante {
     min-width: 280px;
     max-width: 280px;
     white-space: nowrap;
+    position: sticky;
+    left: 60px;
+    z-index: 15;
+    background-color: var(--color-blanco);
 }
 
 tbody tr:nth-child(even) {
@@ -751,6 +765,22 @@ body.dark-mode tbody tr:hover td:hover {
 /* Inputs en hover también se resaltan */
 body.dark-mode tbody tr:hover td:hover input {
     background-color: var(--color-celda-hover);
+}
+
+/* Columnas sticky en modo oscuro */
+body.dark-mode td.numero {
+    background-color: var(--color-header-principal);
+    color: #FFFFFF;
+}
+
+body.dark-mode td.nombre-estudiante {
+    background-color: var(--color-blanco);
+}
+
+body.dark-mode th.header-numero,
+body.dark-mode th.header-nombre {
+    background-color: var(--color-header-principal);
+    color: #FFFFFF;
 }
 
 /* Headers de tabla en modo oscuro */
