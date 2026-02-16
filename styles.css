@@ -1,8 +1,9 @@
-/* Variables de color institucionales PNSA - Usando colores de filtros */
+/* Variables de color institucionales PNSA - Modo Claro */
 :root {
     --color-primario: #5C6BC0;
     --color-secundario: #EF5350;
     --color-texto: #333333;
+    --color-texto-secundario: #666666;
     --color-fondo: #f5f5f5;
     --color-blanco: #ffffff;
     --color-gris-claro: #e0e0e0;
@@ -12,11 +13,41 @@
     --color-reprobado: #EF5350;
     --color-advertencia: #FFA726;
     
-    /* Colores de la tabla - Usando los mismos de los filtros */
-    --color-header-principal: #bbdefb;  /* Azul claro como caja Curso */
-    --color-header-ra: #ffecb3;         /* Amarillo claro como caja Módulo */
-    --color-header-valor: #c8e6c9;      /* Verde claro como caja Actividades */
-    --color-header-70: #e0e0e0;         /* Gris claro neutro */
+    /* Colores de la tabla */
+    --color-header-principal: #bbdefb;
+    --color-header-ra: #ffecb3;
+    --color-header-valor: #c8e6c9;
+    --color-header-70: #e0e0e0;
+    
+    /* Sombras */
+    --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Variables de color - Modo Oscuro */
+body.dark-mode {
+    --color-primario: #7986CB;
+    --color-secundario: #EF5350;
+    --color-texto: #E0E0E0;
+    --color-texto-secundario: #B0B0B0;
+    --color-fondo: #121212;
+    --color-blanco: #1E1E1E;
+    --color-gris-claro: #2C2C2C;
+    --color-gris-medio: #404040;
+    --color-gris-oscuro: #505050;
+    --color-aprobado: #81C784;
+    --color-reprobado: #E57373;
+    --color-advertencia: #FFB74D;
+    
+    /* Colores de la tabla - Oscuros con buen contraste */
+    --color-header-principal: #1565C0;
+    --color-header-ra: #F57F17;
+    --color-header-valor: #2E7D32;
+    --color-header-70: #424242;
+    
+    /* Sombras más fuertes */
+    --sombra-suave: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --sombra-media: 0 4px 12px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -982,12 +1013,8 @@ body.dark-mode .icono-sol {
 }
 
 /* ==========================================
-   AJUSTES MODO OSCURO
+   AJUSTES MODO OSCURO - Estilos Específicos
    ========================================== */
-
-body.dark-mode {
-    color: var(--color-texto);
-}
 
 /* Inputs en modo oscuro */
 body.dark-mode input[type="number"],
@@ -1003,6 +1030,12 @@ body.dark-mode select:focus,
 body.dark-mode textarea:focus {
     background-color: #333333;
     border-color: var(--color-primario);
+}
+
+/* Options de select en modo oscuro */
+body.dark-mode select option {
+    background-color: #2C2C2C;
+    color: #E0E0E0;
 }
 
 /* Tablas en modo oscuro */
