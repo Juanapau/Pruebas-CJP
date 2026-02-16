@@ -30,12 +30,17 @@ body {
     background-color: var(--color-fondo);
     color: var(--color-texto);
     line-height: 1.6;
+    overflow-x: hidden;
+    width: 100%;
 }
 
 .container {
     max-width: 1400px;
     margin: 0 auto;
     padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 /* Header */
@@ -67,6 +72,10 @@ header p {
     padding: 25px;
     margin-bottom: 25px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .filtro-header {
@@ -86,8 +95,10 @@ header p {
 
 .filtros-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: 20px;
+    width: 100%;
+    max-width: 100%;
 }
 
 .filtro-grupo {
@@ -98,6 +109,8 @@ header p {
     border-radius: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .filtro-grupo:hover {
@@ -145,6 +158,8 @@ header p {
     cursor: pointer;
     transition: all 0.3s ease;
     font-weight: 500;
+    width: 100%;
+    max-width: 100%;
 }
 
 .filtro-grupo select:hover {
@@ -681,12 +696,53 @@ input[type="number"]:disabled {
 
 /* Responsive */
 @media (max-width: 768px) {
-    header h1 {
+    body {
+        font-size: 14px;
+    }
+    
+    .container {
+        padding: 10px;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+    
+    h1 {
         font-size: 1.5rem;
     }
-
+    
+    /* Filtros en columna única */
     .filtros-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
+        gap: 15px;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .filtro-grupo {
+        width: 100%;
+        max-width: 100%;
+        padding: 15px;
+        box-sizing: border-box;
+    }
+    
+    .filtro-grupo select {
+        width: 100%;
+        max-width: 100%;
+        font-size: 16px; /* Evita zoom en iOS */
+    }
+    
+    /* Filtros seccion */
+    .filtros-seccion {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+    }
+    
+    /* Botones más grandes para touch */
+    select, button {
+        min-height: 44px;
+        font-size: 16px;
     }
 
     .tabla-scroll {
@@ -817,4 +873,69 @@ input[type="number"]:disabled {
     color: #66bb6a;     /* Verde agradable del sistema */
     margin-left: 15px;
     display: inline-block;
+}
+
+/* Móviles pequeños (max 480px) - Ajuste crítico */
+@media (max-width: 480px) {
+    body {
+        font-size: 13px;
+        overflow-x: hidden;
+        width: 100vw;
+    }
+    
+    .container {
+        padding: 8px;
+        width: 100%;
+        max-width: 100vw;
+    }
+    
+    h1 {
+        font-size: 1.3rem;
+        padding: 12px;
+    }
+    
+    /* Filtros aún más compactos */
+    .filtros-seccion {
+        padding: 12px;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .filtro-header {
+        padding: 10px 12px;
+    }
+    
+    .filtro-header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .filtros-container {
+        gap: 12px;
+        width: 100%;
+    }
+    
+    .filtro-grupo {
+        padding: 12px;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .filtro-grupo label {
+        font-size: 0.85rem;
+    }
+    
+    .filtro-grupo select {
+        padding: 10px;
+        font-size: 16px;
+        width: 100%;
+    }
+}
+
+/* Ajuste universal para todos los elementos */
+* {
+    max-width: 100%;
+}
+
+html {
+    overflow-x: hidden;
 }
