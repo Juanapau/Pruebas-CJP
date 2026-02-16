@@ -1052,8 +1052,16 @@ body.dark-mode td {
     border-color: var(--color-gris-claro);
 }
 
+body.dark-mode tbody tr {
+    background-color: var(--color-blanco); /* Todas iguales - gris oscuro */
+}
+
+body.dark-mode tbody tr:nth-child(even) {
+    background-color: var(--color-blanco); /* Mismo color que impares */
+}
+
 body.dark-mode tbody tr:hover {
-    background-color: #2C2C2C;
+    background-color: #2C2C2C; /* Un poco más claro al hover */
 }
 
 /* Headers de tabla en modo oscuro con buen contraste */
