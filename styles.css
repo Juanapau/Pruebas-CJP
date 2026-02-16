@@ -753,6 +753,15 @@ body.dark-mode tbody tr:nth-child(even) {
     background-color: #2D2D2D;
 }
 
+/* Todas las celdas heredan el color de la fila */
+body.dark-mode tbody tr:nth-child(odd) td {
+    background-color: #1E1E1E;
+}
+
+body.dark-mode tbody tr:nth-child(even) td {
+    background-color: #2D2D2D;
+}
+
 body.dark-mode tbody tr:hover {
     background-color: var(--color-fila-hover);
 }
