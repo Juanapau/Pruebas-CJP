@@ -2,9 +2,7 @@
 const CONFIG = {
     GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw3CURWoHl3tsZd8wflU0z4C_lvU1V55RcUldl2kIzQqIc3l1JsUOlR8R8qxWvsDOtl/exec',
     NUM_ACTIVIDADES: 15,
-    PORCENTAJE_APROBATORIO: 70,
-    TIMEOUT_MS: 12000,      // 12 segundos antes de reintentar
-    MAX_REINTENTOS: 2       // Máximo 2 reintentos automáticos
+    PORCENTAJE_APROBATORIO: 70
 };
 
 // Estado global de la aplicación
@@ -783,24 +781,9 @@ function mostrarCargando(mostrar, subtexto = 'Conectando con Google Sheets') {
     if (sub) sub.textContent = subtexto;
 }
 
-// Fetch robusto compatible con Google Apps Script (no usa AbortController)
-async function fetchConTimeout(url, intento = 1) {
-    const timeout = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('TIMEOUT')), CONFIG.TIMEOUT_MS)
-    );
-    try {
-        const response = await Promise.race([fetch(url), timeout]);
-        return response;
-    } catch (error) {
-        if (intento <= CONFIG.MAX_REINTENTOS) {
-            console.warn(`⚠️ Intento ${intento} fallido, reintentando...`);
-            const sub = document.getElementById('loadingSubtexto');
-            if (sub) sub.textContent = `Reintentando... (${intento}/${CONFIG.MAX_REINTENTOS})`;
-            await new Promise(r => setTimeout(r, 1500));
-            return fetchConTimeout(url, intento + 1);
-        }
-        throw error;
-    }
+// Fetch robusto compatible con Google Apps Script
+async function fetchConTimeout(url) {
+    return fetch(url);
 }
 
 // Funciones de guardado masivo
