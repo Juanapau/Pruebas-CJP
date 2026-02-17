@@ -330,21 +330,23 @@ thead {
     z-index: 10;
 }
 
+/* Los th del thead no tienen bordes ni espaciado */
+thead th {
+    border: none !important;
+    border-radius: 0 !important;
+}
+
 th {
     padding: 8px;
     text-align: center;
     font-weight: 600;
-    border: 2px solid #455A64;
+    border: none;
     background-color: var(--color-header-principal);
     color: var(--color-texto);
-    border-radius: 8px;
+    border-radius: 0;
 }
 
-/* Bordes en modo oscuro */
-body.dark-mode th {
-    border-color: #607D8B;
-}
-
+/* Bordes en modo oscuro - solo para td */
 body.dark-mode td {
     border-color: #607D8B;
 }
@@ -357,8 +359,9 @@ th.header-numero {
     position: sticky;
     left: 0;
     z-index: 25;
-    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
+    box-shadow: none;
+    border-radius: 0;
+    border: none;
 }
 
 th.header-nombre {
@@ -373,8 +376,9 @@ th.header-nombre {
     position: sticky;
     left: 68px;
     z-index: 25;
-    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
+    box-shadow: none;
+    border-radius: 0;
+    border: none;
 }
 
 th.header-ra {
