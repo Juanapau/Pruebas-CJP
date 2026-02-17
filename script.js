@@ -1814,7 +1814,7 @@ async function guardarAsistencia() {
         alert('❌ Error de conexión al guardar la asistencia');
     } finally {
         asistenciaElementos.btnGuardar.disabled = false;
-        asistenciaElementos.btnGuardar.textContent = '💾 Guardar Asistencia';
+        asistenciaElementos.btnGuardar.textContent = '💾 Guardar';
     }
 }
 
