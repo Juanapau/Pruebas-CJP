@@ -512,13 +512,12 @@ tbody tr:hover {
     max-width: 100% !important;
     padding: 6px 3px !important;
     margin: 0 !important;
-    border: none !important;
-    border-radius: 0 !important;
+    border: 1px solid var(--color-gris-claro) !important;
+    border-radius: 2px !important;
     text-align: center !important;
     font-size: 0.85rem !important;
     transition: all 0.2s ease;
     box-sizing: border-box !important;
-    background-color: transparent !important;
 }
 
 .input-oportunidad-simple::-webkit-outer-spin-button,
@@ -533,8 +532,8 @@ tbody tr:hover {
 
 .input-oportunidad-simple:focus {
     outline: none;
-    border: none !important;
-    background-color: transparent !important;
+    border-color: var(--color-secundario);
+    background-color: #fff3e0;
 }
 
 /* Validación de colores */
