@@ -408,7 +408,7 @@ th.header-ra {
 }
 
 th.header-valor-num {
-    background-color: var(--color-header-principal);
+    background-color: var(--color-header-valor);
     font-size: 1.2rem;
     font-weight: bold;
     padding: 8px 2px;
@@ -487,7 +487,7 @@ th.header-total {
     font-weight: bold;
     font-size: 1.1rem;
     background-color: transparent;
-    color: var(--color-texto);
+    color: white;
     -webkit-appearance: none;
     -moz-appearance: textfield;
     appearance: none;
@@ -501,9 +501,9 @@ th.header-total {
 }
 
 .input-valor-ra:focus {
-    outline: 2px solid var(--color-primario);
+    outline: 2px solid rgba(255, 255, 255, 0.5);
     outline-offset: -2px;
-    background-color: rgba(92, 107, 192, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* Celdas del cuerpo */
