@@ -37,7 +37,7 @@ body.dark-mode {
     --color-texto-secundario: #9AA0A6;
     --color-fondo: #1F1F1F;
     --color-blanco: #2D2D2D;
-    --color-gris-claro: #3C3C3C;
+    --color-gris-claro: #546E7A;
     --color-gris-medio: #4A4A4A;
     --color-gris-oscuro: #5A5A5A;
     --color-aprobado: #81C784;
@@ -45,7 +45,7 @@ body.dark-mode {
     --color-advertencia: #FFB74D;
     
     /* Colores de la tabla - Oscuros profesionales */
-    --color-header-principal: #64748b;
+    --color-header-principal: #455A64;
     --color-header-ra: #5D4E37;
     --color-header-valor: #2E5339;
     --color-header-70: #424242;
@@ -308,9 +308,9 @@ body.dark-mode .icono-sol {
 /* Tablas */
 table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
     table-layout: auto;
-    border-spacing: 0;
+    border-spacing: 4px;
 }
 
 /* Distribución equitativa de columnas de oportunidades */
@@ -331,12 +331,22 @@ thead {
 }
 
 th {
-    padding: 2px 8px;
+    padding: 8px;
     text-align: center;
     font-weight: 600;
-    border: 1px solid var(--color-gris-claro);
+    border: 2px solid #455A64;
     background-color: var(--color-header-principal);
     color: var(--color-texto);
+    border-radius: 8px;
+}
+
+/* Bordes en modo oscuro */
+body.dark-mode th {
+    border-color: #607D8B;
+}
+
+body.dark-mode td {
+    border-color: #607D8B;
 }
 
 th.header-numero {
@@ -347,7 +357,8 @@ th.header-numero {
     position: sticky;
     left: 0;
     z-index: 20;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
 }
 
 th.header-nombre {
@@ -360,9 +371,10 @@ th.header-nombre {
     color: var(--color-texto);
     white-space: nowrap;
     position: sticky;
-    left: 65px;
+    left: 69px;
     z-index: 20;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
 }
 
 th.header-ra {
@@ -453,11 +465,12 @@ th.header-total {
 
 /* Celdas del cuerpo */
 td {
-    padding: 2px 8px;
+    padding: 8px;
     text-align: center;
-    border: 1px solid var(--color-gris-claro);
+    border: 2px solid #455A64;
     background-color: var(--color-blanco);
     color: var(--color-texto);
+    border-radius: 8px;
 }
 
 td.numero {
@@ -467,7 +480,8 @@ td.numero {
     position: sticky;
     left: 0;
     z-index: 15;
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
 }
 
 td.nombre-estudiante {
@@ -480,18 +494,20 @@ td.nombre-estudiante {
     max-width: 280px;
     white-space: nowrap;
     position: sticky;
-    left: 65px;
+    left: 69px;
     z-index: 15;
     background-color: var(--color-blanco);
-    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
 }
 
 tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
+    /* Sin color alterno para mantener limpio */
 }
 
-tbody tr:hover {
-    background-color: #B2EBF2;
+tbody tr:hover td {
+    background-color: #546E7A !important;
+    transition: background-color 0.2s ease;
 }
 
 .celda-total {
@@ -504,10 +520,8 @@ tbody tr:hover {
     width: auto;
     min-width: 50px;
     max-width: 80px;
-    padding: 6px 2px !important;
+    padding: 4px !important;
     margin: 0 !important;
-    border-left: 0 !important;
-    border-right: 0 !important;
 }
 
 /* Input simple de oportunidad */
@@ -515,15 +529,18 @@ tbody tr:hover {
 .input-actividad {
     width: 100% !important;
     max-width: 100% !important;
-    padding: 6px 3px !important;
+    padding: 8px 3px !important;
     margin: 0 !important;
-    border: 1px solid var(--color-gris-claro) !important;
-    border-radius: 2px !important;
+    border: 2px solid #37474F !important;
+    border-radius: 6px !important;
     text-align: center !important;
-    font-size: 0.85rem !important;
+    font-size: 0.95rem !important;
+    font-weight: 500 !important;
     transition: all 0.2s ease;
     box-sizing: border-box !important;
     box-shadow: none !important;
+    background-color: #37474F !important;
+    color: #E8EAED !important;
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
@@ -545,24 +562,25 @@ tbody tr:hover {
 .input-oportunidad-simple:focus,
 .input-actividad:focus {
     outline: none;
-    border-color: var(--color-secundario);
-    background-color: #fff3e0;
+    border-color: #64B5F6 !important;
+    background-color: #455A64 !important;
+    box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.2) !important;
 }
 
 /* Validación de colores */
 .input-oportunidad-simple.reprobado,
 .input-actividad.reprobado {
-    background-color: #ffebee;
-    border-color: var(--color-reprobado);
-    color: var(--color-reprobado);
+    background-color: #5C2D2D !important;
+    border-color: #EF5350 !important;
+    color: #FFCDD2 !important;
     font-weight: 600;
 }
 
 .input-oportunidad-simple.aprobado,
 .input-actividad.aprobado {
-    background-color: #e8f5e9;
-    border-color: var(--color-aprobado);
-    color: var(--color-aprobado);
+    background-color: #2D4A2E !important;
+    border-color: #66BB6A !important;
+    color: #C8E6C9 !important;
     font-weight: 600;
 }
 
