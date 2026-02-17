@@ -260,14 +260,17 @@ async function manejarCambioModulo(e) {
             return;
         }
         state.moduloSeleccionado = moduloId;
-        
-        // OPTIMIZACIÓN: Cargar RAs y Calificaciones en paralelo (más rápido)
-        await Promise.all([
-            cargarRAsDelModulo(moduloId),
-            cargarCalificaciones(moduloId)
-        ]);
-        
-        // Mostrar botón guardar
+        try {
+            // Cargar RAs y Calificaciones en paralelo
+            await Promise.all([
+                cargarRAsDelModulo(moduloId),
+                cargarCalificaciones(moduloId)
+            ]);
+        } catch (error) {
+            console.error('Error al cargar módulo:', error);
+        } finally {
+            mostrarCargando(false); // Garantiza que siempre se cierre
+        }
         elementos.btnGuardarRegistro.style.display = 'flex';
     } else {
         state.moduloSeleccionado = null;
@@ -275,7 +278,6 @@ async function manejarCambioModulo(e) {
         elementos.selectRA.innerHTML = '<option value="">Seleccione un RA</option>';
         elementos.tablaRegistroHead.innerHTML = '';
         elementos.tablaRegistroBody.innerHTML = '';
-        // Ocultar botón guardar
         elementos.btnGuardarRegistro.style.display = 'none';
     }
 }
@@ -781,22 +783,20 @@ function mostrarCargando(mostrar, subtexto = 'Conectando con Google Sheets') {
     if (sub) sub.textContent = subtexto;
 }
 
-// Fetch con timeout y reintentos automáticos
+// Fetch robusto compatible con Google Apps Script (no usa AbortController)
 async function fetchConTimeout(url, intento = 1) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), CONFIG.TIMEOUT_MS);
-    
+    const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('TIMEOUT')), CONFIG.TIMEOUT_MS)
+    );
     try {
-        const response = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeoutId);
+        const response = await Promise.race([fetch(url), timeout]);
         return response;
     } catch (error) {
-        clearTimeout(timeoutId);
-        if (intento < CONFIG.MAX_REINTENTOS) {
+        if (intento <= CONFIG.MAX_REINTENTOS) {
             console.warn(`⚠️ Intento ${intento} fallido, reintentando...`);
             const sub = document.getElementById('loadingSubtexto');
             if (sub) sub.textContent = `Reintentando... (${intento}/${CONFIG.MAX_REINTENTOS})`;
-            await new Promise(r => setTimeout(r, 1500)); // Esperar 1.5s antes de reintentar
+            await new Promise(r => setTimeout(r, 1500));
             return fetchConTimeout(url, intento + 1);
         }
         throw error;
