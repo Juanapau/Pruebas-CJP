@@ -479,13 +479,31 @@ th.header-total {
 
 /* Input para valor del RA en el encabezado */
 .input-valor-ra {
-    width: 60px;
-    padding: 4px;
+    width: 100%;
+    padding: 8px 4px;
     text-align: center;
-    border: 1px solid var(--color-gris-claro);
-    border-radius: 4px;
+    border: none;
+    border-radius: 0;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    background-color: transparent;
+    color: var(--color-texto);
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    appearance: none;
+}
+
+/* Quitar flechas de incremento/decremento */
+.input-valor-ra::-webkit-outer-spin-button,
+.input-valor-ra::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input-valor-ra:focus {
+    outline: 2px solid var(--color-primario);
+    outline-offset: -2px;
+    background-color: rgba(92, 107, 192, 0.1);
 }
 
 /* Celdas del cuerpo */
