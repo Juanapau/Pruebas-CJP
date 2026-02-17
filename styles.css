@@ -694,6 +694,13 @@ tbody tr:hover td {
     appearance: none !important;
 }
 
+/* Input de actividades más grande */
+.input-actividad {
+    padding: 14px 3px !important;
+    font-size: 1rem !important;
+    border-radius: 8px !important;
+}
+
 .input-oportunidad-simple::-webkit-outer-spin-button,
 .input-oportunidad-simple::-webkit-inner-spin-button,
 .input-actividad::-webkit-outer-spin-button,
