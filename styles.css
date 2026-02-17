@@ -336,10 +336,25 @@ thead tr {
     background-color: var(--color-header-principal);
 }
 
+/* Aplicar fondo entre celdas del thead */
+thead::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-header-principal);
+    z-index: -1;
+}
+
 /* Los th del thead no tienen bordes ni espaciado */
 thead th {
     border: none !important;
     border-radius: 0 !important;
+    box-shadow: 
+        4px 0 0 0 var(--color-header-principal),
+        -4px 0 0 0 var(--color-header-principal);
 }
 
 th {
