@@ -435,6 +435,8 @@ th.header-minimo-num {
     width: auto;
     min-width: 50px;
     max-width: 80px;
+    position: relative;
+    left: -4px;
 }
 
 th.header-vacia {
@@ -475,6 +477,8 @@ th.header-label-70 {
     width: auto;
     min-width: 50px;
     max-width: 80px;
+    position: relative;
+    left: -4px;
 }
 
 th.header-total {
