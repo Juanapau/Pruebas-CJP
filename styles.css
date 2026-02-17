@@ -347,6 +347,7 @@ th.header-numero {
     position: sticky;
     left: 0;
     z-index: 20;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
 th.header-nombre {
@@ -361,6 +362,7 @@ th.header-nombre {
     position: sticky;
     left: 65px;
     z-index: 20;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
 th.header-ra {
@@ -465,6 +467,7 @@ td.numero {
     position: sticky;
     left: 0;
     z-index: 15;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
 td.nombre-estudiante {
@@ -480,6 +483,7 @@ td.nombre-estudiante {
     left: 65px;
     z-index: 15;
     background-color: var(--color-blanco);
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
 tbody tr:nth-child(even) {
