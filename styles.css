@@ -518,6 +518,10 @@ tbody tr:hover {
     font-size: 0.85rem !important;
     transition: all 0.2s ease;
     box-sizing: border-box !important;
+    box-shadow: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
 }
 
 .input-oportunidad-simple::-webkit-outer-spin-button,
@@ -712,6 +716,10 @@ body.dark-mode textarea {
     background-color: transparent;
     color: #E8EAED;
     border-color: #3C3C3C;
+    box-shadow: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
 }
 
 body.dark-mode input[type="number"]:focus,
@@ -788,6 +796,23 @@ body.dark-mode tbody tr:hover td:hover input {
 body.dark-mode td.numero {
     background-color: var(--color-header-principal);
     color: #FFFFFF;
+}
+
+/* Asegurar filas alternas en tabla de actividades */
+body.dark-mode #tablaActividades tbody tr:nth-child(odd) td {
+    background-color: #1E1E1E !important;
+}
+
+body.dark-mode #tablaActividades tbody tr:nth-child(even) td {
+    background-color: #2D2D2D !important;
+}
+
+body.dark-mode #tablaActividades tbody tr:hover td {
+    background-color: #37474F !important;
+}
+
+body.dark-mode #tablaActividades tbody tr:hover td:hover {
+    background-color: #000000 !important;
 }
 
 body.dark-mode tbody tr td.nombre-estudiante {
