@@ -694,6 +694,15 @@ tbody tr:hover td {
     appearance: none !important;
 }
 
+/* Input de actividades más grande */
+#tablaActividades .input-actividad {
+    padding: 13px 3px !important;
+}
+
+#tablaActividades td:not(.numero):not(.nombre-estudiante):not(.celda-total) {
+    padding: 2px !important;
+}
+
 .input-oportunidad-simple::-webkit-outer-spin-button,
 .input-oportunidad-simple::-webkit-inner-spin-button,
 .input-actividad::-webkit-outer-spin-button,
