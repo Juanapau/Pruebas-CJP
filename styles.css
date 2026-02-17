@@ -311,8 +311,7 @@ table {
     width: 100%;
     border-collapse: separate;
     table-layout: auto;
-    border-spacing: 4px;
-    background-color: var(--color-header-principal);
+    border-spacing: 4px 0;
 }
 
 /* Distribución equitativa de columnas de oportunidades */
@@ -514,6 +513,15 @@ td.nombre-estudiante {
 
 tbody tr:nth-child(even) {
     /* Sin color alterno para mantener limpio */
+}
+
+/* Espaciado entre filas del tbody */
+tbody tr {
+    border-top: 4px solid var(--color-fondo);
+}
+
+tbody tr:first-child {
+    border-top: 4px solid var(--color-fondo);
 }
 
 tbody tr:hover td {
