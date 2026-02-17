@@ -371,7 +371,7 @@ th.header-nombre {
     color: var(--color-texto);
     white-space: nowrap;
     position: sticky;
-    left: 69px;
+    left: 64px;
     z-index: 20;
     box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
@@ -494,7 +494,7 @@ td.nombre-estudiante {
     max-width: 280px;
     white-space: nowrap;
     position: sticky;
-    left: 69px;
+    left: 64px;
     z-index: 15;
     background-color: var(--color-blanco);
     box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
