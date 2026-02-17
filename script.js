@@ -1466,9 +1466,7 @@ const asistenciaElementos = {
     tablaBody: document.getElementById('tablaAsistenciaBody'),
     btnGuardar: document.getElementById('btnGuardarAsistencia'),
     btnVolver: document.getElementById('btnVolverDesdeAsistencia'),
-    moduloInfo: document.getElementById('asistenciaModuloInfo'),
-    cursoInfo: document.getElementById('asistenciaCursoInfo'),
-    mesInfo: document.getElementById('asistenciaMesInfo')
+    moduloInfo: document.getElementById('asistenciaModulo')
 };
 
 function inicializarEventosAsistencia() {
@@ -1499,9 +1497,6 @@ function mostrarVistaAsistencia() {
     if (moduloSeleccionado) {
         asistenciaElementos.moduloInfo.textContent = moduloSeleccionado.nombre;
     }
-    
-    asistenciaElementos.cursoInfo.textContent = state.cursoSeleccionado || '-';
-    asistenciaElementos.mesInfo.textContent = '-';
 }
 
 function volverDesdeAsistencia() {
@@ -1512,30 +1507,9 @@ function volverDesdeAsistencia() {
 
 async function manejarCambioMesAsistencia(e) {
     const mes = e.target.value;
-    if (!mes) {
-        asistenciaElementos.mesInfo.textContent = '-';
-        return;
-    }
+    if (!mes) return;
     
     asistenciaState.mesSeleccionado = mes;
-    
-    // Actualizar texto del mes
-    const mesesNombres = {
-        '2025-01': 'Enero 2025',
-        '2025-02': 'Febrero 2025',
-        '2025-03': 'Marzo 2025',
-        '2025-04': 'Abril 2025',
-        '2025-05': 'Mayo 2025',
-        '2025-06': 'Junio 2025',
-        '2025-07': 'Julio 2025',
-        '2025-08': 'Agosto 2025',
-        '2025-09': 'Septiembre 2025',
-        '2025-10': 'Octubre 2025',
-        '2025-11': 'Noviembre 2025',
-        '2025-12': 'Diciembre 2025'
-    };
-    asistenciaElementos.mesInfo.textContent = mesesNombres[mes] || mes;
-    
     await cargarAsistenciasMes(state.moduloSeleccionado, state.cursoSeleccionado, mes);
     generarTablaAsistencia();
 }
