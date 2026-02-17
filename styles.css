@@ -884,7 +884,7 @@ tbody tr:hover td {
 
 .scroll-nav-buttons {
     position: fixed;
-    top: 150px;
+    top: 250px;
     z-index: 1000;
 }
 
