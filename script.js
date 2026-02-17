@@ -89,8 +89,8 @@ async function cargarModulos() {
         poblarSelectModulos();
         return;
     }
+    mostrarCargando(true, 'Cargando módulos...');
     try {
-        mostrarCargando(true, 'Cargando módulos...');
         const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getModulos`);
         const data = await response.json();
         state.modulos = data.modulos || [];
@@ -98,9 +98,10 @@ async function cargarModulos() {
         poblarSelectModulos();
     } catch (error) {
         console.error('❌ ERROR al cargar módulos:', error);
-        alert('Error al cargar los módulos. Verifica tu conexión e intenta de nuevo.');
         state.modulos = [];
         poblarSelectModulos();
+    } finally {
+        mostrarCargando(false);
     }
 }
 
@@ -110,16 +111,17 @@ async function cargarEstudiantes(curso) {
         state.estudiantes = cached;
         return;
     }
+    mostrarCargando(true, `Cargando estudiantes de ${curso}...`);
     try {
-        mostrarCargando(true, `Cargando estudiantes de ${curso}...`);
         const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`);
         const data = await response.json();
         state.estudiantes = data.estudiantes || [];
         guardarEnCache('estudiantes', state.estudiantes, curso);
     } catch (error) {
         console.error(`❌ ERROR al cargar estudiantes de ${curso}:`, error);
-        alert('Error al cargar los estudiantes. Verifica tu conexión e intenta de nuevo.');
         state.estudiantes = [];
+    } finally {
+        mostrarCargando(false);
     }
 }
 
