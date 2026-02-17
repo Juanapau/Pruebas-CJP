@@ -607,7 +607,6 @@ td {
     padding: 8px;
     text-align: center;
     border: 2px solid #455A64;
-    background-color: var(--color-blanco);
     color: var(--color-texto);
     border-radius: 8px;
 }
@@ -635,7 +634,6 @@ td.nombre-estudiante {
     position: sticky;
     left: 68px;
     z-index: 18;
-    background-color: var(--color-blanco);
     box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
 }
