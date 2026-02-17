@@ -334,6 +334,31 @@ thead {
 thead th {
     border: none !important;
     border-radius: 0 !important;
+    outline: 4px solid var(--color-header-principal);
+    outline-offset: -4px;
+}
+
+/* Colores específicos para cada tipo de header */
+thead th.header-numero,
+thead th.header-nombre {
+    outline-color: var(--color-header-principal);
+}
+
+thead th.header-ra {
+    outline-color: var(--color-header-ra);
+}
+
+thead th.header-valor-num {
+    outline-color: var(--color-header-principal);
+}
+
+thead th.header-minimo-num,
+thead th.header-label-70 {
+    outline-color: var(--color-header-70);
+}
+
+thead th.header-label-valor {
+    outline-color: var(--color-header-valor);
 }
 
 th {
