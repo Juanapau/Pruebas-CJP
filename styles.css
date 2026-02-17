@@ -359,7 +359,7 @@ th.header-nombre {
     color: var(--color-texto);
     white-space: nowrap;
     position: sticky;
-    left: 60px;
+    left: 65px;
     z-index: 20;
 }
 
@@ -477,7 +477,7 @@ td.nombre-estudiante {
     max-width: 280px;
     white-space: nowrap;
     position: sticky;
-    left: 60px;
+    left: 65px;
     z-index: 15;
     background-color: var(--color-blanco);
 }
