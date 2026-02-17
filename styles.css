@@ -790,6 +790,15 @@ body.dark-mode tbody tr:hover td {
     background-color: var(--color-fila-hover);
 }
 
+/* Columnas sticky también cambian en hover */
+body.dark-mode tbody tr:hover td.numero {
+    background-color: var(--color-fila-hover) !important;
+}
+
+body.dark-mode tbody tr:hover td.nombre-estudiante {
+    background-color: var(--color-fila-hover) !important;
+}
+
 /* Celda específica donde está el mouse - NEGRA */
 body.dark-mode tbody tr:hover td:hover {
     background-color: #000000;
