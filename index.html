@@ -141,10 +141,23 @@
         <!-- Vista de Asistencia -->
         <div id="vistaAsistencia" class="vista-asistencia" style="display: none;">
             <div class="tabla-header-con-boton">
-                <h2>📋 Registro de Asistencia - <span id="asistenciaModulo" class="modulo-info"></span></h2>
+                <h2>📋 Registro de Asistencia</h2>
                 <button id="btnGuardarAsistencia" class="btn-guardar">
                     💾 Guardar Asistencia
                 </button>
+            </div>
+
+            <!-- Info de contexto -->
+            <div class="info-contexto-asistencia">
+                <div class="info-item">
+                    <strong>📚 Módulo:</strong> <span id="asistenciaModuloInfo">-</span>
+                </div>
+                <div class="info-item">
+                    <strong>🎓 Curso:</strong> <span id="asistenciaCursoInfo">-</span>
+                </div>
+                <div class="info-item">
+                    <strong>📅 Mes:</strong> <span id="asistenciaMesInfo">-</span>
+                </div>
             </div>
 
             <div class="filtros-asistencia">
