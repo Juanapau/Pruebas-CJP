@@ -1,9 +1,10 @@
 // Configuración
 const CONFIG = {
-    // URL del Web App de Google Apps Script
     GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw3CURWoHl3tsZd8wflU0z4C_lvU1V55RcUldl2kIzQqIc3l1JsUOlR8R8qxWvsDOtl/exec',
     NUM_ACTIVIDADES: 15,
-    PORCENTAJE_APROBATORIO: 70
+    PORCENTAJE_APROBATORIO: 70,
+    TIMEOUT_MS: 12000,      // 12 segundos antes de reintentar
+    MAX_REINTENTOS: 2       // Máximo 2 reintentos automáticos
 };
 
 // Estado global de la aplicación
@@ -84,88 +85,63 @@ async function cargarDatosIniciales() {
 }
 
 async function cargarModulos() {
-    // Intentar cargar desde caché primero
     const cached = obtenerDeCache('modulos');
     if (cached) {
         state.modulos = cached;
         poblarSelectModulos();
         return;
     }
-    
-    // Si no hay caché, cargar desde Google Sheets
-    console.time('⏱️ Carga de Módulos (Sheets)');
     try {
-        const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getModulos`);
+        mostrarCargando(true, 'Cargando módulos...');
+        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getModulos`);
         const data = await response.json();
         state.modulos = data.modulos || [];
-        
-        // Guardar en caché
         guardarEnCache('modulos', state.modulos);
-        
-        console.timeEnd('⏱️ Carga de Módulos (Sheets)');
-        console.log('✅ Módulos cargados desde Google Sheets:', state.modulos.length);
         poblarSelectModulos();
     } catch (error) {
-        console.error('❌ ERROR al cargar módulos desde Google Sheets:', error);
-        alert('Error al cargar los módulos. Verifica la conexión con Google Sheets.');
+        console.error('❌ ERROR al cargar módulos:', error);
+        alert('Error al cargar los módulos. Verifica tu conexión e intenta de nuevo.');
         state.modulos = [];
         poblarSelectModulos();
     }
 }
 
 async function cargarEstudiantes(curso) {
-    // Intentar cargar desde caché
     const cached = obtenerDeCache('estudiantes', curso);
     if (cached) {
         state.estudiantes = cached;
         return;
     }
-    
-    // Cargar desde Sheets
-    console.time(`⏱️ Carga de Estudiantes ${curso} (Sheets)`);
     try {
-        const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`);
+        mostrarCargando(true, `Cargando estudiantes de ${curso}...`);
+        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`);
         const data = await response.json();
         state.estudiantes = data.estudiantes || [];
-        
-        // Guardar en caché
         guardarEnCache('estudiantes', state.estudiantes, curso);
-        
-        console.timeEnd(`⏱️ Carga de Estudiantes ${curso} (Sheets)`);
-        console.log(`✅ Estudiantes de ${curso} cargados desde Google Sheets:`, state.estudiantes.length);
     } catch (error) {
         console.error(`❌ ERROR al cargar estudiantes de ${curso}:`, error);
-        alert('Error al cargar los estudiantes. Verifica la conexión con Google Sheets.');
+        alert('Error al cargar los estudiantes. Verifica tu conexión e intenta de nuevo.');
         state.estudiantes = [];
     }
 }
 
 async function cargarRAsDelModulo(moduloId) {
-    // Intentar cargar desde caché
     const cached = obtenerDeCache('ras', moduloId);
     if (cached) {
         state.ras = cached;
         poblarSelectRAs();
         return;
     }
-    
-    // Cargar desde Sheets
-    console.time('⏱️ Carga de RAs (Sheets)');
-    mostrarCargando(true);
+    mostrarCargando(true, 'Cargando resultados de aprendizaje...');
     try {
-        const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getRAs&moduloId=${moduloId}`);
+        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getRAs&moduloId=${moduloId}`);
         const data = await response.json();
         state.ras = data.ras || [];
-        
-        // Guardar en caché
         guardarEnCache('ras', state.ras, moduloId);
-        
-        console.timeEnd('⏱️ Carga de RAs (Sheets)');
-        console.log(`✅ RAs cargados desde Google Sheets (Módulo ${moduloId}):`, state.ras.length);
         poblarSelectRAs();
     } catch (error) {
-        console.error('❌ ERROR al cargar RAs desde Google Sheets:', error);
-        alert('Error al cargar los RAs. Verifica la conexión con Google Sheets.');
+        console.error('❌ ERROR al cargar RAs:', error);
+        alert('Error al cargar los RAs. Verifica tu conexión e intenta de nuevo.');
         state.ras = [];
         poblarSelectRAs();
     } finally {
@@ -174,27 +150,18 @@ async function cargarRAsDelModulo(moduloId) {
 }
 
 async function cargarCalificaciones(moduloId) {
-    // Intentar cargar desde caché
     const cached = obtenerDeCache('calificaciones', moduloId);
     if (cached) {
         state.calificaciones = cached;
         generarTablaRegistro();
         return;
     }
-    
-    // Cargar desde Sheets
-    console.time('⏱️ Carga de Calificaciones (Sheets)');
-    mostrarCargando(true);
+    mostrarCargando(true, 'Cargando calificaciones...');
     try {
-        const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getCalificaciones&moduloId=${moduloId}`);
+        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getCalificaciones&moduloId=${moduloId}`);
         const data = await response.json();
         state.calificaciones = data.calificaciones || [];
-        
-        // Guardar en caché
         guardarEnCache('calificaciones', state.calificaciones, moduloId);
-        
-        console.timeEnd('⏱️ Carga de Calificaciones (Sheets)');
-        console.log(`📊 ${state.calificaciones.length} calificaciones cargadas`);
         generarTablaRegistro();
     } catch (error) {
         console.error('Error al cargar calificaciones:', error);
@@ -206,34 +173,21 @@ async function cargarCalificaciones(moduloId) {
 }
 
 async function cargarActividadesRA(raId) {
-    // Intentar cargar desde caché
     const cached = obtenerDeCache('actividades', raId);
     if (cached) {
-        // Eliminar actividades anteriores de este RA y agregar las del caché
         state.actividades = state.actividades.filter(a => a.raId != raId);
         state.actividades.push(...cached);
         generarTablaActividades();
         return;
     }
-    
-    // Cargar desde Sheets
-    console.time('⏱️ Carga de Actividades (Sheets)');
-    mostrarCargando(true);
+    mostrarCargando(true, 'Cargando actividades del RA...');
     try {
-        const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getActividades&raId=${raId}`);
+        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getActividades&raId=${raId}`);
         const data = await response.json();
-        
         const actividadesDelRA = data.actividades || [];
-        
-        // Guardar en caché
         guardarEnCache('actividades', actividadesDelRA, raId);
-        
-        // Eliminar actividades anteriores de este RA y agregar las nuevas
         state.actividades = state.actividades.filter(a => a.raId != raId);
         state.actividades.push(...actividadesDelRA);
-        
-        console.timeEnd('⏱️ Carga de Actividades (Sheets)');
-        console.log(`📋 ${actividadesDelRA.length} actividades cargadas de Google Sheets`);
         generarTablaActividades();
     } catch (error) {
         console.error('Error al cargar actividades:', error);
@@ -821,8 +775,32 @@ async function guardarActividad(input) {
     }
 }
 
-function mostrarCargando(mostrar) {
-    elementos.loading.style.display = mostrar ? 'block' : 'none';
+function mostrarCargando(mostrar, subtexto = 'Conectando con Google Sheets') {
+    elementos.loading.style.display = mostrar ? 'flex' : 'none';
+    const sub = document.getElementById('loadingSubtexto');
+    if (sub) sub.textContent = subtexto;
+}
+
+// Fetch con timeout y reintentos automáticos
+async function fetchConTimeout(url, intento = 1) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), CONFIG.TIMEOUT_MS);
+    
+    try {
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        return response;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        if (intento < CONFIG.MAX_REINTENTOS) {
+            console.warn(`⚠️ Intento ${intento} fallido, reintentando...`);
+            const sub = document.getElementById('loadingSubtexto');
+            if (sub) sub.textContent = `Reintentando... (${intento}/${CONFIG.MAX_REINTENTOS})`;
+            await new Promise(r => setTimeout(r, 1500)); // Esperar 1.5s antes de reintentar
+            return fetchConTimeout(url, intento + 1);
+        }
+        throw error;
+    }
 }
 
 // Funciones de guardado masivo
