@@ -1454,19 +1454,23 @@ function actualizarNavegacionTablas() {
 // ==========================================
 
 const asistenciaState = {
+    moduloSeleccionado: null,
+    cursoSeleccionado: null,
     mesSeleccionado: null,
+    estudiantes: [],
     asistencias: [],
     diasDelMes: []
 };
 
 const asistenciaElementos = {
     vistaAsistencia: document.getElementById('vistaAsistencia'),
+    selectModulo: document.getElementById('selectModuloAsistencia'),
+    selectCurso: document.getElementById('selectCursoAsistencia'),
     selectMes: document.getElementById('selectMesAsistencia'),
     tablaHead: document.getElementById('tablaAsistenciaHead'),
     tablaBody: document.getElementById('tablaAsistenciaBody'),
     btnGuardar: document.getElementById('btnGuardarAsistencia'),
-    btnVolver: document.getElementById('btnVolverDesdeAsistencia'),
-    moduloInfo: document.getElementById('asistenciaModulo')
+    btnVolver: document.getElementById('btnVolverDesdeAsistencia')
 };
 
 function inicializarEventosAsistencia() {
@@ -1476,6 +1480,8 @@ function inicializarEventosAsistencia() {
         }
     });
     
+    asistenciaElementos.selectModulo.addEventListener('change', manejarCambioModuloAsistencia);
+    asistenciaElementos.selectCurso.addEventListener('change', manejarCambioCursoAsistencia);
     asistenciaElementos.selectMes.addEventListener('change', manejarCambioMesAsistencia);
     asistenciaElementos.btnVolver.addEventListener('click', volverDesdeAsistencia);
     asistenciaElementos.btnGuardar.addEventListener('click', guardarAsistencia);
@@ -1493,10 +1499,27 @@ function mostrarVistaAsistencia() {
     elementos.vistaActividades.style.display = 'none';
     asistenciaElementos.vistaAsistencia.style.display = 'block';
     
-    const moduloSeleccionado = state.modulos.find(m => m.id === state.moduloSeleccionado);
-    if (moduloSeleccionado) {
-        asistenciaElementos.moduloInfo.textContent = moduloSeleccionado.nombre;
-    }
+    // Poblar select de módulos
+    poblarSelectModulosAsistencia();
+    
+    // Resetear selectores
+    asistenciaElementos.selectModulo.value = '';
+    asistenciaElementos.selectCurso.value = '';
+    asistenciaElementos.selectMes.value = '';
+    
+    // Limpiar tabla
+    asistenciaElementos.tablaHead.innerHTML = '';
+    asistenciaElementos.tablaBody.innerHTML = '';
+}
+
+function poblarSelectModulosAsistencia() {
+    asistenciaElementos.selectModulo.innerHTML = '<option value="">Seleccione un módulo</option>';
+    state.modulos.forEach(modulo => {
+        const option = document.createElement('option');
+        option.value = modulo.id;
+        option.textContent = modulo.nombre;
+        asistenciaElementos.selectModulo.appendChild(option);
+    });
 }
 
 function volverDesdeAsistencia() {
@@ -1505,13 +1528,66 @@ function volverDesdeAsistencia() {
     elementos.selectRA.value = '';
 }
 
+async function manejarCambioModuloAsistencia(e) {
+    const moduloId = e.target.value;
+    if (!moduloId) {
+        asistenciaElementos.tablaHead.innerHTML = '';
+        asistenciaElementos.tablaBody.innerHTML = '';
+        return;
+    }
+    asistenciaState.moduloSeleccionado = moduloId;
+    verificarYCargarAsistencia();
+}
+
+async function manejarCambioCursoAsistencia(e) {
+    const curso = e.target.value;
+    if (!curso) {
+        asistenciaElementos.tablaHead.innerHTML = '';
+        asistenciaElementos.tablaBody.innerHTML = '';
+        return;
+    }
+    asistenciaState.cursoSeleccionado = curso;
+    
+    // Cargar estudiantes del curso
+    await cargarEstudiantesAsistencia(curso);
+    verificarYCargarAsistencia();
+}
+
 async function manejarCambioMesAsistencia(e) {
     const mes = e.target.value;
-    if (!mes) return;
-    
+    if (!mes) {
+        asistenciaElementos.tablaHead.innerHTML = '';
+        asistenciaElementos.tablaBody.innerHTML = '';
+        return;
+    }
     asistenciaState.mesSeleccionado = mes;
-    await cargarAsistenciasMes(state.moduloSeleccionado, state.cursoSeleccionado, mes);
+    verificarYCargarAsistencia();
+}
+
+async function verificarYCargarAsistencia() {
+    // Verificar que todos los filtros estén seleccionados
+    if (!asistenciaState.moduloSeleccionado || !asistenciaState.cursoSeleccionado || !asistenciaState.mesSeleccionado) {
+        return;
+    }
+    
+    await cargarAsistenciasMes(asistenciaState.moduloSeleccionado, asistenciaState.cursoSeleccionado, asistenciaState.mesSeleccionado);
     generarTablaAsistencia();
+}
+
+async function cargarEstudiantesAsistencia(curso) {
+    mostrarCargando(true, 'Cargando estudiantes...');
+    try {
+        const response = await fetchConTimeout(
+            `${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`
+        );
+        const data = await response.json();
+        asistenciaState.estudiantes = data.estudiantes || [];
+    } catch (error) {
+        console.error('Error al cargar estudiantes:', error);
+        asistenciaState.estudiantes = [];
+    } finally {
+        mostrarCargando(false);
+    }
 }
 
 async function cargarAsistenciasMes(moduloId, curso, mes) {
@@ -1547,7 +1623,7 @@ function generarDiasLaborables(mes) {
 }
 
 function generarTablaAsistencia() {
-    if (!asistenciaState.mesSeleccionado || state.estudiantes.length === 0) {
+    if (!asistenciaState.mesSeleccionado || asistenciaState.estudiantes.length === 0) {
         asistenciaElementos.tablaHead.innerHTML = '';
         asistenciaElementos.tablaBody.innerHTML = '';
         return;
@@ -1574,7 +1650,7 @@ function generarTablaAsistencia() {
     asistenciaElementos.tablaHead.innerHTML = headerHTML;
     
     let bodyHTML = '';
-    state.estudiantes.forEach(estudiante => {
+    asistenciaState.estudiantes.forEach(estudiante => {
         bodyHTML += '<tr>';
         bodyHTML += `<td class="numero">${estudiante.numero}</td>`;
         bodyHTML += `<td class="nombre-estudiante">${estudiante.nombre}</td>`;
@@ -1718,8 +1794,8 @@ async function guardarAsistencia() {
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=guardarAsistencias`, {
             method: 'POST',
             body: JSON.stringify({
-                moduloId: state.moduloSeleccionado,
-                curso: state.cursoSeleccionado,
+                moduloId: asistenciaState.moduloSeleccionado,
+                curso: asistenciaState.cursoSeleccionado,
                 mes: asistenciaState.mesSeleccionado,
                 asistencias: asistenciaState.asistencias,
                 diasDelMes: asistenciaState.diasDelMes
