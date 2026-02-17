@@ -640,20 +640,19 @@ td.nombre-estudiante {
 
 /* Cebra modo claro */
 tbody tr:nth-child(odd) td {
-    background-color: #ffffff !important;
+    background-color: #ffffff;
 }
 
 tbody tr:nth-child(even) td {
-    background-color: #eaf1fb !important;
+    background-color: #eaf1fb;
 }
 
-/* Espaciado entre filas del tbody */
 tbody tr:nth-child(odd) td.nombre-estudiante {
-    background-color: #ffffff !important;
+    background-color: #ffffff;
 }
 
 tbody tr:nth-child(even) td.nombre-estudiante {
-    background-color: #eaf1fb !important;
+    background-color: #eaf1fb;
 }
 
 /* Espaciado entre filas del tbody */
