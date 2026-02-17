@@ -546,6 +546,15 @@ thead th.header-combinado {
     box-shadow: none;
 }
 
+/* Línea separadora verde entre grupos de RA */
+.separador-ra {
+    border-left: 3px solid #0aa574 !important;
+}
+
+thead th.separador-ra {
+    border-left: 3px solid #0aa574 !important;
+}
+
 /* Input para valor del RA en el encabezado */
 .input-valor-ra {
     width: 100%;
