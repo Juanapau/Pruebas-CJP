@@ -467,8 +467,8 @@ function generarTablaActividades() {
     
     // Generar encabezado
     let headerHTML = '<tr>';
-    headerHTML += '<th>No.</th>';
-    headerHTML += '<th>Nombres</th>';
+    headerHTML += '<th class="header-numero">No.</th>';
+    headerHTML += '<th class="header-nombre">Nombres</th>';
     
     for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
         headerHTML += `<th class="actividad-header">Ac.${i}</th>`;
