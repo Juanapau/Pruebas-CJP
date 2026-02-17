@@ -229,6 +229,11 @@ function poblarSelectRAs() {
         option.textContent = `Actividades ${ra.nombre}`;
         elementos.selectRA.appendChild(option);
     });
+    
+    // Agregar opción de asistencia
+    if (typeof agregarOpcionAsistencia === 'function') {
+        agregarOpcionAsistencia();
+    }
 }
 
 // Manejadores de eventos
@@ -1442,4 +1447,303 @@ function actualizarNavegacionTablas() {
             contenedorActividades.dispatchEvent(new Event('scroll'));
         }
     }, 200);
+}
+
+// ==========================================
+// MÓDULO DE ASISTENCIA
+// ==========================================
+
+const asistenciaState = {
+    mesSeleccionado: null,
+    asistencias: [],
+    diasDelMes: []
+};
+
+const asistenciaElementos = {
+    vistaAsistencia: document.getElementById('vistaAsistencia'),
+    selectMes: document.getElementById('selectMesAsistencia'),
+    tablaHead: document.getElementById('tablaAsistenciaHead'),
+    tablaBody: document.getElementById('tablaAsistenciaBody'),
+    btnGuardar: document.getElementById('btnGuardarAsistencia'),
+    btnVolver: document.getElementById('btnVolverDesdeAsistencia'),
+    moduloInfo: document.getElementById('asistenciaModulo')
+};
+
+function inicializarEventosAsistencia() {
+    elementos.selectRA.addEventListener('change', function(e) {
+        if (e.target.value === 'asistencia') {
+            mostrarVistaAsistencia();
+        }
+    });
+    
+    asistenciaElementos.selectMes.addEventListener('change', manejarCambioMesAsistencia);
+    asistenciaElementos.btnVolver.addEventListener('click', volverDesdeAsistencia);
+    asistenciaElementos.btnGuardar.addEventListener('click', guardarAsistencia);
+}
+
+function agregarOpcionAsistencia() {
+    const optionAsistencia = document.createElement('option');
+    optionAsistencia.value = 'asistencia';
+    optionAsistencia.textContent = '📋 Ver Asistencia';
+    elementos.selectRA.appendChild(optionAsistencia);
+}
+
+function mostrarVistaAsistencia() {
+    elementos.vistaRegistro.style.display = 'none';
+    elementos.vistaActividades.style.display = 'none';
+    asistenciaElementos.vistaAsistencia.style.display = 'block';
+    
+    const moduloSeleccionado = state.modulos.find(m => m.id === state.moduloSeleccionado);
+    if (moduloSeleccionado) {
+        asistenciaElementos.moduloInfo.textContent = moduloSeleccionado.nombre;
+    }
+}
+
+function volverDesdeAsistencia() {
+    asistenciaElementos.vistaAsistencia.style.display = 'none';
+    elementos.vistaRegistro.style.display = 'block';
+    elementos.selectRA.value = '';
+}
+
+async function manejarCambioMesAsistencia(e) {
+    const mes = e.target.value;
+    if (!mes) return;
+    
+    asistenciaState.mesSeleccionado = mes;
+    await cargarAsistenciasMes(state.moduloSeleccionado, state.cursoSeleccionado, mes);
+    generarTablaAsistencia();
+}
+
+async function cargarAsistenciasMes(moduloId, curso, mes) {
+    mostrarCargando(true, 'Cargando asistencias...');
+    try {
+        const response = await fetchConTimeout(
+            `${CONFIG.GOOGLE_SCRIPT_URL}?action=getAsistencias&moduloId=${moduloId}&curso=${curso}&mes=${mes}`
+        );
+        const data = await response.json();
+        asistenciaState.asistencias = data.asistencias || [];
+    } catch (error) {
+        console.error('Error al cargar asistencias:', error);
+        asistenciaState.asistencias = [];
+    } finally {
+        mostrarCargando(false);
+    }
+}
+
+function generarDiasLaborables(mes) {
+    const [year, month] = mes.split('-');
+    const primerDia = new Date(year, parseInt(month) - 1, 1);
+    const ultimoDia = new Date(year, parseInt(month), 0);
+    
+    const dias = [];
+    for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
+        const fecha = new Date(year, parseInt(month) - 1, dia);
+        const diaSemana = fecha.getDay();
+        if (diaSemana !== 0 && diaSemana !== 6) {
+            dias.push(dia);
+        }
+    }
+    return dias;
+}
+
+function generarTablaAsistencia() {
+    if (!asistenciaState.mesSeleccionado || state.estudiantes.length === 0) {
+        asistenciaElementos.tablaHead.innerHTML = '';
+        asistenciaElementos.tablaBody.innerHTML = '';
+        return;
+    }
+    
+    asistenciaState.diasDelMes = generarDiasLaborables(asistenciaState.mesSeleccionado);
+    
+    let headerHTML = '<tr>';
+    headerHTML += '<th class="header-numero">#</th>';
+    headerHTML += '<th class="header-nombre">Nombre</th>';
+    
+    asistenciaState.diasDelMes.forEach((dia, index) => {
+        const claseExtra = index === 0 ? ' separador-ra' : '';
+        headerHTML += `<th class="header-dia${claseExtra}">
+            <input type="number" value="${dia}" min="1" max="31" 
+                   data-dia-index="${index}" class="input-dia-header">
+        </th>`;
+    });
+    
+    headerHTML += '<th class="header-total-asistencia">Total</th>';
+    headerHTML += '<th class="header-porcentaje-asistencia">%</th>';
+    headerHTML += '</tr>';
+    
+    asistenciaElementos.tablaHead.innerHTML = headerHTML;
+    
+    let bodyHTML = '';
+    state.estudiantes.forEach(estudiante => {
+        bodyHTML += '<tr>';
+        bodyHTML += `<td class="numero">${estudiante.numero}</td>`;
+        bodyHTML += `<td class="nombre-estudiante">${estudiante.nombre}</td>`;
+        
+        asistenciaState.diasDelMes.forEach((dia, index) => {
+            const asistencia = obtenerAsistencia(estudiante.id, dia);
+            const claseExtra = index === 0 ? ' separador-ra' : '';
+            bodyHTML += `<td class="celda-asistencia${claseExtra}">
+                <input type="text" maxlength="1" 
+                       data-estudiante="${estudiante.id}" 
+                       data-dia="${dia}" 
+                       value="${asistencia}" 
+                       class="input-asistencia ${obtenerClaseEstado(asistencia)}">
+            </td>`;
+        });
+        
+        const totales = calcularTotalesAsistencia(estudiante.id);
+        bodyHTML += `<td class="celda-total-asistencia">${totales.total}</td>`;
+        bodyHTML += `<td class="celda-porcentaje-asistencia">${totales.porcentaje}%</td>`;
+        bodyHTML += '</tr>';
+    });
+    
+    asistenciaElementos.tablaBody.innerHTML = bodyHTML;
+    agregarEventosAsistencia();
+    configurarNavegacion('tablaScrollAsistencia', 'scrollLeftAsistencia', 'scrollRightAsistencia');
+}
+
+function obtenerAsistencia(estudianteId, dia) {
+    const asistencia = asistenciaState.asistencias.find(
+        a => a.estudianteId === estudianteId && a.dia === dia
+    );
+    return asistencia ? asistencia.estado : '';
+}
+
+function obtenerClaseEstado(estado) {
+    const estadoUpper = estado.toUpperCase();
+    if (estadoUpper === 'P') return 'presente';
+    if (estadoUpper === 'E') return 'excusa';
+    if (estadoUpper === 'A') return 'ausente';
+    if (estadoUpper === 'F') return 'feriado';
+    return '';
+}
+
+function calcularTotalesAsistencia(estudianteId) {
+    let presentes = 0;
+    let excusas = 0;
+    let diasContados = 0;
+    
+    asistenciaState.diasDelMes.forEach(dia => {
+        const estado = obtenerAsistencia(estudianteId, dia).toUpperCase();
+        if (estado === 'P') {
+            presentes++;
+            diasContados++;
+        } else if (estado === 'E') {
+            excusas++;
+            diasContados++;
+        } else if (estado === 'A') {
+            diasContados++;
+        }
+    });
+    
+    const excusasComoAusencias = Math.floor(excusas / 3);
+    const diasPresentes = presentes + excusas - (excusasComoAusencias * 3);
+    const porcentaje = diasContados > 0 ? Math.round((diasPresentes / diasContados) * 100) : 0;
+    
+    return { total: diasPresentes, porcentaje: porcentaje };
+}
+
+function agregarEventosAsistencia() {
+    document.querySelectorAll('.input-dia-header').forEach(input => {
+        input.addEventListener('change', function() {
+            const index = parseInt(this.dataset.diaIndex);
+            const nuevoDia = parseInt(this.value);
+            if (nuevoDia >= 1 && nuevoDia <= 31) {
+                asistenciaState.diasDelMes[index] = nuevoDia;
+                generarTablaAsistencia();
+            }
+        });
+    });
+    
+    document.querySelectorAll('.input-asistencia').forEach(input => {
+        input.addEventListener('input', function() {
+            const valor = this.value.toUpperCase();
+            const estudianteId = this.dataset.estudiante;
+            const dia = parseInt(this.dataset.dia);
+            
+            if (valor && !['P', 'E', 'A', 'F'].includes(valor)) {
+                this.value = '';
+                return;
+            }
+            
+            this.value = valor;
+            this.className = 'input-asistencia ' + obtenerClaseEstado(valor);
+            actualizarAsistenciaState(estudianteId, dia, valor);
+            actualizarTotalesEstudiante(estudianteId);
+        });
+    });
+}
+
+function actualizarAsistenciaState(estudianteId, dia, estado) {
+    const index = asistenciaState.asistencias.findIndex(
+        a => a.estudianteId === estudianteId && a.dia === dia
+    );
+    
+    if (index !== -1) {
+        if (estado === '') {
+            asistenciaState.asistencias.splice(index, 1);
+        } else {
+            asistenciaState.asistencias[index].estado = estado;
+        }
+    } else if (estado !== '') {
+        asistenciaState.asistencias.push({
+            estudianteId: estudianteId,
+            mes: asistenciaState.mesSeleccionado,
+            dia: dia,
+            estado: estado
+        });
+    }
+}
+
+function actualizarTotalesEstudiante(estudianteId) {
+    const totales = calcularTotalesAsistencia(estudianteId);
+    const fila = document.querySelector(`input[data-estudiante="${estudianteId}"]`).closest('tr');
+    const celdaTotal = fila.querySelector('.celda-total-asistencia');
+    const celdaPorcentaje = fila.querySelector('.celda-porcentaje-asistencia');
+    
+    celdaTotal.textContent = totales.total;
+    celdaPorcentaje.textContent = `${totales.porcentaje}%`;
+}
+
+async function guardarAsistencia() {
+    if (asistenciaState.asistencias.length === 0) {
+        alert('No hay datos de asistencia para guardar.');
+        return;
+    }
+    
+    asistenciaElementos.btnGuardar.disabled = true;
+    asistenciaElementos.btnGuardar.textContent = '⏳ Guardando...';
+    
+    try {
+        const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=guardarAsistencias`, {
+            method: 'POST',
+            body: JSON.stringify({
+                moduloId: state.moduloSeleccionado,
+                curso: state.cursoSeleccionado,
+                mes: asistenciaState.mesSeleccionado,
+                asistencias: asistenciaState.asistencias,
+                diasDelMes: asistenciaState.diasDelMes
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert('✅ Asistencia guardada exitosamente');
+        } else {
+            alert('❌ Error al guardar: ' + (data.error || 'Error desconocido'));
+        }
+    } catch (error) {
+        console.error('Error al guardar asistencia:', error);
+        alert('❌ Error de conexión al guardar la asistencia');
+    } finally {
+        asistenciaElementos.btnGuardar.disabled = false;
+        asistenciaElementos.btnGuardar.textContent = '💾 Guardar Asistencia';
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarEventosAsistencia);
+} else {
+    inicializarEventosAsistencia();
 }
