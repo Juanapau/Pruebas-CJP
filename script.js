@@ -394,7 +394,7 @@ function generarTablaRegistro() {
     
     state.ras.forEach(ra => {
         // Cada RA ocupa 3 columnas (las 3 oportunidades)
-        headerHTML += `<th colspan="3" class="header-ra">%${ra.codigo}</th>`;
+        headerHTML += `<th colspan="3" class="header-ra separador-ra">%${ra.codigo}</th>`;
     });
     
     headerHTML += '<th rowspan="2" class="header-total">Total</th>';
@@ -407,7 +407,7 @@ function generarTablaRegistro() {
         const minimo = calcularMinimo(ra.valorTotal || 0);
         
         // Celda combinada negra (colspan 2) con valor y "Valor"
-        headerHTML += `<th colspan="2" class="header-combinado">
+        headerHTML += `<th colspan="2" class="header-combinado separador-ra">
             <div class="combinado-container">
                 <div class="combinado-negro">
                     <div class="combinado-negro-valor">
@@ -445,8 +445,8 @@ function generarTablaRegistro() {
             const valorFinal = obtenerUltimoValor(calificacion);
             totalEstudiante += valorFinal;
             
-            // SOLO 3 celdas: las 3 oportunidades
-            bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="1" value="${calificacion.op1 !== null && calificacion.op1 !== undefined ? calificacion.op1 : ''}" min="0" max="${ra.valorTotal}"></td>`;
+            // SOLO 3 celdas: las 3 oportunidades — primera lleva clase separador-ra
+            bodyHTML += `<td class="celda-oportunidad separador-ra"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="1" value="${calificacion.op1 !== null && calificacion.op1 !== undefined ? calificacion.op1 : ''}" min="0" max="${ra.valorTotal}"></td>`;
             bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="2" value="${calificacion.op2 !== null && calificacion.op2 !== undefined ? calificacion.op2 : ''}" min="0" max="${ra.valorTotal}"></td>`;
             bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="3" value="${calificacion.op3 !== null && calificacion.op3 !== undefined ? calificacion.op3 : ''}" min="0" max="${ra.valorTotal}"></td>`;
         });
