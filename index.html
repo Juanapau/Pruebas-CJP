@@ -33,8 +33,13 @@
                             <option value="">Seleccione un curso</option>
                             <option value="4toA">4toA</option>
                             <option value="4toB">4toB</option>
+                            <option value="4toC">4toC</option>
+                            <option value="5toA">5toA</option>
                             <option value="5toB">5toB</option>
+                            <option value="5toC">5toC</option>
+                            <option value="6toA">6toA</option>
                             <option value="6toB">6toB</option>
+                            <option value="6toC">6toC</option>
                         </select>
                     </div>
 
@@ -128,6 +133,81 @@
                         <tbody id="tablaActividadesBody">
                             <!-- Se genera dinámicamente -->
                         </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista de Asistencia -->
+        <div id="vistaAsistencia" class="vista-asistencia" style="display: none;">
+            <div class="tabla-header-con-boton">
+                <h2>📋 Registro de Asistencia - <span id="asistenciaModulo" class="modulo-info"></span></h2>
+                <button id="btnGuardarAsistencia" class="btn-guardar">
+                    💾 Guardar Asistencia
+                </button>
+            </div>
+
+            <div class="filtros-asistencia">
+                <div class="filtro-grupo">
+                    <label>📅 Mes</label>
+                    <select id="selectMesAsistencia">
+                        <option value="">Seleccione un mes</option>
+                        <option value="2025-01">Enero 2025</option>
+                        <option value="2025-02">Febrero 2025</option>
+                        <option value="2025-03">Marzo 2025</option>
+                        <option value="2025-04">Abril 2025</option>
+                        <option value="2025-05">Mayo 2025</option>
+                        <option value="2025-06">Junio 2025</option>
+                        <option value="2025-07">Julio 2025</option>
+                        <option value="2025-08">Agosto 2025</option>
+                        <option value="2025-09">Septiembre 2025</option>
+                        <option value="2025-10">Octubre 2025</option>
+                        <option value="2025-11">Noviembre 2025</option>
+                        <option value="2025-12">Diciembre 2025</option>
+                    </select>
+                </div>
+                <button id="btnVolverDesdeAsistencia" class="btn-volver-nuevo">
+                    ← Volver al Registro de Calificaciones
+                </button>
+            </div>
+
+            <div class="leyenda-asistencia">
+                <strong>Leyenda de estados:</strong>
+                <div class="leyenda-items">
+                    <div class="leyenda-item">
+                        <div class="leyenda-cuadro estado-presente"></div>
+                        <span>P = Presente</span>
+                    </div>
+                    <div class="leyenda-item">
+                        <div class="leyenda-cuadro estado-excusa"></div>
+                        <span>E = Excusa</span>
+                    </div>
+                    <div class="leyenda-item">
+                        <div class="leyenda-cuadro estado-ausente"></div>
+                        <span>A = Ausente</span>
+                    </div>
+                    <div class="leyenda-item">
+                        <div class="leyenda-cuadro estado-feriado"></div>
+                        <span>F = Feriado</span>
+                    </div>
+                </div>
+                <div class="leyenda-nota">
+                    Nota: 3 excusas = 1 ausencia. Se requiere 70% de asistencia.
+                </div>
+            </div>
+
+            <div class="tabla-scroll-container">
+                <div class="scroll-nav-buttons scroll-nav-left">
+                    <button class="scroll-nav-btn" id="scrollLeftAsistencia">◀</button>
+                </div>
+                <div class="scroll-nav-buttons scroll-nav-right">
+                    <button class="scroll-nav-btn" id="scrollRightAsistencia">▶</button>
+                </div>
+
+                <div id="tablaScrollAsistencia" class="tabla-scroll">
+                    <table id="tablaAsistencia">
+                        <thead id="tablaAsistenciaHead"></thead>
+                        <tbody id="tablaAsistenciaBody"></tbody>
                     </table>
                 </div>
             </div>
