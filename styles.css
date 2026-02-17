@@ -357,6 +357,14 @@ thead th {
         -4px 0 0 0 var(--color-header-principal);
 }
 
+/* Box-shadow específico para celdas con fondo negro */
+thead th.header-valor-num,
+thead th.header-label-valor {
+    box-shadow: 
+        4px 0 0 0 #1a1a1a,
+        -4px 0 0 0 #1a1a1a;
+}
+
 th {
     padding: 8px;
     text-align: center;
@@ -408,11 +416,11 @@ th.header-ra {
 }
 
 th.header-valor-num {
-    background-color: var(--color-header-valor);
+    background-color: #1a1a1a;
     font-size: 1.2rem;
     font-weight: bold;
     padding: 8px 2px;
-    color: var(--color-texto);
+    color: white;
     width: auto;
     min-width: 50px;
     max-width: 80px;
@@ -450,10 +458,10 @@ th.header-sub-minimo {
 }
 
 th.header-label-valor {
-    background-color: var(--color-header-valor);
+    background-color: #1a1a1a;
     font-size: 0.85rem;
     font-weight: 500;
-    color: var(--color-texto);
+    color: white;
     width: auto;
     min-width: 50px;
     max-width: 80px;
