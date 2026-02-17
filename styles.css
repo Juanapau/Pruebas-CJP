@@ -507,7 +507,8 @@ tbody tr:hover {
 }
 
 /* Input simple de oportunidad */
-.input-oportunidad-simple {
+.input-oportunidad-simple,
+.input-actividad {
     width: 100% !important;
     max-width: 100% !important;
     padding: 6px 3px !important;
@@ -525,30 +526,36 @@ tbody tr:hover {
 }
 
 .input-oportunidad-simple::-webkit-outer-spin-button,
-.input-oportunidad-simple::-webkit-inner-spin-button {
+.input-oportunidad-simple::-webkit-inner-spin-button,
+.input-actividad::-webkit-outer-spin-button,
+.input-actividad::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
 
-.input-oportunidad-simple {
+.input-oportunidad-simple,
+.input-actividad {
     -moz-appearance: textfield;
 }
 
-.input-oportunidad-simple:focus {
+.input-oportunidad-simple:focus,
+.input-actividad:focus {
     outline: none;
     border-color: var(--color-secundario);
     background-color: #fff3e0;
 }
 
 /* Validación de colores */
-.input-oportunidad-simple.reprobado {
+.input-oportunidad-simple.reprobado,
+.input-actividad.reprobado {
     background-color: #ffebee;
     border-color: var(--color-reprobado);
     color: var(--color-reprobado);
     font-weight: 600;
 }
 
-.input-oportunidad-simple.aprobado {
+.input-oportunidad-simple.aprobado,
+.input-actividad.aprobado {
     background-color: #e8f5e9;
     border-color: var(--color-aprobado);
     color: var(--color-aprobado);
