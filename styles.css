@@ -362,9 +362,9 @@ th.header-numero {
 }
 
 th.header-nombre {
-    width: 280px;
-    min-width: 280px;
-    max-width: 280px;
+    width: 270px;
+    min-width: 270px;
+    max-width: 270px;
     background-color: var(--color-header-principal);
     text-align: left;
     padding-left: 15px;
@@ -489,9 +489,9 @@ td.nombre-estudiante {
     font-weight: 500;
     padding-left: 15px;
     padding-right: 10px;
-    width: 280px;
-    min-width: 280px;
-    max-width: 280px;
+    width: 270px;
+    min-width: 270px;
+    max-width: 270px;
     white-space: nowrap;
     position: sticky;
     left: 64px;
