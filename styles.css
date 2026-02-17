@@ -938,6 +938,15 @@ body.dark-mode textarea {
     appearance: none !important;
 }
 
+/* Inputs de actividades y módulo siempre con estilo oscuro sin importar el modo */
+.input-actividad,
+.input-oportunidad-simple {
+    background-color: #37474F !important;
+    color: #E8EAED !important;
+    border: 2px solid #37474F !important;
+    border-radius: 6px !important;
+}
+
 body.dark-mode input[type="number"]:focus,
 body.dark-mode select:focus,
 body.dark-mode textarea:focus {
