@@ -1342,21 +1342,20 @@ function configurarNavegacion(contenedorId, btnLeftId, btnRightId) {
     
     if (!contenedor || !btnLeft || !btnRight) return;
     
+    let animacionId = null;
+    const VELOCIDAD = 3; // px por frame — ajusta este valor para más/menos velocidad
+    
     // Función para actualizar visibilidad de botones
     function actualizarBotones() {
         const scrollLeft = contenedor.scrollLeft;
-        const scrollWidth = contenedor.scrollWidth;
-        const clientWidth = contenedor.clientWidth;
-        const maxScroll = scrollWidth - clientWidth;
+        const maxScroll = contenedor.scrollWidth - contenedor.clientWidth;
         
-        // Mostrar botón izquierdo si hay scroll a la izquierda
         if (scrollLeft > 10) {
             btnLeft.classList.add('visible');
         } else {
             btnLeft.classList.remove('visible');
         }
         
-        // Mostrar botón derecho si hay contenido oculto a la derecha
         if (scrollLeft < maxScroll - 10) {
             btnRight.classList.add('visible');
         } else {
@@ -1364,29 +1363,59 @@ function configurarNavegacion(contenedorId, btnLeftId, btnRightId) {
         }
     }
     
-    // Función para scroll suave
-    function scrollSuave(direccion) {
-        const distancia = 300; // px
-        const inicio = contenedor.scrollLeft;
-        const destino = direccion === 'left' 
-            ? Math.max(0, inicio - distancia)
-            : Math.min(contenedor.scrollWidth - contenedor.clientWidth, inicio + distancia);
+    // Scroll continuo mientras el mouse esté encima
+    function iniciarScrollContinuo(direccion) {
+        if (animacionId) return; // Ya hay una animación corriendo
         
-        contenedor.scrollTo({
-            left: destino,
-            behavior: 'smooth'
-        });
+        function paso() {
+            const maxScroll = contenedor.scrollWidth - contenedor.clientWidth;
+            
+            if (direccion === 'left') {
+                if (contenedor.scrollLeft <= 0) {
+                    detenerScroll();
+                    return;
+                }
+                contenedor.scrollLeft -= VELOCIDAD;
+            } else {
+                if (contenedor.scrollLeft >= maxScroll) {
+                    detenerScroll();
+                    return;
+                }
+                contenedor.scrollLeft += VELOCIDAD;
+            }
+            
+            actualizarBotones();
+            animacionId = requestAnimationFrame(paso);
+        }
+        
+        animacionId = requestAnimationFrame(paso);
     }
     
-    // Event listeners
-    btnLeft.addEventListener('click', () => scrollSuave('left'));
-    btnRight.addEventListener('click', () => scrollSuave('right'));
-    contenedor.addEventListener('scroll', actualizarBotones);
+    function detenerScroll() {
+        if (animacionId) {
+            cancelAnimationFrame(animacionId);
+            animacionId = null;
+        }
+    }
     
-    // Actualizar al cambiar tamaño de ventana
+    // Hover — iniciar y detener scroll continuo
+    btnLeft.addEventListener('mouseenter', () => iniciarScrollContinuo('left'));
+    btnLeft.addEventListener('mouseleave', detenerScroll);
+    btnRight.addEventListener('mouseenter', () => iniciarScrollContinuo('right'));
+    btnRight.addEventListener('mouseleave', detenerScroll);
+    
+    // También mantener el click para dispositivos táctiles
+    btnLeft.addEventListener('click', () => {
+        contenedor.scrollBy({ left: -300, behavior: 'smooth' });
+    });
+    btnRight.addEventListener('click', () => {
+        contenedor.scrollBy({ left: 300, behavior: 'smooth' });
+    });
+    
+    contenedor.addEventListener('scroll', actualizarBotones);
     window.addEventListener('resize', actualizarBotones);
     
-    // Observer para detectar cambios en el contenido de la tabla
+    // Observer para detectar cambios en el contenido
     const observer = new MutationObserver(() => {
         setTimeout(actualizarBotones, 100);
     });
@@ -1397,7 +1426,6 @@ function configurarNavegacion(contenedorId, btnLeftId, btnRightId) {
         attributes: true
     });
     
-    // Actualizar inicialmente
     setTimeout(actualizarBotones, 100);
 }
 
