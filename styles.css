@@ -694,7 +694,7 @@ tbody tr:hover td {
     appearance: none !important;
 }
 
-/* Input de actividades más grande */
+/* Input de actividades más grande — solo padding diferente, colores heredados */
 #tablaActividades .input-actividad {
     padding: 13px 3px !important;
 }
@@ -947,14 +947,6 @@ body.dark-mode textarea {
     appearance: none !important;
 }
 
-/* Input del módulo principal siempre oscuro */
-.input-oportunidad-simple {
-    background-color: #37474F !important;
-    color: #E8EAED !important;
-    border: 2px solid #37474F !important;
-    border-radius: 6px !important;
-}
-
 body.dark-mode input[type="number"]:focus,
 body.dark-mode select:focus,
 body.dark-mode textarea:focus {
@@ -1042,38 +1034,21 @@ body.dark-mode td.numero {
 
 /* Cebra tabla de actividades - modo claro */
 #tablaActividades tbody tr:nth-child(odd) td {
-    background-color: #f0f4f8 !important;
 }
 
 #tablaActividades tbody tr:nth-child(even) td {
-    background-color: #dce6f0 !important;
 }
 
-/* Input de actividades transparente para mostrar el cebra de la celda */
-#tablaActividades .input-actividad {
-    background-color: transparent !important;
-    border-color: rgba(69, 90, 100, 0.4) !important;
-    color: #333333 !important;
-}
-
-/* Modo oscuro: cebra + input transparente */
 body.dark-mode #tablaActividades tbody tr:nth-child(odd) td {
-    background-color: #1E1E1E !important;
 }
 
 body.dark-mode #tablaActividades tbody tr:nth-child(even) td {
-    background-color: #2D2D2D !important;
 }
 
 body.dark-mode #tablaActividades .input-actividad {
-    background-color: transparent !important;
-    border-color: rgba(96, 125, 139, 0.5) !important;
-    color: #E8EAED !important;
 }
 
 body.dark-mode #tablaActividades tbody tr:hover td {
-    background-color: #546E7A !important;
-    transition: background-color 0.2s ease;
 }
 
 body.dark-mode tbody tr td.nombre-estudiante {
