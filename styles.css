@@ -1507,3 +1507,201 @@ td {
 html {
     overflow-x: hidden;
 }
+
+/* ==========================================
+   MÓDULO DE ASISTENCIA
+   ========================================== */
+
+.vista-asistencia {
+    display: none;
+}
+
+.filtros-asistencia {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--color-blanco);
+    border-radius: 8px;
+}
+
+.filtros-asistencia .filtro-grupo {
+    flex: 1;
+}
+
+.leyenda-asistencia {
+    background: var(--color-blanco);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.leyenda-asistencia strong {
+    color: var(--color-texto);
+    font-size: 0.95rem;
+}
+
+.leyenda-items {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.leyenda-cuadro {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    border: 2px solid;
+}
+
+.estado-presente {
+    background-color: #2E5339;
+    border-color: #66BB6A;
+}
+
+.estado-excusa {
+    background-color: #5D4E37;
+    border-color: #FFB74D;
+}
+
+.estado-ausente {
+    background-color: #5C2D2D;
+    border-color: #EF5350;
+}
+
+.estado-feriado {
+    background-color: #37474F;
+    border-color: #90A4AE;
+}
+
+.leyenda-nota {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: var(--color-texto-secundario);
+    font-style: italic;
+}
+
+th.header-dia {
+    background-color: #64B5F6;
+    color: white;
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
+    font-size: 0.85rem;
+    padding: 4px;
+}
+
+th.header-dia input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.95rem;
+    padding: 4px 2px;
+}
+
+th.header-dia input:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+th.header-total-asistencia {
+    background-color: #81C784;
+    color: white;
+    width: 80px;
+    font-weight: bold;
+}
+
+th.header-porcentaje-asistencia {
+    background-color: #FFB74D;
+    color: white;
+    width: 80px;
+    font-weight: bold;
+}
+
+.celda-asistencia {
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
+    padding: 4px !important;
+}
+
+.celda-asistencia input {
+    width: 100%;
+    padding: 10px 4px;
+    border-radius: 6px;
+    border: 2px solid #37474F;
+    background-color: #37474F;
+    color: #E8EAED;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+}
+
+.celda-asistencia input:focus {
+    outline: none;
+    border-color: #64B5F6;
+    background-color: #455A64;
+    box-shadow: 0 0 0 3px rgba(100, 181, 246, 0.2);
+}
+
+.celda-asistencia input.presente {
+    background-color: #2E5339 !important;
+    border-color: #66BB6A !important;
+    color: #A5D6A7 !important;
+}
+
+.celda-asistencia input.excusa {
+    background-color: #5D4E37 !important;
+    border-color: #FFB74D !important;
+    color: #FFD54F !important;
+}
+
+.celda-asistencia input.ausente {
+    background-color: #5C2D2D !important;
+    border-color: #EF5350 !important;
+    color: #FFCDD2 !important;
+}
+
+.celda-asistencia input.feriado {
+    background-color: #37474F !important;
+    border-color: #90A4AE !important;
+    color: #B0BEC5 !important;
+}
+
+.celda-total-asistencia {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #81C784;
+}
+
+.celda-porcentaje-asistencia {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #FFB74D;
+}
+
+body.dark-mode .filtros-asistencia {
+    background: #2D2D2D;
+}
+
+body.dark-mode .leyenda-asistencia {
+    background: #2D2D2D;
+}
+
+body.dark-mode .leyenda-nota {
+    color: #9AA0A6;
+}
