@@ -968,7 +968,7 @@ body.dark-mode td.numero {
 
 /* Asegurar filas alternas en tabla de actividades */
 body.dark-mode #tablaActividades tbody tr:nth-child(odd) td {
-    background-color: #1E1E1E !important;
+    background-color: #2D2D2D !important;
 }
 
 body.dark-mode #tablaActividades tbody tr:nth-child(even) td {
@@ -976,11 +976,8 @@ body.dark-mode #tablaActividades tbody tr:nth-child(even) td {
 }
 
 body.dark-mode #tablaActividades tbody tr:hover td {
-    background-color: #37474F !important;
-}
-
-body.dark-mode #tablaActividades tbody tr:hover td:hover {
-    background-color: #000000 !important;
+    background-color: #546E7A !important;
+    transition: background-color 0.2s ease;
 }
 
 body.dark-mode tbody tr td.nombre-estudiante {
