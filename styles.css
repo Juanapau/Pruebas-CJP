@@ -303,6 +303,7 @@ body.dark-mode .icono-sol {
     max-height: 600px;
     border-radius: 8px;
     position: relative;
+    background-color: var(--color-header-principal);
 }
 
 /* Tablas */
@@ -311,6 +312,7 @@ table {
     border-collapse: separate;
     table-layout: auto;
     border-spacing: 4px;
+    background-color: var(--color-header-principal);
 }
 
 /* Distribución equitativa de columnas de oportunidades */
