@@ -1705,35 +1705,3 @@ body.dark-mode .leyenda-asistencia {
 body.dark-mode .leyenda-nota {
     color: #9AA0A6;
 }
-
-/* Info de contexto de asistencia */
-.info-contexto-asistencia {
-    display: flex;
-    gap: 30px;
-    padding: 15px 20px;
-    background: var(--color-blanco);
-    border-radius: 8px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-}
-
-.info-contexto-asistencia .info-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.info-contexto-asistencia .info-item strong {
-    color: var(--color-texto-secundario);
-    font-size: 0.9rem;
-}
-
-.info-contexto-asistencia .info-item span {
-    color: var(--color-texto);
-    font-weight: 600;
-    font-size: 1rem;
-}
-
-body.dark-mode .info-contexto-asistencia {
-    background: #2D2D2D;
-}
