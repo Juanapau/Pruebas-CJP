@@ -356,7 +356,7 @@ th.header-numero {
     color: var(--color-texto);
     position: sticky;
     left: 0;
-    z-index: 20;
+    z-index: 25;
     box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
 }
@@ -371,8 +371,8 @@ th.header-nombre {
     color: var(--color-texto);
     white-space: nowrap;
     position: sticky;
-    left: 64px;
-    z-index: 20;
+    left: 68px;
+    z-index: 25;
     box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
 }
@@ -479,7 +479,7 @@ td.numero {
     color: var(--color-texto);
     position: sticky;
     left: 0;
-    z-index: 15;
+    z-index: 18;
     box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
 }
@@ -494,8 +494,8 @@ td.nombre-estudiante {
     max-width: 270px;
     white-space: nowrap;
     position: sticky;
-    left: 64px;
-    z-index: 15;
+    left: 68px;
+    z-index: 18;
     background-color: var(--color-blanco);
     box-shadow: 4px 0 8px rgba(0, 0, 0, 0.2);
     border-radius: 8px;
