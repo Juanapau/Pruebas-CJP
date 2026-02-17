@@ -669,6 +669,22 @@ tbody tr:hover td {
     transition: background-color 0.2s ease;
 }
 
+/* Celda específica hover en modo claro - Efecto degradado */
+tbody tr:hover td:hover {
+    background: linear-gradient(135deg, #607D8B 0%, #455A64 100%) !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: inset 0 0 8px rgba(100, 181, 246, 0.3);
+}
+
+/* Input dentro de la celda hover en modo claro */
+tbody tr:hover td:hover input {
+    background: linear-gradient(135deg, #607D8B 0%, #455A64 100%) !important;
+    color: #FFFFFF;
+    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.4);
+    transition: all 0.2s ease;
+}
+
 .celda-total {
     font-weight: bold;
     font-size: 1.1rem;
@@ -1025,17 +1041,20 @@ body.dark-mode tbody tr:hover td.nombre-estudiante {
     background-color: var(--color-fila-hover) !important;
 }
 
-/* Celda específica donde está el mouse - NEGRA */
+/* Celda específica donde está el mouse - Efecto degradado */
 body.dark-mode tbody tr:hover td:hover {
-    background-color: #000000;
+    background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%) !important;
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    transition: all 0.2s ease;
+    box-shadow: inset 0 0 8px rgba(100, 181, 246, 0.3);
 }
 
-/* Input dentro de la celda hover también negro */
+/* Input dentro de la celda hover con efecto degradado */
 body.dark-mode tbody tr:hover td:hover input {
-    background-color: #000000;
+    background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%) !important;
     color: #FFFFFF;
+    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.4);
+    transition: all 0.2s ease;
 }
 
 /* Columnas sticky en modo oscuro */
