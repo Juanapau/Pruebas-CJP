@@ -147,21 +147,32 @@
                 </button>
             </div>
 
-            <!-- Info de contexto -->
-            <div class="info-contexto-asistencia">
-                <div class="info-item">
-                    <strong>📚 Módulo:</strong> <span id="asistenciaModuloInfo">-</span>
+            <!-- Filtros de asistencia en tarjetas -->
+            <div class="filtros-asistencia-tarjetas">
+                <div class="filtro-tarjeta">
+                    <label>📚 Módulo</label>
+                    <select id="selectModuloAsistencia">
+                        <option value="">Seleccione un módulo</option>
+                    </select>
                 </div>
-                <div class="info-item">
-                    <strong>🎓 Curso:</strong> <span id="asistenciaCursoInfo">-</span>
-                </div>
-                <div class="info-item">
-                    <strong>📅 Mes:</strong> <span id="asistenciaMesInfo">-</span>
-                </div>
-            </div>
 
-            <div class="filtros-asistencia">
-                <div class="filtro-grupo">
+                <div class="filtro-tarjeta">
+                    <label>🎓 Curso</label>
+                    <select id="selectCursoAsistencia">
+                        <option value="">Seleccione un curso</option>
+                        <option value="4toA">4toA</option>
+                        <option value="4toB">4toB</option>
+                        <option value="4toC">4toC</option>
+                        <option value="5toA">5toA</option>
+                        <option value="5toB">5toB</option>
+                        <option value="5toC">5toC</option>
+                        <option value="6toA">6toA</option>
+                        <option value="6toB">6toB</option>
+                        <option value="6toC">6toC</option>
+                    </select>
+                </div>
+
+                <div class="filtro-tarjeta">
                     <label>📅 Mes</label>
                     <select id="selectMesAsistencia">
                         <option value="">Seleccione un mes</option>
@@ -179,6 +190,9 @@
                         <option value="2025-12">Diciembre 2025</option>
                     </select>
                 </div>
+            </div>
+
+            <div class="filtros-asistencia">
                 <button id="btnVolverDesdeAsistencia" class="btn-volver-nuevo">
                     ← Volver al Registro de Calificaciones
                 </button>
