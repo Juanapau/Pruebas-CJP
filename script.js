@@ -389,35 +389,42 @@ function generarTablaRegistro() {
 
     // Generar encabezado - Primera fila con los códigos de RA
     let headerHTML = '<tr>';
-    headerHTML += '<th rowspan="3" class="header-numero">#</th>';
-    headerHTML += '<th rowspan="3" class="header-nombre">Nombre</th>';
+    headerHTML += '<th rowspan="2" class="header-numero">#</th>';
+    headerHTML += '<th rowspan="2" class="header-nombre">Nombre</th>';
     
     state.ras.forEach(ra => {
-        // Cada RA ocupa SOLO 3 columnas (las 3 oportunidades)
+        // Cada RA ocupa 3 columnas (las 3 oportunidades)
         headerHTML += `<th colspan="3" class="header-ra">%${ra.codigo}</th>`;
     });
     
-    headerHTML += '<th rowspan="3" class="header-total">Total</th>';
+    headerHTML += '<th rowspan="2" class="header-total">Total</th>';
     headerHTML += '</tr>';
     
-    // Segunda fila: 40 (colspan 2) y 28 (colspan 1) sobre las 3 columnas
+    // Segunda fila: Celdas combinadas con estructura interna
     headerHTML += '<tr>';
     
     state.ras.forEach(ra => {
         const minimo = calcularMinimo(ra.valorTotal || 0);
-        // 40 ocupa 2 columnas, 28 ocupa 1 columna (total 3)
-        headerHTML += `<th colspan="2" class="header-valor-num"><input type="number" class="input-valor-ra" data-ra="${ra.id}" value="${ra.valorTotal || 0}" min="0" max="100"></th>`;
-        headerHTML += `<th class="header-minimo-num">${minimo}</th>`;
-    });
-    
-    headerHTML += '</tr>';
-    
-    // Tercera fila: "Valor" (colspan 2) y "70%" (colspan 1)
-    headerHTML += '<tr>';
-    
-    state.ras.forEach(ra => {
-        headerHTML += `<th colspan="2" class="header-label-valor">Valor</th>`;
-        headerHTML += `<th class="header-label-70">70%</th>`;
+        
+        // Celda combinada negra (colspan 2) con valor y "Valor"
+        headerHTML += `<th colspan="2" class="header-combinado">
+            <div class="combinado-container">
+                <div class="combinado-negro">
+                    <div class="combinado-negro-valor">
+                        <input type="number" class="input-valor-ra" data-ra="${ra.id}" value="${ra.valorTotal || 0}" min="0" max="100">
+                    </div>
+                    <div class="combinado-negro-label">Valor</div>
+                </div>
+            </div>
+        </th>`;
+        
+        // Celda combinada gris (colspan 1) con mínimo y "70%"
+        headerHTML += `<th class="header-combinado">
+            <div class="combinado-gris">
+                <div class="combinado-gris-valor">${minimo}</div>
+                <div class="combinado-gris-label">70%</div>
+            </div>
+        </th>`;
     });
     
     headerHTML += '</tr>';
