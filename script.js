@@ -1883,12 +1883,13 @@ function irARegistroCalificaciones() {
 }
 
 function irARegistroActividades() {
-    // Solo mostrar si hay un RA seleccionado
-    if (state.raSeleccionado) {
-        mostrarVistaActividades(state.raSeleccionado);
-    } else {
-        alert('Por favor, selecciona un Resultado de Aprendizaje primero desde Registro de Calificaciones');
-        irARegistroCalificaciones();
+    elementos.vistaRegistro.style.display = 'none';
+    elementos.vistaActividades.style.display = 'block';
+    asistenciaElementos.vistaAsistencia.style.display = 'none';
+    
+    // Si no hay RA seleccionado, inicializar filtros independientes
+    if (!state.raSeleccionado) {
+        inicializarFiltrosActividades();
     }
 }
 
@@ -1901,4 +1902,100 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', inicializarMenu);
 } else {
     inicializarMenu();
+}
+
+// ==========================================
+// FILTROS INDEPENDIENTES EN VISTA ACTIVIDADES
+// ==========================================
+
+const filtrosActividadesElementos = {
+    selectCurso: document.getElementById('selectCursoActividades'),
+    selectModulo: document.getElementById('selectModuloActividades'),
+    selectRA: document.getElementById('selectRAActividades')
+};
+
+function inicializarFiltrosActividades() {
+    // Limpiar selecciones
+    filtrosActividadesElementos.selectCurso.value = '';
+    filtrosActividadesElementos.selectModulo.value = '';
+    filtrosActividadesElementos.selectRA.value = '';
+    
+    // Limpiar tabla
+    elementos.tablaActividadesHead.innerHTML = '';
+    elementos.tablaActividadesBody.innerHTML = '';
+    document.getElementById('raDescripcion').value = '';
+    
+    // Poblar módulos
+    poblarModulosActividades();
+    
+    // Eventos
+    filtrosActividadesElementos.selectCurso.addEventListener('change', manejarCambioCursoActividades);
+    filtrosActividadesElementos.selectModulo.addEventListener('change', manejarCambioModuloActividades);
+    filtrosActividadesElementos.selectRA.addEventListener('change', manejarCambioRAActividades);
+}
+
+function poblarModulosActividades() {
+    filtrosActividadesElementos.selectModulo.innerHTML = '<option value="">Seleccione módulo</option>';
+    state.modulos.forEach(modulo => {
+        const option = document.createElement('option');
+        option.value = modulo.id;
+        option.textContent = modulo.nombre;
+        filtrosActividadesElementos.selectModulo.appendChild(option);
+    });
+}
+
+async function manejarCambioCursoActividades(e) {
+    const curso = e.target.value;
+    if (!curso) {
+        filtrosActividadesElementos.selectModulo.value = '';
+        filtrosActividadesElementos.selectRA.value = '';
+        return;
+    }
+    
+    state.cursoSeleccionado = curso;
+    
+    // Filtrar módulos por curso
+    await cargarModulos();
+    const modulosFiltrados = state.modulos.filter(m => m.curso === curso);
+    
+    filtrosActividadesElementos.selectModulo.innerHTML = '<option value="">Seleccione módulo</option>';
+    modulosFiltrados.forEach(modulo => {
+        const option = document.createElement('option');
+        option.value = modulo.id;
+        option.textContent = modulo.nombre;
+        filtrosActividadesElementos.selectModulo.appendChild(option);
+    });
+    
+    filtrosActividadesElementos.selectRA.innerHTML = '<option value="">Seleccione RA</option>';
+}
+
+async function manejarCambioModuloActividades(e) {
+    const moduloId = e.target.value;
+    if (!moduloId) {
+        filtrosActividadesElementos.selectRA.value = '';
+        return;
+    }
+    
+    state.moduloSeleccionado = moduloId;
+    
+    // Cargar RAs del módulo
+    await cargarRAs(moduloId);
+    
+    filtrosActividadesElementos.selectRA.innerHTML = '<option value="">Seleccione RA</option>';
+    state.ras.forEach(ra => {
+        const option = document.createElement('option');
+        option.value = ra.id;
+        option.textContent = `Actividades ${ra.nombre}`;
+        filtrosActividadesElementos.selectRA.appendChild(option);
+    });
+}
+
+async function manejarCambioRAActividades(e) {
+    const raId = e.target.value;
+    if (!raId) return;
+    
+    state.raSeleccionado = raId;
+    
+    // Cargar y mostrar actividades
+    await mostrarVistaActividades(raId);
 }
