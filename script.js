@@ -1783,3 +1783,122 @@ if (document.readyState === 'loading') {
 } else {
     inicializarEventosAsistencia();
 }
+
+// ==========================================
+// MENÚ LATERAL
+// ==========================================
+
+const menuElementos = {
+    btnAbrir: document.getElementById('btnAbrirMenu'),
+    btnCerrar: document.getElementById('btnCerrarMenu'),
+    overlay: document.getElementById('menuOverlay'),
+    panel: document.getElementById('menuLateral'),
+    btnModoMenu: document.getElementById('btnModoOscuroMenu'),
+    textoModo: document.getElementById('textoModo'),
+    menuCalif: document.getElementById('menuRegistroCalif'),
+    menuAct: document.getElementById('menuRegistroAct'),
+    menuAsist: document.getElementById('menuRegistroAsist')
+};
+
+function inicializarMenu() {
+    // Abrir menú
+    menuElementos.btnAbrir.addEventListener('click', abrirMenu);
+    
+    // Cerrar menú
+    menuElementos.btnCerrar.addEventListener('click', cerrarMenu);
+    menuElementos.overlay.addEventListener('click', cerrarMenu);
+    
+    // Modo oscuro desde el menú
+    menuElementos.btnModoMenu.addEventListener('click', () => {
+        alternarModoOscuro();
+        actualizarTextoModo();
+    });
+    
+    // Navegación
+    menuElementos.menuCalif.addEventListener('click', () => {
+        irARegistroCalificaciones();
+        cerrarMenu();
+    });
+    
+    menuElementos.menuAct.addEventListener('click', () => {
+        irARegistroActividades();
+        cerrarMenu();
+    });
+    
+    menuElementos.menuAsist.addEventListener('click', () => {
+        irARegistroAsistencia();
+        cerrarMenu();
+    });
+    
+    // Actualizar texto modo al cargar
+    actualizarTextoModo();
+    
+    // Cerrar con ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && menuElementos.panel.classList.contains('active')) {
+            cerrarMenu();
+        }
+    });
+}
+
+function abrirMenu() {
+    menuElementos.panel.classList.add('active');
+    menuElementos.overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    actualizarMenuActivo();
+}
+
+function cerrarMenu() {
+    menuElementos.panel.classList.remove('active');
+    menuElementos.overlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function actualizarTextoModo() {
+    const esModoOscuro = document.body.classList.contains('dark-mode');
+    menuElementos.textoModo.textContent = esModoOscuro ? 'Oscuro' : 'Claro';
+}
+
+function actualizarMenuActivo() {
+    // Remover active de todos
+    [menuElementos.menuCalif, menuElementos.menuAct, menuElementos.menuAsist].forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Agregar active según vista activa
+    if (elementos.vistaRegistro.style.display !== 'none') {
+        menuElementos.menuCalif.classList.add('active');
+    } else if (elementos.vistaActividades.style.display !== 'none') {
+        menuElementos.menuAct.classList.add('active');
+    } else if (asistenciaElementos.vistaAsistencia.style.display !== 'none') {
+        menuElementos.menuAsist.classList.add('active');
+    }
+}
+
+function irARegistroCalificaciones() {
+    elementos.vistaRegistro.style.display = 'block';
+    elementos.vistaActividades.style.display = 'none';
+    asistenciaElementos.vistaAsistencia.style.display = 'none';
+    elementos.selectRA.value = '';
+}
+
+function irARegistroActividades() {
+    // Solo mostrar si hay un RA seleccionado
+    if (state.raSeleccionado) {
+        mostrarVistaActividades(state.raSeleccionado);
+    } else {
+        alert('Por favor, selecciona un Resultado de Aprendizaje primero desde Registro de Calificaciones');
+        irARegistroCalificaciones();
+    }
+}
+
+function irARegistroAsistencia() {
+    mostrarVistaAsistencia();
+}
+
+// Inicializar menú al cargar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarMenu);
+} else {
+    inicializarMenu();
+}
