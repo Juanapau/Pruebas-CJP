@@ -2433,8 +2433,8 @@ body.dark-mode .filtros-titulo-compacto {
 
 /* Modo oscuro */
 body.dark-mode .filtros-seccion-compacta {
-    background: linear-gradient(135deg, #2E5339 0%, #3a6647 100%);
-    border-left-color: #81C784;
+    background: #263238;
+    border-left-color: #546E7A;
 }
 
 body.dark-mode .filtros-titulo-compacto {
@@ -2496,4 +2496,33 @@ body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(3) sele
     .filtros-actividades-compactos {
         grid-template-columns: 1fr;
     }
+}
+
+/* Flechitas en selects - Modo oscuro */
+body.dark-mode .filtro-compacto select,
+body.dark-mode .filtros-actividades-compactos .filtro-compacto select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23E8EAED' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+    padding-right: 35px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* Flechitas específicas por color en modo oscuro */
+body.dark-mode .filtro-compacto:nth-child(1) select,
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(1) select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2380DEEA' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+}
+
+body.dark-mode .filtro-compacto:nth-child(2) select,
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(2) select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23A5D6A7' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+}
+
+body.dark-mode .filtro-compacto:nth-child(3) select,
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(3) select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23FFE082' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
 }
