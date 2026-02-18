@@ -2772,3 +2772,17 @@ body.dark-mode .filtros-asistencia-compactos .filtro-compacto select {
     background-size: 14px !important;
     padding-right: 40px !important;
 }
+
+/* Encabezado "Descripción del RA" en modo oscuro - Verde */
+body.dark-mode .ra-descripcion-box {
+    background: linear-gradient(135deg, #2E5339 0%, #3a6647 100%);
+    border-left: 4px solid #81C784;
+}
+
+body.dark-mode .ra-descripcion-header h3 {
+    color: #E8EAED;
+}
+
+body.dark-mode .ra-descripcion-header {
+    border-bottom-color: rgba(129, 199, 132, 0.3);
+}
