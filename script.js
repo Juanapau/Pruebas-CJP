@@ -177,8 +177,8 @@ async function cargarActividadesRA(raId) {
     if (cached) {
         state.actividades = state.actividades.filter(a => a.raId != raId);
         state.actividades.push(...cached);
-        // Cargar descripciones
-        await cargarDescripcionesActividades(raId);
+        // Cargar descripciones con moduloId
+        await cargarDescripcionesActividades(state.moduloSeleccionado, raId);
         generarTablaActividades();
         return;
     }
@@ -190,8 +190,8 @@ async function cargarActividadesRA(raId) {
         guardarEnCache('actividades', actividadesDelRA, raId);
         state.actividades = state.actividades.filter(a => a.raId != raId);
         state.actividades.push(...actividadesDelRA);
-        // Cargar descripciones
-        await cargarDescripcionesActividades(raId);
+        // Cargar descripciones con moduloId
+        await cargarDescripcionesActividades(state.moduloSeleccionado, raId);
         generarTablaActividades();
     } catch (error) {
         console.error('Error al cargar actividades:', error);
@@ -2138,10 +2138,10 @@ if (document.readyState === 'loading') {
 let descripcionesActividades = {};
 
 // Cargar descripciones de actividades
-async function cargarDescripcionesActividades(raId) {
-    console.log('🔍 Cargando descripciones para RA:', raId);
+async function cargarDescripcionesActividades(moduloId, raId) {
+    console.log('🔍 Cargando descripciones para Módulo:', moduloId, 'RA:', raId);
     try {
-        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getDescripcionesActividades&raId=${raId}`);
+        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getDescripcionesActividades&moduloId=${moduloId}&raId=${raId}`);
         const data = await response.json();
         
         console.log('📥 Respuesta de descripciones:', data);
