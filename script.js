@@ -1482,11 +1482,8 @@ function inicializarEventosAsistencia() {
     
     asistenciaElementos.selectModulo.addEventListener('change', manejarCambioModuloAsistencia);
     asistenciaElementos.selectCurso.addEventListener('change', manejarCambioCursoAsistencia);
-    
-    // Escuchar ambos eventos para asegurar que funcione
     asistenciaElementos.selectMes.addEventListener('change', manejarCambioMesAsistencia);
     asistenciaElementos.selectMes.addEventListener('input', manejarCambioMesAsistencia);
-    
     asistenciaElementos.btnVolver.addEventListener('click', volverDesdeAsistencia);
     asistenciaElementos.btnGuardar.addEventListener('click', guardarAsistencia);
 }
@@ -1502,13 +1499,10 @@ function mostrarVistaAsistencia() {
     elementos.vistaRegistro.style.display = 'none';
     elementos.vistaActividades.style.display = 'none';
     asistenciaElementos.vistaAsistencia.style.display = 'block';
-    
     poblarSelectModulosAsistencia();
-    
     asistenciaElementos.selectModulo.value = '';
     asistenciaElementos.selectCurso.value = '';
     asistenciaElementos.selectMes.value = '';
-    
     asistenciaElementos.tablaHead.innerHTML = '';
     asistenciaElementos.tablaBody.innerHTML = '';
 }
@@ -1548,7 +1542,6 @@ async function manejarCambioCursoAsistencia(e) {
         return;
     }
     asistenciaState.cursoSeleccionado = curso;
-    
     await cargarEstudiantesAsistencia(curso);
     verificarYCargarAsistencia();
 }
@@ -1556,20 +1549,13 @@ async function manejarCambioCursoAsistencia(e) {
 async function manejarCambioMesAsistencia(e) {
     const mes = e.target.value;
     console.log('Mes seleccionado:', mes);
-    
     if (!mes) {
         asistenciaElementos.tablaHead.innerHTML = '';
         asistenciaElementos.tablaBody.innerHTML = '';
         return;
     }
-    
     asistenciaState.mesSeleccionado = mes;
-    console.log('Estado asistencia:', {
-        modulo: asistenciaState.moduloSeleccionado,
-        curso: asistenciaState.cursoSeleccionado,
-        mes: asistenciaState.mesSeleccionado
-    });
-    
+    console.log('Estado asistencia:', {modulo: asistenciaState.moduloSeleccionado, curso: asistenciaState.cursoSeleccionado, mes: asistenciaState.mesSeleccionado});
     await verificarYCargarAsistencia();
 }
 
@@ -1577,7 +1563,6 @@ async function verificarYCargarAsistencia() {
     if (!asistenciaState.moduloSeleccionado || !asistenciaState.cursoSeleccionado || !asistenciaState.mesSeleccionado) {
         return;
     }
-    
     await cargarAsistenciasMes(asistenciaState.moduloSeleccionado, asistenciaState.cursoSeleccionado, asistenciaState.mesSeleccionado);
     generarTablaAsistencia();
 }
@@ -1585,9 +1570,7 @@ async function verificarYCargarAsistencia() {
 async function cargarEstudiantesAsistencia(curso) {
     mostrarCargando(true, 'Cargando estudiantes...');
     try {
-        const response = await fetchConTimeout(
-            `${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`
-        );
+        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`);
         const data = await response.json();
         asistenciaState.estudiantes = data.estudiantes || [];
     } catch (error) {
@@ -1599,16 +1582,14 @@ async function cargarEstudiantesAsistencia(curso) {
 }
 
 async function cargarAsistenciasMes(moduloId, curso, mes) {
-    console.log('Cargando asistencias:', { moduloId, curso, mes });
+    console.log('Cargando asistencias:', {moduloId, curso, mes});
     mostrarCargando(true, 'Cargando asistencias...');
     try {
         const url = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getAsistencias&moduloId=${moduloId}&curso=${curso}&mes=${mes}`;
         console.log('URL:', url);
-        
         const response = await fetchConTimeout(url);
         const data = await response.json();
         console.log('Asistencias cargadas:', data);
-        
         asistenciaState.asistencias = data.asistencias || [];
         console.log('Estado actualizado con', asistenciaState.asistencias.length, 'registros');
     } catch (error) {
@@ -1623,7 +1604,6 @@ function generarDiasLaborables(mes) {
     const [year, month] = mes.split('-');
     const primerDia = new Date(year, parseInt(month) - 1, 1);
     const ultimoDia = new Date(year, parseInt(month), 0);
-    
     const dias = [];
     for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
         const fecha = new Date(year, parseInt(month) - 1, dia);
@@ -1639,76 +1619,54 @@ function generarTablaAsistencia() {
     console.log('Generando tabla de asistencia...');
     console.log('Estudiantes:', asistenciaState.estudiantes.length);
     console.log('Asistencias guardadas:', asistenciaState.asistencias.length);
-    
     if (!asistenciaState.mesSeleccionado || asistenciaState.estudiantes.length === 0) {
         console.log('No hay mes o estudiantes, limpiando tabla');
         asistenciaElementos.tablaHead.innerHTML = '';
         asistenciaElementos.tablaBody.innerHTML = '';
         return;
     }
-    
     asistenciaState.diasDelMes = generarDiasLaborables(asistenciaState.mesSeleccionado);
     console.log('Días del mes:', asistenciaState.diasDelMes);
-    
     let headerHTML = '<tr>';
     headerHTML += '<th class="header-numero">#</th>';
     headerHTML += '<th class="header-nombre">Nombre</th>';
-    
     asistenciaState.diasDelMes.forEach((dia, index) => {
         const claseExtra = index === 0 ? ' separador-ra' : '';
-        headerHTML += `<th class="header-dia${claseExtra}">
-            <input type="number" value="${dia}" min="1" max="31" 
-                   data-dia-index="${index}" class="input-dia-header">
-        </th>`;
+        headerHTML += `<th class="header-dia${claseExtra}"><input type="number" value="${dia}" min="1" max="31" data-dia-index="${index}" class="input-dia-header"></th>`;
     });
-    
     headerHTML += '<th class="header-total-asistencia">Total</th>';
     headerHTML += '<th class="header-porcentaje-asistencia">%</th>';
     headerHTML += '</tr>';
-    
     asistenciaElementos.tablaHead.innerHTML = headerHTML;
-    
     let bodyHTML = '';
     asistenciaState.estudiantes.forEach(estudiante => {
         bodyHTML += '<tr>';
         bodyHTML += `<td class="numero">${estudiante.numero}</td>`;
         bodyHTML += `<td class="nombre-estudiante">${estudiante.nombre}</td>`;
-        
         asistenciaState.diasDelMes.forEach((dia, index) => {
             const asistencia = obtenerAsistencia(estudiante.id, dia);
             const claseExtra = index === 0 ? ' separador-ra' : '';
-            bodyHTML += `<td class="celda-asistencia${claseExtra}">
-                <input type="text" maxlength="1" 
-                       data-estudiante="${estudiante.id}" 
-                       data-dia="${dia}" 
-                       value="${asistencia}" 
-                       class="input-asistencia ${obtenerClaseEstado(asistencia)}">
-            </td>`;
+            bodyHTML += `<td class="celda-asistencia${claseExtra}"><input type="text" maxlength="1" data-estudiante="${estudiante.id}" data-dia="${dia}" value="${asistencia}" class="input-asistencia ${obtenerClaseEstado(asistencia)}"></td>`;
         });
-        
         const totales = calcularTotalesAsistencia(estudiante.id);
         bodyHTML += `<td class="celda-total-asistencia">${totales.total}</td>`;
         bodyHTML += `<td class="celda-porcentaje-asistencia">${totales.porcentaje}%</td>`;
         bodyHTML += '</tr>';
     });
-    
     asistenciaElementos.tablaBody.innerHTML = bodyHTML;
     agregarEventosAsistencia();
     configurarNavegacion('tablaScrollAsistencia', 'scrollLeftAsistencia', 'scrollRightAsistencia');
 }
 
 function obtenerAsistencia(estudianteId, dia) {
-    const asistencia = asistenciaState.asistencias.find(
-        a => {
-            const match = a.estudianteId === estudianteId && a.dia === dia;
-            if (asistenciaState.asistencias.length > 0 && dia === 2) {
-                console.log(`Buscando: EstID="${estudianteId}" (${typeof estudianteId}), Dia=${dia} (${typeof dia})`);
-                console.log(`  Comparando con: EstID="${a.estudianteId}" (${typeof a.estudianteId}), Dia=${a.dia} (${typeof a.dia})`);
-                console.log(`  Match: ${match}`);
-            }
-            return match;
-        }
-    );
+    const asistencia = asistenciaState.asistencias.find(a => {
+        const idMatch = String(a.estudianteId) === String(estudianteId);
+        const diaMatch = Number(a.dia) === Number(dia);
+        return idMatch && diaMatch;
+    });
+    if (asistencia) {
+        console.log(`✓ Encontrada asistencia: Est=${estudianteId}, Dia=${dia}, Estado=${asistencia.estado}`);
+    }
     return asistencia ? asistencia.estado : '';
 }
 
@@ -1722,32 +1680,19 @@ function obtenerClaseEstado(estado) {
 }
 
 function calcularTotalesAsistencia(estudianteId) {
-    let presentes = 0;
-    let excusas = 0;
-    let ausentes = 0;
-    let feriados = 0;
-    
+    let presentes = 0, excusas = 0, ausentes = 0, feriados = 0;
     asistenciaState.diasDelMes.forEach(dia => {
         const estado = obtenerAsistencia(estudianteId, dia).toUpperCase();
-        if (estado === 'P') {
-            presentes++;
-        } else if (estado === 'E') {
-            excusas++;
-        } else if (estado === 'A') {
-            ausentes++;
-        } else if (estado === 'F') {
-            feriados++;
-        }
+        if (estado === 'P') presentes++;
+        else if (estado === 'E') excusas++;
+        else if (estado === 'A') ausentes++;
+        else if (estado === 'F') feriados++;
     });
-    
     const excusasComoAusencias = Math.floor(excusas / 3);
     const total = presentes + (excusas - (excusasComoAusencias * 3));
     const diasValidos = asistenciaState.diasDelMes.length - feriados;
     const porcentaje = diasValidos > 0 ? Math.round((total / diasValidos) * 100) : 0;
-    
-    console.log(`Estudiante ${estudianteId}: P=${presentes}, E=${excusas}, A=${ausentes}, F=${feriados}, Total=${total}, %=${porcentaje}`);
-    
-    return { total: total, porcentaje: porcentaje };
+    return {total, porcentaje};
 }
 
 function agregarEventosAsistencia() {
@@ -1761,18 +1706,15 @@ function agregarEventosAsistencia() {
             }
         });
     });
-    
     document.querySelectorAll('.input-asistencia').forEach(input => {
         input.addEventListener('input', function() {
             const valor = this.value.toUpperCase();
             const estudianteId = this.dataset.estudiante;
             const dia = parseInt(this.dataset.dia);
-            
             if (valor && !['P', 'E', 'A', 'F'].includes(valor)) {
                 this.value = '';
                 return;
             }
-            
             this.value = valor;
             this.className = 'input-asistencia ' + obtenerClaseEstado(valor);
             actualizarAsistenciaState(estudianteId, dia, valor);
@@ -1782,12 +1724,7 @@ function agregarEventosAsistencia() {
 }
 
 function actualizarAsistenciaState(estudianteId, dia, estado) {
-    console.log('Actualizando asistencia:', { estudianteId, dia, estado });
-    
-    const index = asistenciaState.asistencias.findIndex(
-        a => a.estudianteId === estudianteId && a.dia === dia
-    );
-    
+    const index = asistenciaState.asistencias.findIndex(a => String(a.estudianteId) === String(estudianteId) && Number(a.dia) === Number(dia));
     if (index !== -1) {
         if (estado === '') {
             asistenciaState.asistencias.splice(index, 1);
@@ -1795,15 +1732,8 @@ function actualizarAsistenciaState(estudianteId, dia, estado) {
             asistenciaState.asistencias[index].estado = estado;
         }
     } else if (estado !== '') {
-        asistenciaState.asistencias.push({
-            estudianteId: estudianteId,
-            mes: asistenciaState.mesSeleccionado,
-            dia: dia,
-            estado: estado
-        });
+        asistenciaState.asistencias.push({estudianteId: estudianteId, mes: asistenciaState.mesSeleccionado, dia: dia, estado: estado});
     }
-    
-    console.log('Estado asistencias actual:', asistenciaState.asistencias);
 }
 
 function actualizarTotalesEstudiante(estudianteId) {
@@ -1811,7 +1741,6 @@ function actualizarTotalesEstudiante(estudianteId) {
     const fila = document.querySelector(`input[data-estudiante="${estudianteId}"]`).closest('tr');
     const celdaTotal = fila.querySelector('.celda-total-asistencia');
     const celdaPorcentaje = fila.querySelector('.celda-porcentaje-asistencia');
-    
     celdaTotal.textContent = totales.total;
     celdaPorcentaje.textContent = `${totales.porcentaje}%`;
 }
@@ -1821,35 +1750,20 @@ async function guardarAsistencia() {
         alert('No hay datos de asistencia para guardar.');
         return;
     }
-    
-    console.log('=== GUARDANDO ASISTENCIA ===');
-    console.log('Módulo:', asistenciaState.moduloSeleccionado);
-    console.log('Curso:', asistenciaState.cursoSeleccionado);
-    console.log('Mes:', asistenciaState.mesSeleccionado);
-    console.log('Asistencias a guardar:', asistenciaState.asistencias);
-    
     asistenciaElementos.btnGuardar.disabled = true;
     asistenciaElementos.btnGuardar.textContent = '⏳ Guardando...';
-    
     try {
-        const payload = {
-            moduloId: asistenciaState.moduloSeleccionado,
-            curso: asistenciaState.cursoSeleccionado,
-            mes: asistenciaState.mesSeleccionado,
-            asistencias: asistenciaState.asistencias,
-            diasDelMes: asistenciaState.diasDelMes
-        };
-        
-        console.log('Payload completo:', JSON.stringify(payload, null, 2));
-        
         const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=guardarAsistencias`, {
             method: 'POST',
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                moduloId: asistenciaState.moduloSeleccionado,
+                curso: asistenciaState.cursoSeleccionado,
+                mes: asistenciaState.mesSeleccionado,
+                asistencias: asistenciaState.asistencias,
+                diasDelMes: asistenciaState.diasDelMes
+            })
         });
-        
         const data = await response.json();
-        console.log('Respuesta del servidor:', data);
-        
         if (data.success) {
             alert('✅ Asistencia guardada exitosamente');
         } else {
