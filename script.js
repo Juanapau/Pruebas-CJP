@@ -177,6 +177,8 @@ async function cargarActividadesRA(raId) {
     if (cached) {
         state.actividades = state.actividades.filter(a => a.raId != raId);
         state.actividades.push(...cached);
+        // Cargar descripciones
+        await cargarDescripcionesActividades(raId);
         generarTablaActividades();
         return;
     }
@@ -188,6 +190,8 @@ async function cargarActividadesRA(raId) {
         guardarEnCache('actividades', actividadesDelRA, raId);
         state.actividades = state.actividades.filter(a => a.raId != raId);
         state.actividades.push(...actividadesDelRA);
+        // Cargar descripciones
+        await cargarDescripcionesActividades(raId);
         generarTablaActividades();
     } catch (error) {
         console.error('Error al cargar actividades:', error);
@@ -439,7 +443,12 @@ function generarTablaActividades() {
     headerHTML += '<th class="header-nombre">Nombres</th>';
     
     for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
-        headerHTML += `<th class="actividad-header">Ac.${i}</th>`;
+        const descripcion = descripcionesActividades[i] || '';
+        if (descripcion) {
+            headerHTML += `<th class="actividad-header header-actividad" data-descripcion="${descripcion}">Ac.${i}</th>`;
+        } else {
+            headerHTML += `<th class="actividad-header">Ac.${i}</th>`;
+        }
     }
     
     headerHTML += '<th class="header-total">Total</th>';
@@ -2109,4 +2118,27 @@ if (document.readyState === 'loading') {
 } else {
     inicializarFiltrosActividades();  // Esto inicializa los eventos
     sincronizarFiltrosCalificacionesActividades();
+}
+
+// ==========================================
+// DESCRIPCIONES DE ACTIVIDADES
+// ==========================================
+
+// Variable para almacenar las descripciones
+let descripcionesActividades = {};
+
+// Cargar descripciones de actividades
+async function cargarDescripcionesActividades(raId) {
+    try {
+        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getDescripcionesActividades&raId=${raId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            descripcionesActividades = data.descripciones || {};
+            console.log('Descripciones cargadas:', descripcionesActividades);
+        }
+    } catch (error) {
+        console.error('Error al cargar descripciones:', error);
+        descripcionesActividades = {};
+    }
 }
