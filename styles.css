@@ -2255,3 +2255,43 @@ body.dark-mode .filtro-compacto select:hover {
         grid-template-columns: 1fr;
     }
 }
+
+/* Filtros compactos en módulo de calificaciones */
+.filtros-seccion-compacta {
+    background: var(--color-blanco);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: var(--sombra-suave);
+}
+
+.filtros-titulo-compacto {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-texto);
+    margin: 0 0 15px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #E0E0E0;
+}
+
+.filtros-compactos-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+/* Modo oscuro */
+body.dark-mode .filtros-seccion-compacta {
+    background: #2D2D2D;
+}
+
+body.dark-mode .filtros-titulo-compacto {
+    border-bottom-color: #444;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filtros-compactos-grid {
+        grid-template-columns: 1fr;
+    }
+}
