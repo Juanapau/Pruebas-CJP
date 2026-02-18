@@ -1499,15 +1499,12 @@ function mostrarVistaAsistencia() {
     elementos.vistaActividades.style.display = 'none';
     asistenciaElementos.vistaAsistencia.style.display = 'block';
     
-    // Poblar select de módulos
     poblarSelectModulosAsistencia();
     
-    // Resetear selectores
     asistenciaElementos.selectModulo.value = '';
     asistenciaElementos.selectCurso.value = '';
     asistenciaElementos.selectMes.value = '';
     
-    // Limpiar tabla
     asistenciaElementos.tablaHead.innerHTML = '';
     asistenciaElementos.tablaBody.innerHTML = '';
 }
@@ -1548,7 +1545,6 @@ async function manejarCambioCursoAsistencia(e) {
     }
     asistenciaState.cursoSeleccionado = curso;
     
-    // Cargar estudiantes del curso
     await cargarEstudiantesAsistencia(curso);
     verificarYCargarAsistencia();
 }
@@ -1565,7 +1561,6 @@ async function manejarCambioMesAsistencia(e) {
 }
 
 async function verificarYCargarAsistencia() {
-    // Verificar que todos los filtros estén seleccionados
     if (!asistenciaState.moduloSeleccionado || !asistenciaState.cursoSeleccionado || !asistenciaState.mesSeleccionado) {
         return;
     }
@@ -1700,7 +1695,6 @@ function calcularTotalesAsistencia(estudianteId) {
     let ausentes = 0;
     let feriados = 0;
     
-    // Contar todos los estados de todos los días del mes
     asistenciaState.diasDelMes.forEach(dia => {
         const estado = obtenerAsistencia(estudianteId, dia).toUpperCase();
         if (estado === 'P') {
@@ -1714,16 +1708,9 @@ function calcularTotalesAsistencia(estudianteId) {
         }
     });
     
-    // 3 excusas = 1 ausencia
     const excusasComoAusencias = Math.floor(excusas / 3);
-    
-    // Total = P + E (restando las excusas que se convirtieron en ausencias)
     const total = presentes + (excusas - (excusasComoAusencias * 3));
-    
-    // Días totales del mes menos los feriados
     const diasValidos = asistenciaState.diasDelMes.length - feriados;
-    
-    // Porcentaje de asistencia
     const porcentaje = diasValidos > 0 ? Math.round((total / diasValidos) * 100) : 0;
     
     console.log(`Estudiante ${estudianteId}: P=${presentes}, E=${excusas}, A=${ausentes}, F=${feriados}, Total=${total}, %=${porcentaje}`);
