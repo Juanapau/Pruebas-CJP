@@ -2007,3 +2007,80 @@ async function manejarCambioRAActividades(e) {
     // Cargar y mostrar actividades
     mostrarVistaActividades();
 }
+
+// ==========================================
+// SINCRONIZACIÓN DE FILTROS ENTRE MÓDULOS
+// ==========================================
+
+function sincronizarFiltrosCalificacionesActividades() {
+    // Sincronizar cuando cambien los filtros en Calificaciones
+    elementos.selectCurso.addEventListener('change', function() {
+        filtrosActividadesElementos.selectCurso.value = this.value;
+        // Actualizar módulos en Actividades si hay curso seleccionado
+        if (this.value) {
+            actualizarModulosEnActividades(this.value);
+        }
+    });
+    
+    elementos.selectModulo.addEventListener('change', function() {
+        filtrosActividadesElementos.selectModulo.value = this.value;
+        // Actualizar RAs en Actividades si hay módulo seleccionado
+        if (this.value) {
+            actualizarRAsEnActividades(this.value);
+        }
+    });
+    
+    elementos.selectRA.addEventListener('change', function() {
+        filtrosActividadesElementos.selectRA.value = this.value;
+    });
+}
+
+async function actualizarModulosEnActividades(curso) {
+    // Cargar módulos si es necesario
+    if (state.modulos.length === 0) {
+        await cargarModulos();
+    }
+    
+    // Filtrar módulos por curso
+    const modulosFiltrados = state.modulos.filter(m => m.curso === curso);
+    
+    // Poblar select de módulos en Actividades
+    filtrosActividadesElementos.selectModulo.innerHTML = '<option value="">Seleccione módulo</option>';
+    modulosFiltrados.forEach(modulo => {
+        const option = document.createElement('option');
+        option.value = modulo.id;
+        option.textContent = modulo.nombre;
+        filtrosActividadesElementos.selectModulo.appendChild(option);
+    });
+    
+    // Si hay módulo seleccionado en Calificaciones, seleccionarlo también
+    if (state.moduloSeleccionado) {
+        filtrosActividadesElementos.selectModulo.value = state.moduloSeleccionado;
+    }
+}
+
+async function actualizarRAsEnActividades(moduloId) {
+    // Cargar RAs del módulo
+    await cargarRAsDelModulo(moduloId);
+    
+    // Poblar select de RAs en Actividades
+    filtrosActividadesElementos.selectRA.innerHTML = '<option value="">Seleccione RA</option>';
+    state.ras.forEach(ra => {
+        const option = document.createElement('option');
+        option.value = ra.id;
+        option.textContent = `Actividades ${ra.nombre}`;
+        filtrosActividadesElementos.selectRA.appendChild(option);
+    });
+    
+    // Si hay RA seleccionado en Calificaciones, seleccionarlo también
+    if (state.raSeleccionado) {
+        filtrosActividadesElementos.selectRA.value = state.raSeleccionado;
+    }
+}
+
+// Inicializar sincronización al cargar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', sincronizarFiltrosCalificacionesActividades);
+} else {
+    sincronizarFiltrosCalificacionesActividades();
+}
