@@ -437,6 +437,9 @@ function generarTablaActividades() {
     const raActual = state.ras.find(ra => ra.id == state.raSeleccionado);
     if (!raActual) return;
     
+    console.log('🎨 Generando tabla para RA:', state.raSeleccionado);
+    console.log('📝 Descripciones disponibles:', descripcionesActividades);
+    
     // Generar encabezado
     let headerHTML = '<tr>';
     headerHTML += '<th class="header-numero">No.</th>';
@@ -444,8 +447,15 @@ function generarTablaActividades() {
     
     for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
         const descripcion = descripcionesActividades[i] || '';
+        console.log(`  Ac.${i}: ${descripcion ? '✅ Tiene descripción' : '❌ Sin descripción'}`);
         if (descripcion) {
-            headerHTML += `<th class="actividad-header header-actividad" data-descripcion="${descripcion}">Ac.${i}</th>`;
+            // Usar tooltip HTML real
+            headerHTML += `
+                <th class="actividad-header header-actividad">
+                    Ac.${i}
+                    <span class="info-icon">ℹ</span>
+                    <div class="tooltip-bubble">${descripcion}</div>
+                </th>`;
         } else {
             headerHTML += `<th class="actividad-header">Ac.${i}</th>`;
         }
@@ -2129,16 +2139,44 @@ let descripcionesActividades = {};
 
 // Cargar descripciones de actividades
 async function cargarDescripcionesActividades(raId) {
+    console.log('🔍 Cargando descripciones para RA:', raId);
     try {
         const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getDescripcionesActividades&raId=${raId}`);
         const data = await response.json();
         
+        console.log('📥 Respuesta de descripciones:', data);
+        
         if (data.success) {
             descripcionesActividades = data.descripciones || {};
-            console.log('Descripciones cargadas:', descripcionesActividades);
+            console.log('✅ Descripciones cargadas:', descripcionesActividades);
+        } else {
+            console.log('❌ Error en respuesta:', data.error);
         }
     } catch (error) {
-        console.error('Error al cargar descripciones:', error);
+        console.error('❌ Error al cargar descripciones:', error);
         descripcionesActividades = {};
     }
+}
+
+// Posicionar tooltips dinámicamente
+function inicializarTooltips() {
+    document.addEventListener('mouseover', function(e) {
+        if (e.target.closest('.header-actividad')) {
+            const header = e.target.closest('.header-actividad');
+            const tooltip = header.querySelector('.tooltip-bubble');
+            
+            if (tooltip) {
+                const rect = header.getBoundingClientRect();
+                tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+                tooltip.style.top = (rect.top - tooltip.offsetHeight - 15) + 'px';
+            }
+        }
+    });
+}
+
+// Inicializar tooltips al cargar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarTooltips);
+} else {
+    inicializarTooltips();
 }
