@@ -1488,12 +1488,14 @@ function inicializarEventosAsistencia() {
     asistenciaElementos.btnGuardar.addEventListener('click', guardarAsistencia);
 }
 
+/* DESHABILITADO - Acceso a asistencia solo desde menú
 function agregarOpcionAsistencia() {
     const optionAsistencia = document.createElement('option');
     optionAsistencia.value = 'asistencia';
     optionAsistencia.textContent = '📋 Ver Asistencia';
     elementos.selectRA.appendChild(optionAsistencia);
 }
+*/
 
 function mostrarVistaAsistencia() {
     elementos.vistaRegistro.style.display = 'none';
