@@ -17,6 +17,62 @@
         <span class="icono-luna">🌙</span>
     </button>
     
+    <!-- Botón flotante para abrir menú -->
+    <button id="btnAbrirMenu" class="btn-menu-flotante" aria-label="Abrir menú">
+        <span class="icono-menu">☰</span>
+    </button>
+
+    <!-- Overlay oscuro -->
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+    <!-- Panel lateral del menú -->
+    <div id="menuLateral" class="menu-lateral">
+        <div class="menu-header">
+            <h2>📋 Menú Principal</h2>
+            <button id="btnCerrarMenu" class="btn-cerrar-menu" aria-label="Cerrar menú">✕</button>
+        </div>
+
+        <div class="menu-contenido">
+            <!-- Modo oscuro/claro -->
+            <div class="menu-seccion">
+                <h3>⚙️ Configuración</h3>
+                <button id="btnModoOscuroMenu" class="menu-item-config">
+                    <span class="icono-config">
+                        <span class="icono-sol-menu">☀️</span>
+                        <span class="icono-luna-menu">🌙</span>
+                    </span>
+                    <span class="texto-config">Modo <span id="textoModo">Claro</span></span>
+                    <span class="toggle-switch"></span>
+                </button>
+            </div>
+
+            <!-- Separador -->
+            <div class="menu-separador"></div>
+
+            <!-- Navegación -->
+            <div class="menu-seccion">
+                <h3>📂 Navegación</h3>
+                <button id="menuRegistroCalif" class="menu-item">
+                    <span class="menu-icono">📝</span>
+                    <span class="menu-texto">Registro de Calificaciones</span>
+                </button>
+                <button id="menuRegistroAct" class="menu-item">
+                    <span class="menu-icono">📊</span>
+                    <span class="menu-texto">Registro de Actividades</span>
+                </button>
+                <button id="menuRegistroAsist" class="menu-item">
+                    <span class="menu-icono">📋</span>
+                    <span class="menu-texto">Registro de Asistencia</span>
+                </button>
+            </div>
+
+            <!-- Footer del menú -->
+            <div class="menu-footer">
+                <p>Sistema PNSA v2.0</p>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         <!-- Vista Principal: Registro de Calificaciones -->
         <div id="vistaRegistro" class="vista-principal">
