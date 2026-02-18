@@ -555,20 +555,10 @@ function agregarEventosInputsRegistro() {
                 ra.valorTotal = nuevoValor;
             }
             
-            // Guardar en Google Sheets
+            // Guardar en Google Sheets usando GET (evita problemas de CORS)
             try {
-                const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'actualizarValorRA',
-                        raId: raId,
-                        valorTotal: nuevoValor
-                    })
-                });
-                
+                const url = `${CONFIG.GOOGLE_SCRIPT_URL}?action=actualizarValorRA&raId=${raId}&valorTotal=${nuevoValor}`;
+                const response = await fetchConTimeout(url);
                 const data = await response.json();
                 
                 if (data.success) {
