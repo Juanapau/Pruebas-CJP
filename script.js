@@ -1810,7 +1810,7 @@ function inicializarMenu() {
     
     // Modo oscuro desde el menú
     menuElementos.btnModoMenu.addEventListener('click', () => {
-        alternarModoOscuro();
+        toggleModoOscuro();
         actualizarTextoModo();
     });
     
