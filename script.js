@@ -1979,8 +1979,9 @@ async function manejarCambioModuloActividades(e) {
     state.moduloSeleccionado = moduloId;
     
     // Cargar RAs del módulo
-    await cargarRAs(moduloId);
+    await cargarRAsDelModulo(moduloId);
     
+    // Poblar select de RAs
     filtrosActividadesElementos.selectRA.innerHTML = '<option value="">Seleccione RA</option>';
     state.ras.forEach(ra => {
         const option = document.createElement('option');
