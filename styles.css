@@ -2773,10 +2773,10 @@ body.dark-mode .filtros-asistencia-compactos .filtro-compacto select {
     padding-right: 40px !important;
 }
 
-/* Encabezado "Descripción del RA" en modo oscuro - Verde */
+/* Encabezado "Descripción del RA" en modo oscuro - Gris azulado sutil */
 body.dark-mode .ra-descripcion-box {
-    background: linear-gradient(135deg, #2E5339 0%, #3a6647 100%);
-    border-left: 4px solid #81C784;
+    background: #263238;
+    border-left: 4px solid #546E7A;
 }
 
 body.dark-mode .ra-descripcion-header h3 {
@@ -2784,5 +2784,5 @@ body.dark-mode .ra-descripcion-header h3 {
 }
 
 body.dark-mode .ra-descripcion-header {
-    border-bottom-color: rgba(129, 199, 132, 0.3);
+    border-bottom-color: rgba(84, 110, 122, 0.3);
 }
