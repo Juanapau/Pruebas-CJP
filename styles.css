@@ -1929,19 +1929,19 @@ body.dark-mode .filtro-tarjeta input[type="month"]:hover {
 .menu-lateral {
     position: fixed;
     top: 0;
-    right: -350px;
+    left: -350px;
     width: 350px;
     height: 100%;
     background: var(--color-blanco);
-    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
-    transition: right 0.3s ease;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+    transition: left 0.3s ease;
     z-index: 1001;
     display: flex;
     flex-direction: column;
 }
 
 .menu-lateral.active {
-    right: 0;
+    left: 0;
 }
 
 /* Header del menú */
@@ -2813,41 +2813,270 @@ select::-ms-expand {
 
 /* 2. Efecto de iluminación al pasar el mouse - Colores según el borde */
 
-/* Curso - Iluminación Azul */
-.filtro-compacto:nth-child(1) select:hover,
-.filtros-actividades-compactos .filtro-compacto:nth-child(1) select:hover,
-.filtros-asistencia-compactos .filtro-compacto:nth-child(2) select:hover {
-    box-shadow: 0 0 15px rgba(77, 208, 225, 0.6), 0 4px 12px rgba(77, 208, 225, 0.4);
+/* ===== CALIFICACIONES ===== */
+/* Curso (posición 1) - Iluminación Azul */
+.filtros-compactos-grid .filtro-compacto:nth-child(1) select:hover {
+    box-shadow: 0 0 15px rgba(77, 208, 225, 0.6), 0 4px 12px rgba(77, 208, 225, 0.4) !important;
 }
 
-body.dark-mode .filtro-compacto:nth-child(1) select:hover,
-body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(1) select:hover,
-body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) select:hover {
-    box-shadow: 0 0 20px rgba(77, 208, 225, 0.5), 0 4px 12px rgba(77, 208, 225, 0.3);
+body.dark-mode .filtros-compactos-grid .filtro-compacto:nth-child(1) select:hover {
+    box-shadow: 0 0 20px rgba(77, 208, 225, 0.5), 0 4px 12px rgba(77, 208, 225, 0.3) !important;
 }
 
-/* Módulo - Iluminación Verde */
-.filtro-compacto:nth-child(2) select:hover,
-.filtros-actividades-compactos .filtro-compacto:nth-child(2) select:hover,
+/* Módulo (posición 2) - Iluminación Verde */
+.filtros-compactos-grid .filtro-compacto:nth-child(2) select:hover {
+    box-shadow: 0 0 15px rgba(102, 187, 106, 0.6), 0 4px 12px rgba(102, 187, 106, 0.4) !important;
+}
+
+body.dark-mode .filtros-compactos-grid .filtro-compacto:nth-child(2) select:hover {
+    box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), 0 4px 12px rgba(102, 187, 106, 0.3) !important;
+}
+
+/* RA (posición 3) - Iluminación Amarilla */
+.filtros-compactos-grid .filtro-compacto:nth-child(3) select:hover {
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6), 0 4px 12px rgba(255, 193, 7, 0.4) !important;
+}
+
+body.dark-mode .filtros-compactos-grid .filtro-compacto:nth-child(3) select:hover {
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5), 0 4px 12px rgba(255, 193, 7, 0.3) !important;
+}
+
+/* ===== ACTIVIDADES ===== */
+/* Curso (posición 1) - Iluminación Azul */
+.filtros-actividades-compactos .filtro-compacto:nth-child(1) select:hover {
+    box-shadow: 0 0 15px rgba(77, 208, 225, 0.6), 0 4px 12px rgba(77, 208, 225, 0.4) !important;
+}
+
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(1) select:hover {
+    box-shadow: 0 0 20px rgba(77, 208, 225, 0.5), 0 4px 12px rgba(77, 208, 225, 0.3) !important;
+}
+
+/* Módulo (posición 2) - Iluminación Verde */
+.filtros-actividades-compactos .filtro-compacto:nth-child(2) select:hover {
+    box-shadow: 0 0 15px rgba(102, 187, 106, 0.6), 0 4px 12px rgba(102, 187, 106, 0.4) !important;
+}
+
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(2) select:hover {
+    box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), 0 4px 12px rgba(102, 187, 106, 0.3) !important;
+}
+
+/* RA (posición 3) - Iluminación Amarilla */
+.filtros-actividades-compactos .filtro-compacto:nth-child(3) select:hover {
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6), 0 4px 12px rgba(255, 193, 7, 0.4) !important;
+}
+
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(3) select:hover {
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5), 0 4px 12px rgba(255, 193, 7, 0.3) !important;
+}
+
+/* ===== ASISTENCIA ===== */
+/* Módulo (posición 1) - Iluminación Verde */
 .filtros-asistencia-compactos .filtro-compacto:nth-child(1) select:hover {
-    box-shadow: 0 0 15px rgba(102, 187, 106, 0.6), 0 4px 12px rgba(102, 187, 106, 0.4);
+    box-shadow: 0 0 15px rgba(102, 187, 106, 0.6), 0 4px 12px rgba(102, 187, 106, 0.4) !important;
 }
 
-body.dark-mode .filtro-compacto:nth-child(2) select:hover,
-body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(2) select:hover,
 body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) select:hover {
-    box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), 0 4px 12px rgba(102, 187, 106, 0.3);
+    box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), 0 4px 12px rgba(102, 187, 106, 0.3) !important;
 }
 
-/* RA - Iluminación Amarilla */
-.filtro-compacto:nth-child(3) select:hover,
-.filtros-actividades-compactos .filtro-compacto:nth-child(3) select:hover,
+/* Curso (posición 2) - Iluminación Azul */
+.filtros-asistencia-compactos .filtro-compacto:nth-child(2) select:hover {
+    box-shadow: 0 0 15px rgba(77, 208, 225, 0.6), 0 4px 12px rgba(77, 208, 225, 0.4) !important;
+}
+
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) select:hover {
+    box-shadow: 0 0 20px rgba(77, 208, 225, 0.5), 0 4px 12px rgba(77, 208, 225, 0.3) !important;
+}
+
+/* Mes (posición 3) - Iluminación Amarilla */
 .filtros-asistencia-compactos .filtro-compacto:nth-child(3) input:hover {
-    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6), 0 4px 12px rgba(255, 193, 7, 0.4);
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6), 0 4px 12px rgba(255, 193, 7, 0.4) !important;
 }
 
-body.dark-mode .filtro-compacto:nth-child(3) select:hover,
-body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(3) select:hover,
 body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(3) input:hover {
-    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5), 0 4px 12px rgba(255, 193, 7, 0.3);
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5), 0 4px 12px rgba(255, 193, 7, 0.3) !important;
+}
+
+/* ==========================================
+   CORRECCIÓN: ILUMINACIÓN DE TODOS LOS CAMPOS
+   ========================================== */
+
+/* MODO CLARO - Iluminación al hacer hover */
+
+/* Calificaciones - Curso (Azul aqua - posición 1) */
+.filtros-compactos-grid .filtro-compacto:nth-child(1) select:hover {
+    background: linear-gradient(135deg, #B2EBF2 0%, #80DEEA 100%) !important;
+    border-color: #00ACC1 !important;
+    box-shadow: 0 0 15px rgba(77, 208, 225, 0.6), 0 4px 12px rgba(77, 208, 225, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Calificaciones - Módulo (Verde - posición 2) */
+.filtros-compactos-grid .filtro-compacto:nth-child(2) select:hover {
+    background: linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%) !important;
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 15px rgba(102, 187, 106, 0.6), 0 4px 12px rgba(102, 187, 106, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Calificaciones - RA (Amarillo - posición 3) */
+.filtros-compactos-grid .filtro-compacto:nth-child(3) select:hover {
+    background: linear-gradient(135deg, #FFECB3 0%, #FFE082 100%) !important;
+    border-color: #FFC107 !important;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6), 0 4px 12px rgba(255, 193, 7, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Actividades - Curso (Azul aqua - posición 1) */
+.filtros-actividades-compactos .filtro-compacto:nth-child(1) select:hover {
+    background: linear-gradient(135deg, #B2EBF2 0%, #80DEEA 100%) !important;
+    border-color: #00ACC1 !important;
+    box-shadow: 0 0 15px rgba(77, 208, 225, 0.6), 0 4px 12px rgba(77, 208, 225, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Actividades - Módulo (Verde - posición 2) */
+.filtros-actividades-compactos .filtro-compacto:nth-child(2) select:hover {
+    background: linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%) !important;
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 15px rgba(102, 187, 106, 0.6), 0 4px 12px rgba(102, 187, 106, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Actividades - RA (Amarillo - posición 3) */
+.filtros-actividades-compactos .filtro-compacto:nth-child(3) select:hover {
+    background: linear-gradient(135deg, #FFECB3 0%, #FFE082 100%) !important;
+    border-color: #FFC107 !important;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6), 0 4px 12px rgba(255, 193, 7, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Asistencia - Módulo (Verde - posición 1) */
+.filtros-asistencia-compactos .filtro-compacto:nth-child(1) select:hover {
+    background: linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%) !important;
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 15px rgba(102, 187, 106, 0.6), 0 4px 12px rgba(102, 187, 106, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Asistencia - Curso (Azul aqua - posición 2) */
+.filtros-asistencia-compactos .filtro-compacto:nth-child(2) select:hover {
+    background: linear-gradient(135deg, #B2EBF2 0%, #80DEEA 100%) !important;
+    border-color: #00ACC1 !important;
+    box-shadow: 0 0 15px rgba(77, 208, 225, 0.6), 0 4px 12px rgba(77, 208, 225, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Asistencia - Mes (Amarillo - posición 3) */
+.filtros-asistencia-compactos .filtro-compacto:nth-child(3) input:hover {
+    background: linear-gradient(135deg, #FFECB3 0%, #FFE082 100%) !important;
+    border-color: #FFC107 !important;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6), 0 4px 12px rgba(255, 193, 7, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* MODO OSCURO - Iluminación al hacer hover */
+
+/* Calificaciones - Curso (Azul aqua - posición 1) */
+body.dark-mode .filtros-compactos-grid .filtro-compacto:nth-child(1) select:hover {
+    background: linear-gradient(135deg, #266A77 0%, #34808E 100%) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%2380DEEA' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    border-color: #26C6DA !important;
+    box-shadow: 0 0 20px rgba(77, 208, 225, 0.5), 0 4px 12px rgba(77, 208, 225, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Calificaciones - Módulo (Verde - posición 2) */
+body.dark-mode .filtros-compactos-grid .filtro-compacto:nth-child(2) select:hover {
+    background: linear-gradient(135deg, #3a6647 0%, #478056 100%) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23A5D6A7' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), 0 4px 12px rgba(102, 187, 106, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Calificaciones - RA (Amarillo - posición 3) */
+body.dark-mode .filtros-compactos-grid .filtro-compacto:nth-child(3) select:hover {
+    background: linear-gradient(135deg, #6B5B42 0%, #7A6A51 100%) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23FFE082' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    border-color: #FFC107 !important;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5), 0 4px 12px rgba(255, 193, 7, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Actividades - Curso (Azul aqua - posición 1) */
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(1) select:hover {
+    background: linear-gradient(135deg, #266A77 0%, #34808E 100%) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%2380DEEA' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    border-color: #26C6DA !important;
+    box-shadow: 0 0 20px rgba(77, 208, 225, 0.5), 0 4px 12px rgba(77, 208, 225, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Actividades - Módulo (Verde - posición 2) */
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(2) select:hover {
+    background: linear-gradient(135deg, #3a6647 0%, #478056 100%) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23A5D6A7' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), 0 4px 12px rgba(102, 187, 106, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Actividades - RA (Amarillo - posición 3) */
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(3) select:hover {
+    background: linear-gradient(135deg, #6B5B42 0%, #7A6A51 100%) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23FFE082' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    border-color: #FFC107 !important;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5), 0 4px 12px rgba(255, 193, 7, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Asistencia - Módulo (Verde - posición 1) */
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) select:hover {
+    background: linear-gradient(135deg, #3a6647 0%, #478056 100%) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23A5D6A7' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), 0 4px 12px rgba(102, 187, 106, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Asistencia - Curso (Azul aqua - posición 2) */
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) select:hover {
+    background: linear-gradient(135deg, #266A77 0%, #34808E 100%) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%2380DEEA' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    border-color: #26C6DA !important;
+    box-shadow: 0 0 20px rgba(77, 208, 225, 0.5), 0 4px 12px rgba(77, 208, 225, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Asistencia - Mes (Amarillo - posición 3) - SIN FLECHITA */
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(3) input:hover {
+    background: linear-gradient(135deg, #6B5B42 0%, #7A6A51 100%) !important;
+    border-color: #FFC107 !important;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5), 0 4px 12px rgba(255, 193, 7, 0.3) !important;
+    transform: translateY(-2px) !important;
 }
