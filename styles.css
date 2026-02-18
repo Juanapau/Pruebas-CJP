@@ -2715,3 +2715,13 @@ body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(3) input
         grid-template-columns: 1fr;
     }
 }
+
+/* Encabezado de Asistencia en modo oscuro - Gris azulado */
+body.dark-mode .vista-asistencia .tabla-header-con-boton {
+    background: #263238;
+    border-left: 4px solid #546E7A;
+}
+
+body.dark-mode .vista-asistencia .tabla-header-con-boton h2 {
+    color: #E8EAED;
+}
