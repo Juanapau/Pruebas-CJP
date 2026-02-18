@@ -1975,6 +1975,10 @@ async function manejarCambioModuloActividades(e) {
     const moduloId = e.target.value;
     if (!moduloId) {
         filtrosActividadesElementos.selectRA.value = '';
+        filtrosActividadesElementos.selectRA.innerHTML = '<option value="">Seleccione RA</option>';
+        // Limpiar tabla
+        elementos.tablaActividadesHead.innerHTML = '';
+        elementos.tablaActividadesBody.innerHTML = '';
         return;
     }
     
@@ -1991,20 +1995,32 @@ async function manejarCambioModuloActividades(e) {
         option.textContent = `Actividades ${ra.nombre}`;
         filtrosActividadesElementos.selectRA.appendChild(option);
     });
+    
+    // Limpiar tabla hasta que se seleccione un RA
+    elementos.tablaActividadesHead.innerHTML = '';
+    elementos.tablaActividadesBody.innerHTML = '';
+    document.getElementById('raDescripcion').value = '';
 }
 
 async function manejarCambioRAActividades(e) {
     const raId = e.target.value;
-    if (!raId) return;
+    if (!raId) {
+        // Limpiar tabla
+        elementos.tablaActividadesHead.innerHTML = '';
+        elementos.tablaActividadesBody.innerHTML = '';
+        document.getElementById('raDescripcion').value = '';
+        return;
+    }
     
     state.raSeleccionado = raId;
     
-    // Cargar estudiantes si no están cargados
+    // Cargar estudiantes si no están cargados o si cambió el curso
     if (state.estudiantes.length === 0 && state.cursoSeleccionado) {
         await cargarEstudiantes(state.cursoSeleccionado);
     }
     
-    // Cargar y mostrar actividades
+    // IMPORTANTE: Recargar y mostrar actividades
+    await cargarActividadesRA(raId);
     mostrarVistaActividades();
 }
 
