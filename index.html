@@ -70,15 +70,11 @@
     <div class="container">
         <!-- Vista Principal: Registro de Calificaciones -->
         <div id="vistaRegistro" class="vista-principal">
-            <div class="filtros-seccion">
-                <div class="filtro-header">
-                    <h2>📋 Filtros de Selección</h2>
-                </div>
-                <div class="filtros-container">
-                    <div class="filtro-grupo">
-                        <label for="selectCurso">
-                            <span class="icono">🎓</span> Curso
-                        </label>
+            <div class="filtros-seccion-compacta">
+                <h3 class="filtros-titulo-compacto">📋 Filtros de Selección</h3>
+                <div class="filtros-compactos-grid">
+                    <div class="filtro-compacto">
+                        <label>🎓 Curso</label>
                         <select id="selectCurso">
                             <option value="">Seleccione un curso</option>
                             <option value="4toA">4toA</option>
@@ -93,19 +89,15 @@
                         </select>
                     </div>
 
-                    <div class="filtro-grupo">
-                        <label for="selectModulo">
-                            <span class="icono">📚</span> Módulo
-                        </label>
+                    <div class="filtro-compacto">
+                        <label>📚 Módulo</label>
                         <select id="selectModulo">
                             <option value="">Seleccione un módulo</option>
                         </select>
                     </div>
 
-                    <div class="filtro-grupo">
-                        <label for="selectRA">
-                            <span class="icono">📊</span> Actividades por RA
-                        </label>
+                    <div class="filtro-compacto">
+                        <label>📊 Actividades por RA</label>
                         <select id="selectRA">
                             <option value="">Seleccione un RA</option>
                         </select>
