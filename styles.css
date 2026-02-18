@@ -1832,3 +1832,36 @@ body.dark-mode .filtro-tarjeta input[type="month"]:hover {
         grid-template-columns: 1fr;
     }
 }
+
+/* Botones de asistencia */
+.botones-asistencia {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-volver-asistencia {
+    background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-volver-asistencia:hover {
+    background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+    box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-volver-asistencia:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
+}
