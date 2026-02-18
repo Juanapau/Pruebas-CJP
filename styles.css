@@ -2716,12 +2716,33 @@ body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(3) input
     }
 }
 
-/* Encabezado de Asistencia en modo oscuro - Gris azulado */
-body.dark-mode .vista-asistencia .tabla-header-con-boton {
-    background: #263238;
-    border-left: 4px solid #546E7A;
+/* 2. Corregir flechitas - Solo una flecha al final en modo oscuro */
+
+/* Asegurar que se elimina la flecha nativa del navegador en TODOS los selects en modo oscuro */
+body.dark-mode select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
-body.dark-mode .vista-asistencia .tabla-header-con-boton h2 {
-    color: #E8EAED;
+/* Agregar flechita personalizada solo a los filtros en modo oscuro */
+body.dark-mode .filtro-compacto select {
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 14px;
+    padding-right: 40px;
+}
+
+/* Asegurar que los selects en filtros de actividades también tengan solo una flecha */
+body.dark-mode .filtros-actividades-compactos .filtro-compacto select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Asegurar que los selects en filtros de asistencia también tengan solo una flecha */
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
