@@ -1482,7 +1482,11 @@ function inicializarEventosAsistencia() {
     
     asistenciaElementos.selectModulo.addEventListener('change', manejarCambioModuloAsistencia);
     asistenciaElementos.selectCurso.addEventListener('change', manejarCambioCursoAsistencia);
+    
+    // Escuchar ambos eventos para asegurar que funcione
     asistenciaElementos.selectMes.addEventListener('change', manejarCambioMesAsistencia);
+    asistenciaElementos.selectMes.addEventListener('input', manejarCambioMesAsistencia);
+    
     asistenciaElementos.btnVolver.addEventListener('click', volverDesdeAsistencia);
     asistenciaElementos.btnGuardar.addEventListener('click', guardarAsistencia);
 }
@@ -1551,13 +1555,22 @@ async function manejarCambioCursoAsistencia(e) {
 
 async function manejarCambioMesAsistencia(e) {
     const mes = e.target.value;
+    console.log('Mes seleccionado:', mes);
+    
     if (!mes) {
         asistenciaElementos.tablaHead.innerHTML = '';
         asistenciaElementos.tablaBody.innerHTML = '';
         return;
     }
+    
     asistenciaState.mesSeleccionado = mes;
-    verificarYCargarAsistencia();
+    console.log('Estado asistencia:', {
+        modulo: asistenciaState.moduloSeleccionado,
+        curso: asistenciaState.cursoSeleccionado,
+        mes: asistenciaState.mesSeleccionado
+    });
+    
+    await verificarYCargarAsistencia();
 }
 
 async function verificarYCargarAsistencia() {
@@ -1586,13 +1599,18 @@ async function cargarEstudiantesAsistencia(curso) {
 }
 
 async function cargarAsistenciasMes(moduloId, curso, mes) {
+    console.log('Cargando asistencias:', { moduloId, curso, mes });
     mostrarCargando(true, 'Cargando asistencias...');
     try {
-        const response = await fetchConTimeout(
-            `${CONFIG.GOOGLE_SCRIPT_URL}?action=getAsistencias&moduloId=${moduloId}&curso=${curso}&mes=${mes}`
-        );
+        const url = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getAsistencias&moduloId=${moduloId}&curso=${curso}&mes=${mes}`;
+        console.log('URL:', url);
+        
+        const response = await fetchConTimeout(url);
         const data = await response.json();
+        console.log('Asistencias cargadas:', data);
+        
         asistenciaState.asistencias = data.asistencias || [];
+        console.log('Estado actualizado con', asistenciaState.asistencias.length, 'registros');
     } catch (error) {
         console.error('Error al cargar asistencias:', error);
         asistenciaState.asistencias = [];
@@ -1618,13 +1636,19 @@ function generarDiasLaborables(mes) {
 }
 
 function generarTablaAsistencia() {
+    console.log('Generando tabla de asistencia...');
+    console.log('Estudiantes:', asistenciaState.estudiantes.length);
+    console.log('Asistencias guardadas:', asistenciaState.asistencias.length);
+    
     if (!asistenciaState.mesSeleccionado || asistenciaState.estudiantes.length === 0) {
+        console.log('No hay mes o estudiantes, limpiando tabla');
         asistenciaElementos.tablaHead.innerHTML = '';
         asistenciaElementos.tablaBody.innerHTML = '';
         return;
     }
     
     asistenciaState.diasDelMes = generarDiasLaborables(asistenciaState.mesSeleccionado);
+    console.log('Días del mes:', asistenciaState.diasDelMes);
     
     let headerHTML = '<tr>';
     headerHTML += '<th class="header-numero">#</th>';
