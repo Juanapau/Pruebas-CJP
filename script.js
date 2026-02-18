@@ -1997,6 +1997,11 @@ async function manejarCambioRAActividades(e) {
     
     state.raSeleccionado = raId;
     
+    // Cargar estudiantes si no están cargados
+    if (state.estudiantes.length === 0 && state.cursoSeleccionado) {
+        await cargarEstudiantes(state.cursoSeleccionado);
+    }
+    
     // Cargar y mostrar actividades
-    await mostrarVistaActividades(raId);
+    mostrarVistaActividades();
 }
