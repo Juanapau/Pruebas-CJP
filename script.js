@@ -545,7 +545,7 @@ function generarActividadesEjemplo() {
 function agregarEventosInputsRegistro() {
     // Eventos para cambiar valor total del RA
     document.querySelectorAll('.input-valor-ra').forEach(input => {
-        input.addEventListener('change', function() {
+        input.addEventListener('change', async function() {
             const raId = this.dataset.ra;
             const nuevoValor = parseFloat(this.value) || 0;
             
@@ -553,6 +553,31 @@ function agregarEventosInputsRegistro() {
             const ra = state.ras.find(r => r.id == raId);
             if (ra) {
                 ra.valorTotal = nuevoValor;
+            }
+            
+            // Guardar en Google Sheets
+            try {
+                const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'actualizarValorRA',
+                        raId: raId,
+                        valorTotal: nuevoValor
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    console.log('✅ Valor del RA actualizado en Google Sheets');
+                } else {
+                    console.error('❌ Error al actualizar valor del RA:', data.error);
+                }
+            } catch (error) {
+                console.error('❌ Error al guardar valor del RA:', error);
             }
             
             // Recalcular y regenerar tabla
@@ -2179,4 +2204,76 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', inicializarTooltips);
 } else {
     inicializarTooltips();
+}
+
+// ==========================================
+// ACTUALIZAR DESCRIPCIÓN DEL RA
+// ==========================================
+
+// Función para guardar la descripción del RA
+async function guardarDescripcionRA() {
+    if (!state.raSeleccionado) {
+        console.log('No hay RA seleccionado');
+        return;
+    }
+    
+    const descripcion = elementos.raDescripcion.value.trim();
+    
+    try {
+        const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'actualizarRA',
+                raId: state.raSeleccionado,
+                descripcion: descripcion
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log('✅ Descripción del RA guardada');
+            // Actualizar en el state local
+            const raActual = state.ras.find(ra => ra.id == state.raSeleccionado);
+            if (raActual) {
+                raActual.descripcion = descripcion;
+            }
+        } else {
+            console.error('Error al guardar descripción:', data.error);
+        }
+    } catch (error) {
+        console.error('Error al guardar descripción del RA:', error);
+    }
+}
+
+// Agregar evento al textarea de descripción para guardar automáticamente
+function inicializarEventoDescripcionRA() {
+    const raDescripcionTextarea = document.getElementById('raDescripcion');
+    
+    if (raDescripcionTextarea) {
+        // Guardar cuando se sale del campo (blur)
+        raDescripcionTextarea.addEventListener('blur', function() {
+            if (state.raSeleccionado) {
+                guardarDescripcionRA();
+            }
+        });
+        
+        // También guardar con Ctrl+S o Cmd+S
+        raDescripcionTextarea.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                guardarDescripcionRA();
+            }
+        });
+    }
+}
+
+// Inicializar evento al cargar
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inicializarEventoDescripcionRA);
+} else {
+    inicializarEventoDescripcionRA();
 }
