@@ -1874,7 +1874,7 @@ body.dark-mode .filtro-tarjeta input[type="month"]:hover {
 .btn-menu-flotante {
     position: fixed;
     bottom: 30px;
-    right: 30px;
+    left: 30px;
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -2785,4 +2785,69 @@ body.dark-mode .ra-descripcion-header h3 {
 
 body.dark-mode .ra-descripcion-header {
     border-bottom-color: rgba(84, 110, 122, 0.3);
+}
+
+/* ==========================================
+   CORRECCIONES DE DETALLES
+   ========================================== */
+
+/* 1. Quitar barra vertical del cursor en los selects */
+select {
+    cursor: pointer;
+}
+
+select::-ms-expand {
+    display: none;
+}
+
+/* Quitar el cursor de texto (I-beam) en los selects */
+.filtro-compacto select,
+.filtros-actividades-compactos .filtro-compacto select,
+.filtros-asistencia-compactos .filtro-compacto select,
+.filtros-compactos-grid .filtro-compacto select {
+    cursor: pointer !important;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+/* 2. Efecto de iluminación al pasar el mouse - Colores según el borde */
+
+/* Curso - Iluminación Azul */
+.filtro-compacto:nth-child(1) select:hover,
+.filtros-actividades-compactos .filtro-compacto:nth-child(1) select:hover,
+.filtros-asistencia-compactos .filtro-compacto:nth-child(2) select:hover {
+    box-shadow: 0 0 15px rgba(77, 208, 225, 0.6), 0 4px 12px rgba(77, 208, 225, 0.4);
+}
+
+body.dark-mode .filtro-compacto:nth-child(1) select:hover,
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(1) select:hover,
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) select:hover {
+    box-shadow: 0 0 20px rgba(77, 208, 225, 0.5), 0 4px 12px rgba(77, 208, 225, 0.3);
+}
+
+/* Módulo - Iluminación Verde */
+.filtro-compacto:nth-child(2) select:hover,
+.filtros-actividades-compactos .filtro-compacto:nth-child(2) select:hover,
+.filtros-asistencia-compactos .filtro-compacto:nth-child(1) select:hover {
+    box-shadow: 0 0 15px rgba(102, 187, 106, 0.6), 0 4px 12px rgba(102, 187, 106, 0.4);
+}
+
+body.dark-mode .filtro-compacto:nth-child(2) select:hover,
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(2) select:hover,
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) select:hover {
+    box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), 0 4px 12px rgba(102, 187, 106, 0.3);
+}
+
+/* RA - Iluminación Amarilla */
+.filtro-compacto:nth-child(3) select:hover,
+.filtros-actividades-compactos .filtro-compacto:nth-child(3) select:hover,
+.filtros-asistencia-compactos .filtro-compacto:nth-child(3) input:hover {
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6), 0 4px 12px rgba(255, 193, 7, 0.4);
+}
+
+body.dark-mode .filtro-compacto:nth-child(3) select:hover,
+body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(3) select:hover,
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(3) input:hover {
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5), 0 4px 12px rgba(255, 193, 7, 0.3);
 }
