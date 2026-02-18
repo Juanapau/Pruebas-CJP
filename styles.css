@@ -2228,6 +2228,24 @@ body:not(.dark-mode) .icono-luna-menu {
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    width: 100%;
+    min-width: 0;
+}
+
+/* Asegurar anchos consistentes para los filtros */
+.filtros-compactos-grid .filtro-compacto,
+.filtros-actividades-compactos .filtro-compacto,
+.filtros-asistencia-compactos .filtro-compacto {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.filtros-compactos-grid .filtro-compacto select,
+.filtros-actividades-compactos .filtro-compacto select,
+.filtros-asistencia-compactos .filtro-compacto select,
+.filtros-asistencia-compactos .filtro-compacto input {
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .filtro-compacto select:hover {
