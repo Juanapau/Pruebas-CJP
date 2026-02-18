@@ -2501,11 +2501,11 @@ body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(3) sele
 /* Flechitas en selects - Modo oscuro */
 body.dark-mode .filtro-compacto select,
 body.dark-mode .filtros-actividades-compactos .filtro-compacto select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23E8EAED' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23E8EAED' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 12px;
-    padding-right: 35px;
+    background-position: right 15px center;
+    background-size: 14px;
+    padding-right: 40px;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -2514,15 +2514,15 @@ body.dark-mode .filtros-actividades-compactos .filtro-compacto select {
 /* Flechitas específicas por color en modo oscuro */
 body.dark-mode .filtro-compacto:nth-child(1) select,
 body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(1) select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2380DEEA' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%2380DEEA' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E");
 }
 
 body.dark-mode .filtro-compacto:nth-child(2) select,
 body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(2) select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23A5D6A7' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23A5D6A7' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E");
 }
 
 body.dark-mode .filtro-compacto:nth-child(3) select,
 body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(3) select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23FFE082' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23FFE082' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E");
 }
