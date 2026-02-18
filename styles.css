@@ -2614,8 +2614,7 @@ body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(3) sele
 }
 
 /* Modo oscuro - Módulo (verde) */
-body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) select,
-body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) input {
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) select {
     background: linear-gradient(135deg, #2E5339 0%, #3a6647 100%);
     border-color: #66BB6A;
     color: #A5D6A7;
@@ -2624,10 +2623,18 @@ body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) input
     background-position: right 15px center;
     background-size: 14px;
     padding-right: 40px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
-body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) select:hover,
-body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) input:hover {
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) input {
+    background: linear-gradient(135deg, #2E5339 0%, #3a6647 100%);
+    border-color: #66BB6A;
+    color: #A5D6A7;
+}
+
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) select:hover {
     background: linear-gradient(135deg, #3a6647 0%, #478056 100%);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23A5D6A7' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -2637,9 +2644,14 @@ body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) input
     box-shadow: 0 4px 12px rgba(102, 187, 106, 0.3);
 }
 
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(1) input:hover {
+    background: linear-gradient(135deg, #3a6647 0%, #478056 100%);
+    border-color: #4CAF50;
+    box-shadow: 0 4px 12px rgba(102, 187, 106, 0.3);
+}
+
 /* Modo oscuro - Curso (azul) */
-body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) select,
-body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) input {
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) select {
     background: linear-gradient(135deg, #1A3A40 0%, #266A77 100%);
     border-color: #4DD0E1;
     color: #80DEEA;
@@ -2648,10 +2660,18 @@ body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) input
     background-position: right 15px center;
     background-size: 14px;
     padding-right: 40px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
-body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) select:hover,
-body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) input:hover {
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) input {
+    background: linear-gradient(135deg, #1A3A40 0%, #266A77 100%);
+    border-color: #4DD0E1;
+    color: #80DEEA;
+}
+
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) select:hover {
     background: linear-gradient(135deg, #266A77 0%, #34808E 100%);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%2380DEEA' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -2661,15 +2681,19 @@ body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) input
     box-shadow: 0 4px 12px rgba(77, 208, 225, 0.3);
 }
 
-/* Modo oscuro - Mes (amarillo) */
-body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(3) select,
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(2) input:hover {
+    background: linear-gradient(135deg, #266A77 0%, #34808E 100%);
+    border-color: #26C6DA;
+    box-shadow: 0 4px 12px rgba(77, 208, 225, 0.3);
+}
+
+/* Modo oscuro - Mes (amarillo) - SIN FLECHITA porque es input type month */
 body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(3) input {
     background: linear-gradient(135deg, #5D4E37 0%, #6B5B42 100%);
     border-color: #FFD54F;
     color: #FFE082;
 }
 
-body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(3) select:hover,
 body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(3) input:hover {
     background: linear-gradient(135deg, #6B5B42 0%, #7A6A51 100%);
     border-color: #FFC107;
