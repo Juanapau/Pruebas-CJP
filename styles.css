@@ -2746,3 +2746,29 @@ body.dark-mode .filtros-asistencia-compactos .filtro-compacto select {
     -moz-appearance: none;
     appearance: none;
 }
+
+/* ==========================================
+   CORRECCIÓN FLECHITAS - UNA SOLA AL FINAL
+   ========================================== */
+
+/* Asegurar que TODOS los selects en modo oscuro tengan solo UNA flecha */
+body.dark-mode .filtros-compactos-grid .filtro-compacto select {
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    padding-right: 40px !important;
+}
+
+body.dark-mode .filtros-actividades-compactos .filtro-compacto select {
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    padding-right: 40px !important;
+}
+
+body.dark-mode .filtros-asistencia-compactos .filtro-compacto select {
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    padding-right: 40px !important;
+}
