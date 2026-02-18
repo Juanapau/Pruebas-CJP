@@ -1916,13 +1916,8 @@ const filtrosActividadesElementos = {
     selectRA: document.getElementById('selectRAActividades')
 };
 
-// Inicializar eventos UNA SOLA VEZ al cargar
-function inicializarEventosFiltrosActividades() {
-    // Eventos para filtros de actividades
-    filtrosActividadesElementos.selectCurso.addEventListener('change', manejarCambioCursoActividades);
-    filtrosActividadesElementos.selectModulo.addEventListener('change', manejarCambioModuloActividades);
-    filtrosActividadesElementos.selectRA.addEventListener('change', manejarCambioRAActividades);
-}
+// Variable para controlar si los eventos ya fueron inicializados
+let eventosFiltrosActividadesInicializados = false;
 
 function inicializarFiltrosActividades() {
     // Limpiar selecciones
@@ -1937,6 +1932,14 @@ function inicializarFiltrosActividades() {
     
     // Poblar módulos
     poblarModulosActividades();
+    
+    // Agregar eventos solo una vez
+    if (!eventosFiltrosActividadesInicializados) {
+        filtrosActividadesElementos.selectCurso.addEventListener('change', manejarCambioCursoActividades);
+        filtrosActividadesElementos.selectModulo.addEventListener('change', manejarCambioModuloActividades);
+        filtrosActividadesElementos.selectRA.addEventListener('change', manejarCambioRAActividades);
+        eventosFiltrosActividadesInicializados = true;
+    }
 }
 
 function poblarModulosActividades() {
@@ -1953,20 +1956,11 @@ async function manejarCambioCursoActividades(e) {
     const curso = e.target.value;
     if (!curso) {
         filtrosActividadesElementos.selectModulo.value = '';
-        filtrosActividadesElementos.selectModulo.innerHTML = '<option value="">Seleccione módulo</option>';
         filtrosActividadesElementos.selectRA.value = '';
-        filtrosActividadesElementos.selectRA.innerHTML = '<option value="">Seleccione RA</option>';
-        // Limpiar tabla
-        elementos.tablaActividadesHead.innerHTML = '';
-        elementos.tablaActividadesBody.innerHTML = '';
-        document.getElementById('raDescripcion').value = '';
         return;
     }
     
     state.cursoSeleccionado = curso;
-    
-    // Cargar estudiantes del nuevo curso
-    await cargarEstudiantes(curso);
     
     // Filtrar módulos por curso
     await cargarModulos();
@@ -1981,12 +1975,6 @@ async function manejarCambioCursoActividades(e) {
     });
     
     filtrosActividadesElementos.selectRA.innerHTML = '<option value="">Seleccione RA</option>';
-    
-    // Limpiar tabla hasta que se seleccione módulo y RA
-    elementos.tablaActividadesHead.innerHTML = '';
-    elementos.tablaActividadesBody.innerHTML = '';
-    document.getElementById('raDescripcion').value = '';
-}
 }
 
 async function manejarCambioModuloActividades(e) {
@@ -2112,14 +2100,13 @@ async function actualizarRAsEnActividades(moduloId) {
     }
 }
 
-// Inicializar sincronización al cargar
-// Inicializar eventos de filtros de Actividades
+// Inicializar sincronización y eventos al cargar
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
-        inicializarEventosFiltrosActividades();
+        inicializarFiltrosActividades();  // Esto inicializa los eventos
         sincronizarFiltrosCalificacionesActividades();
     });
 } else {
-    inicializarEventosFiltrosActividades();
+    inicializarFiltrosActividades();  // Esto inicializa los eventos
     sincronizarFiltrosCalificacionesActividades();
 }
