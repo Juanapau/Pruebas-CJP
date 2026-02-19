@@ -1,6 +1,6 @@
 // Service Worker para Sistema PNSA
 // Versión del caché - incrementar cuando actualices archivos
-const CACHE_VERSION = 'pnsa-v1.0.1';
+const CACHE_VERSION = 'pnsa-v1.0.2';
 const CACHE_NAME = `${CACHE_VERSION}-static`;
 const DATA_CACHE_NAME = `${CACHE_VERSION}-data`;
 
