@@ -5,6 +5,164 @@ const CONFIG = {
     PORCENTAJE_APROBATORIO: 70
 };
 
+// ==========================================
+// SISTEMA DE CACHÉ PERSISTENTE CON LOCALSTORAGE
+// ==========================================
+
+const CachePersistente = {
+    DURACION: 30 * 60 * 1000, // 30 minutos
+    
+    guardar(clave, datos) {
+        try {
+            const item = {
+                datos: datos,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(`pnsa_cache_${clave}`, JSON.stringify(item));
+            console.log(`💾 Cache guardado: ${clave}`);
+        } catch (error) {
+            console.warn('Error al guardar en localStorage:', error);
+        }
+    },
+    
+    obtener(clave) {
+        try {
+            const item = localStorage.getItem(`pnsa_cache_${clave}`);
+            if (!item) return null;
+            
+            const parsed = JSON.parse(item);
+            const ahora = Date.now();
+            
+            if (ahora - parsed.timestamp > this.DURACION) {
+                console.log(`⏰ Cache expirado: ${clave}`);
+                localStorage.removeItem(`pnsa_cache_${clave}`);
+                return null;
+            }
+            
+            console.log(`⚡ Cache recuperado: ${clave}`);
+            return parsed.datos;
+        } catch (error) {
+            console.warn('Error al leer localStorage:', error);
+            return null;
+        }
+    },
+    
+    invalidar(clave) {
+        localStorage.removeItem(`pnsa_cache_${clave}`);
+        console.log(`🗑️ Cache invalidado: ${clave}`);
+    },
+    
+    limpiarTodo() {
+        const keys = Object.keys(localStorage);
+        keys.forEach(key => {
+            if (key.startsWith('pnsa_cache_')) {
+                localStorage.removeItem(key);
+            }
+        });
+        console.log('🧹 Todo el cache limpiado');
+    }
+};
+
+// ==========================================
+// COLA DE PETICIONES OPTIMIZADA
+// ==========================================
+
+const ColaPeticiones = {
+    cola: [],
+    enProceso: 0,
+    MAX_SIMULTANEAS: 6,
+    
+    async agregar(promesaFn) {
+        if (this.enProceso < this.MAX_SIMULTANEAS) {
+            return await this.ejecutar(promesaFn);
+        }
+        
+        return new Promise((resolve, reject) => {
+            this.cola.push({ promesaFn, resolve, reject });
+        });
+    },
+    
+    async ejecutar(promesaFn) {
+        this.enProceso++;
+        try {
+            const resultado = await promesaFn();
+            this.procesarSiguiente();
+            return resultado;
+        } catch (error) {
+            this.procesarSiguiente();
+            throw error;
+        }
+    },
+    
+    procesarSiguiente() {
+        this.enProceso--;
+        if (this.cola.length > 0 && this.enProceso < this.MAX_SIMULTANEAS) {
+            const { promesaFn, resolve, reject } = this.cola.shift();
+            this.ejecutar(promesaFn).then(resolve).catch(reject);
+        }
+    }
+};
+
+// ==========================================
+// PRECARGA INTELIGENTE DE DATOS
+// ==========================================
+
+const Precargador = {
+    async precargarCurso(curso) {
+        if (!curso) return;
+        console.log(`🔮 Precargando datos del curso ${curso}...`);
+        
+        if (!CachePersistente.obtener(`estudiantes_${curso}`)) {
+            ColaPeticiones.agregar(async () => {
+                try {
+                    const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`);
+                    const data = await response.json();
+                    CachePersistente.guardar(`estudiantes_${curso}`, data.estudiantes);
+                    console.log(`✅ Estudiantes de ${curso} precargados`);
+                } catch (error) {
+                    console.error('Error precargando estudiantes:', error);
+                }
+            });
+        }
+    },
+    
+    async precargarModulo(moduloId) {
+        if (!moduloId) return;
+        console.log(`🔮 Precargando RAs del módulo ${moduloId}...`);
+        
+        if (!CachePersistente.obtener(`ras_${moduloId}`)) {
+            ColaPeticiones.agregar(async () => {
+                try {
+                    const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getRAs&moduloId=${moduloId}`);
+                    const data = await response.json();
+                    CachePersistente.guardar(`ras_${moduloId}`, data.ras);
+                    console.log(`✅ RAs del módulo ${moduloId} precargados`);
+                } catch (error) {
+                    console.error('Error precargando RAs:', error);
+                }
+            });
+        }
+    },
+    
+    async precargarRA(raId) {
+        if (!raId) return;
+        console.log(`🔮 Precargando actividades del RA ${raId}...`);
+        
+        if (!CachePersistente.obtener(`actividades_${raId}`)) {
+            ColaPeticiones.agregar(async () => {
+                try {
+                    const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getActividades&raId=${raId}`);
+                    const data = await response.json();
+                    CachePersistente.guardar(`actividades_${raId}`, data.actividades);
+                    console.log(`✅ Actividades del RA ${raId} precargadas`);
+                } catch (error) {
+                    console.error('Error precargando actividades:', error);
+                }
+            });
+        }
+    }
+};
+
 // Estado global de la aplicación
 const state = {
     modulos: [],
@@ -83,18 +241,35 @@ async function cargarDatosIniciales() {
 }
 
 async function cargarModulos() {
+    // Intentar caché persistente primero
+    const cachePersistente = CachePersistente.obtener('modulos');
+    if (cachePersistente) {
+        state.modulos = cachePersistente;
+        poblarSelectModulos();
+        console.log('⚡ Módulos cargados desde localStorage');
+        return;
+    }
+    
+    // Luego caché en memoria
     const cached = obtenerDeCache('modulos');
     if (cached) {
         state.modulos = cached;
         poblarSelectModulos();
         return;
     }
+    
     mostrarCargando(true, 'Cargando módulos...');
     try {
-        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getModulos`);
+        const response = await ColaPeticiones.agregar(() => 
+            fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getModulos`)
+        );
         const data = await response.json();
         state.modulos = data.modulos || [];
+        
+        // Guardar en ambos cachés
         guardarEnCache('modulos', state.modulos);
+        CachePersistente.guardar('modulos', state.modulos);
+        
         poblarSelectModulos();
     } catch (error) {
         console.error('❌ ERROR al cargar módulos:', error);
@@ -106,17 +281,32 @@ async function cargarModulos() {
 }
 
 async function cargarEstudiantes(curso) {
+    // Caché persistente primero
+    const cachePersist = CachePersistente.obtener(`estudiantes_${curso}`);
+    if (cachePersist) {
+        state.estudiantes = cachePersist;
+        console.log(`⚡ Estudiantes de ${curso} desde localStorage`);
+        return;
+    }
+    
+    // Caché en memoria
     const cached = obtenerDeCache('estudiantes', curso);
     if (cached) {
         state.estudiantes = cached;
         return;
     }
+    
     mostrarCargando(true, `Cargando estudiantes de ${curso}...`);
     try {
-        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`);
+        const response = await ColaPeticiones.agregar(() =>
+            fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`)
+        );
         const data = await response.json();
         state.estudiantes = data.estudiantes || [];
+        
+        // Guardar en ambos cachés
         guardarEnCache('estudiantes', state.estudiantes, curso);
+        CachePersistente.guardar(`estudiantes_${curso}`, state.estudiantes);
     } catch (error) {
         console.error(`❌ ERROR al cargar estudiantes de ${curso}:`, error);
         state.estudiantes = [];
@@ -126,18 +316,35 @@ async function cargarEstudiantes(curso) {
 }
 
 async function cargarRAsDelModulo(moduloId) {
+    // Caché persistente
+    const cachePersist = CachePersistente.obtener(`ras_${moduloId}`);
+    if (cachePersist) {
+        state.ras = cachePersist;
+        poblarSelectRAs();
+        console.log(`⚡ RAs del módulo ${moduloId} desde localStorage`);
+        return;
+    }
+    
+    // Caché en memoria
     const cached = obtenerDeCache('ras', moduloId);
     if (cached) {
         state.ras = cached;
         poblarSelectRAs();
         return;
     }
+    
     mostrarCargando(true, 'Cargando resultados de aprendizaje...');
     try {
-        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getRAs&moduloId=${moduloId}`);
+        const response = await ColaPeticiones.agregar(() =>
+            fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getRAs&moduloId=${moduloId}`)
+        );
         const data = await response.json();
         state.ras = data.ras || [];
+        
+        // Guardar en ambos cachés
         guardarEnCache('ras', state.ras, moduloId);
+        CachePersistente.guardar(`ras_${moduloId}`, state.ras);
+        
         poblarSelectRAs();
     } catch (error) {
         console.error('❌ ERROR al cargar RAs:', error);
@@ -173,26 +380,52 @@ async function cargarCalificaciones(moduloId) {
 }
 
 async function cargarActividadesRA(raId) {
+    // Caché persistente
+    const cachePersist = CachePersistente.obtener(`actividades_${raId}`);
+    if (cachePersist) {
+        state.actividades = state.actividades.filter(a => a.raId != raId);
+        state.actividades.push(...cachePersist);
+        await cargarDescripcionesActividades(state.moduloSeleccionado, raId);
+        generarTablaActividades();
+        cargarInstrumentosRA(state.moduloSeleccionado, raId).then(() => {
+            generarTablaActividades();
+        });
+        console.log(`⚡ Actividades del RA ${raId} desde localStorage`);
+        return;
+    }
+    
+    // Caché en memoria
     const cached = obtenerDeCache('actividades', raId);
     if (cached) {
         state.actividades = state.actividades.filter(a => a.raId != raId);
         state.actividades.push(...cached);
-        // Cargar descripciones con moduloId
         await cargarDescripcionesActividades(state.moduloSeleccionado, raId);
         generarTablaActividades();
+        cargarInstrumentosRA(state.moduloSeleccionado, raId).then(() => {
+            generarTablaActividades();
+        });
         return;
     }
+    
     mostrarCargando(true, 'Cargando actividades del RA...');
     try {
-        const response = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getActividades&raId=${raId}`);
+        const response = await ColaPeticiones.agregar(() =>
+            fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getActividades&raId=${raId}`)
+        );
         const data = await response.json();
         const actividadesDelRA = data.actividades || [];
+        
+        // Guardar en ambos cachés
         guardarEnCache('actividades', actividadesDelRA, raId);
+        CachePersistente.guardar(`actividades_${raId}`, actividadesDelRA);
+        
         state.actividades = state.actividades.filter(a => a.raId != raId);
         state.actividades.push(...actividadesDelRA);
-        // Cargar descripciones con moduloId
         await cargarDescripcionesActividades(state.moduloSeleccionado, raId);
         generarTablaActividades();
+        cargarInstrumentosRA(state.moduloSeleccionado, raId).then(() => {
+            generarTablaActividades();
+        });
     } catch (error) {
         console.error('Error al cargar actividades:', error);
         generarTablaActividades();
@@ -246,15 +479,18 @@ async function manejarCambioCurso(e) {
     if (curso) {
         state.cursoSeleccionado = curso;
         await cargarEstudiantes(curso);
-        poblarSelectModulos(); // Filtrar módulos según el curso seleccionado
-        // Si ya hay un módulo seleccionado, recargar la tabla
+        
+        // Precargar datos anticipadamente
+        Precargador.precargarCurso(curso);
+        
+        poblarSelectModulos();
         if (state.moduloSeleccionado) {
             await cargarCalificaciones(state.moduloSeleccionado);
         }
     } else {
         state.cursoSeleccionado = null;
         state.estudiantes = [];
-        poblarSelectModulos(); // Mostrar todos los módulos
+        poblarSelectModulos();
         elementos.tablaRegistroHead.innerHTML = '';
         elementos.tablaRegistroBody.innerHTML = '';
     }
@@ -269,6 +505,10 @@ async function manejarCambioModulo(e) {
             return;
         }
         state.moduloSeleccionado = moduloId;
+        
+        // Precargar RAs anticipadamente
+        Precargador.precargarModulo(moduloId);
+        
         try {
             // Cargar RAs y Calificaciones en paralelo
             await Promise.all([
@@ -278,7 +518,7 @@ async function manejarCambioModulo(e) {
         } catch (error) {
             console.error('Error al cargar módulo:', error);
         } finally {
-            mostrarCargando(false); // Garantiza que siempre se cierre
+            mostrarCargando(false);
         }
         elementos.btnGuardarRegistro.style.display = 'flex';
     } else {
@@ -438,6 +678,7 @@ function generarTablaActividades() {
     if (!raActual) return;
     
     console.log('🎨 Generando tabla para RA:', state.raSeleccionado);
+    console.log('📋 Instrumentos en caché:', instrumentosCache.configuraciones);
     console.log('📝 Descripciones disponibles:', descripcionesActividades);
     
     // Generar encabezado
@@ -449,15 +690,18 @@ function generarTablaActividades() {
         const descripcion = descripcionesActividades[i] || '';
         console.log(`  Ac.${i}: ${descripcion ? '✅ Tiene descripción' : '❌ Sin descripción'}`);
         if (descripcion) {
-            // Usar tooltip HTML real
             headerHTML += `
-                <th class="actividad-header header-actividad">
+                <th class="actividad-header header-actividad" data-num-actividad="${i}">
                     Ac.${i}
-                    <span class="info-icon">ℹ</span>
+                    <span class="info-icon config-icon" onclick="abrirModalConfigInstrumento(${state.moduloSeleccionado}, ${state.raSeleccionado}, ${i})">ℹ</span>
                     <div class="tooltip-bubble">${descripcion}</div>
                 </th>`;
         } else {
-            headerHTML += `<th class="actividad-header">Ac.${i}</th>`;
+            headerHTML += `
+                <th class="actividad-header" data-num-actividad="${i}">
+                    Ac.${i}
+                    <span class="info-icon config-icon" onclick="abrirModalConfigInstrumento(${state.moduloSeleccionado}, ${state.raSeleccionado}, ${i})">ℹ</span>
+                </th>`;
         }
     }
     
@@ -477,7 +721,32 @@ function generarTablaActividades() {
         
         for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
             const valor = obtenerValorActividad(estudiante.id, i);
-            bodyHTML += `<td><input type="number" class="input-actividad" data-estudiante="${estudiante.id}" data-actividad="${i}" data-ra="${state.raSeleccionado}" value="${valor !== null && valor !== undefined ? valor : ''}" min="0" max="10"></td>`;
+            const tieneInstrumento = tieneInstrumentoConfigurado(state.moduloSeleccionado, state.raSeleccionado, i);
+            
+            // Debug detallado
+            if (i <= 3) { // Solo para las primeras 3 actividades para no saturar
+                console.log(`  🔍 Ac.${i} - tiene instrumento:`, tieneInstrumento);
+            }
+            
+            const claseExtra = tieneInstrumento ? ' celda-con-instrumento' : '';
+            const iconoInstrumento = tieneInstrumento ? '<span class="icono-instrumento" title="Click para evaluar con instrumento">📋</span>' : '';
+            
+            bodyHTML += `<td class="celda-actividad-eval${claseExtra}" 
+                            data-estudiante="${estudiante.id}" 
+                            data-actividad="${i}" 
+                            data-ra="${state.raSeleccionado}"
+                            data-modulo="${state.moduloSeleccionado}">
+                            ${iconoInstrumento}
+                            <input type="number" 
+                                   class="input-actividad${tieneInstrumento ? ' input-con-instrumento' : ''}" 
+                                   data-estudiante="${estudiante.id}" 
+                                   data-actividad="${i}" 
+                                   data-ra="${state.raSeleccionado}" 
+                                   value="${valor !== null && valor !== undefined ? valor : ''}" 
+                                   min="0" 
+                                   max="10"
+                                   ${tieneInstrumento ? 'readonly title="Click para evaluar con instrumento"' : ''}>
+                         </td>`;
             totalActividades += valor || 0;
         }
         
@@ -948,11 +1217,12 @@ async function guardarTodasLasActividades() {
         
         elementos.btnGuardarActividades.textContent = '✅ Guardado';
         
-        // Invalidar caché de actividades y calificaciones
+        // Invalidar caché de actividades y calificaciones (memoria y localStorage)
         invalidarCache('actividades', state.raSeleccionado);
         invalidarCache('calificaciones', state.moduloSeleccionado);
+        CachePersistente.invalidar(`actividades_${state.raSeleccionado}`);
+        CachePersistente.invalidar(`calificaciones_${state.moduloSeleccionado}`);
         
-        // NO recargar inmediatamente - confiar en los datos locales que acabamos de guardar
         console.log('✅ Datos guardados - caché invalidado para próxima carga');
         
         setTimeout(() => {
@@ -2301,3 +2571,1134 @@ function actualizarResumenDiasTrabajados() {
     
     console.log(`📊 Días trabajados: ${diasTrabajados} (contando solo días con P/E/A)`);
 }
+
+// ==========================================
+// SISTEMA DE INSTRUMENTOS DE EVALUACIÓN
+// ==========================================
+
+// ==========================================
+// MODAL DE CONFIGURACIÓN DE INSTRUMENTO
+// ==========================================
+
+const modalConfigState = {
+    moduloId: null,
+    raId: null,
+    numActividad: null,
+    criteriosCounter: 0
+};
+
+const modalConfigElementos = {
+    modal: document.getElementById('modalConfigInstrumento'),
+    overlay: document.querySelector('.modal-overlay-instrumento'),
+    btnCerrar: document.getElementById('btnCerrarConfigInstrumento'),
+    btnCancelar: document.getElementById('btnCancelarConfigInstrumento'),
+    btnGuardar: document.getElementById('btnGuardarConfigInstrumento'),
+    moduloNombre: document.getElementById('configModuloNombre'),
+    raNombre: document.getElementById('configRANombre'),
+    actividadNum: document.getElementById('configActividadNum'),
+    valorActividad: document.getElementById('configValorActividad'),
+    criteriosSection: document.getElementById('configCriteriosSection'),
+    criteriosLista: document.getElementById('configCriteriosLista'),
+    totalPuntos: document.getElementById('totalPuntosCriterios'),
+    btnAgregarCriterio: document.getElementById('btnAgregarCriterio')
+};
+
+// Abrir modal de configuración
+async function abrirModalConfigInstrumento(moduloId, raId, numActividad) {
+    console.log(`⚙️ Abriendo configuración de instrumento: Módulo ${moduloId}, RA ${raId}, Ac.${numActividad}`);
+    
+    modalConfigState.moduloId = moduloId;
+    modalConfigState.raId = raId;
+    modalConfigState.numActividad = numActividad;
+    modalConfigState.criteriosCounter = 0;
+    
+    // Obtener nombres para mostrar
+    const modulo = state.modulos.find(m => m.id == moduloId);
+    const ra = state.ras.find(r => r.id == raId);
+    
+    modalConfigElementos.moduloNombre.textContent = modulo ? modulo.nombre : '-';
+    modalConfigElementos.raNombre.textContent = ra ? ra.nombre : '-';
+    modalConfigElementos.actividadNum.textContent = `Ac.${numActividad}`;
+    
+    // Limpiar formulario
+    modalConfigElementos.valorActividad.value = '';
+    modalConfigElementos.criteriosLista.innerHTML = '';
+    document.getElementById('radioSinInstrumento').checked = true;
+    modalConfigElementos.criteriosSection.style.display = 'none';
+    
+    // ABRIR MODAL INMEDIATAMENTE ⚡
+    modalConfigElementos.modal.style.display = 'flex';
+    
+    // Cargar configuración existente en segundo plano
+    try {
+        const url = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getInstrumentoActividad&moduloId=${moduloId}&raId=${raId}&numActividad=${numActividad}`;
+        const response = await fetchConTimeout(url);
+        const data = await response.json();
+        
+        if (data.success && data.configurado) {
+            modalConfigElementos.valorActividad.value = data.valorActividad;
+            document.getElementById(`radio${capitalizeFirst(data.tipoInstrumento)}`).checked = true;
+            
+            if (data.tipoInstrumento !== 'sin_instrumento') {
+                modalConfigElementos.criteriosSection.style.display = 'block';
+                await cargarCriteriosExistentes(moduloId, raId, numActividad);
+            }
+        }
+    } catch (error) {
+        console.error('Error al cargar configuración:', error);
+    }
+}
+
+function capitalizeFirst(str) {
+    return str.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('');
+}
+
+// Cargar criterios existentes
+async function cargarCriteriosExistentes(moduloId, raId, numActividad) {
+    try {
+        const url = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getCriteriosActividad&moduloId=${moduloId}&raId=${raId}&numActividad=${numActividad}`;
+        const response = await fetchConTimeout(url);
+        const data = await response.json();
+        
+        if (data.success && data.criterios.length > 0) {
+            data.criterios.forEach(criterio => {
+                agregarCriterioConfig(criterio.criterio, criterio.puntajeMax);
+            });
+        }
+    } catch (error) {
+        console.error('Error al cargar criterios:', error);
+    }
+}
+
+// Cerrar modal
+function cerrarModalConfigInstrumento() {
+    modalConfigElementos.modal.style.display = 'none';
+}
+
+// Cambio de tipo de instrumento
+document.querySelectorAll('input[name="tipoInstrumento"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        if (this.value === 'sin_instrumento') {
+            modalConfigElementos.criteriosSection.style.display = 'none';
+        } else {
+            modalConfigElementos.criteriosSection.style.display = 'block';
+        }
+    });
+});
+
+// Agregar criterio
+function agregarCriterioConfig(nombre = '', puntaje = '') {
+    modalConfigState.criteriosCounter++;
+    const id = modalConfigState.criteriosCounter;
+    
+    const div = document.createElement('div');
+    div.className = 'criterio-item-config';
+    div.setAttribute('data-criterio-id', id);
+    div.innerHTML = `
+        <div class="criterio-orden">${id}</div>
+        <input type="text" class="criterio-input-nombre" placeholder="Nombre del criterio" value="${nombre}" data-id="${id}">
+        <input type="number" class="criterio-input-puntaje" placeholder="Puntos" min="0" step="0.1" value="${puntaje}" data-id="${id}">
+        <button type="button" class="btn-eliminar-criterio" data-id="${id}">✕</button>
+    `;
+    
+    modalConfigElementos.criteriosLista.appendChild(div);
+    
+    // Event listeners
+    div.querySelector('.criterio-input-puntaje').addEventListener('input', calcularTotalCriterios);
+    div.querySelector('.btn-eliminar-criterio').addEventListener('click', function() {
+        eliminarCriterioConfig(this.dataset.id);
+    });
+    
+    calcularTotalCriterios();
+}
+
+// Eliminar criterio
+function eliminarCriterioConfig(id) {
+    const criterio = document.querySelector(`[data-criterio-id="${id}"]`);
+    if (criterio) {
+        criterio.remove();
+        renumerarCriterios();
+        calcularTotalCriterios();
+    }
+}
+
+// Renumerar criterios
+function renumerarCriterios() {
+    const criterios = modalConfigElementos.criteriosLista.querySelectorAll('.criterio-item-config');
+    criterios.forEach((criterio, index) => {
+        criterio.querySelector('.criterio-orden').textContent = index + 1;
+    });
+}
+
+// Calcular total de criterios
+function calcularTotalCriterios() {
+    const inputs = modalConfigElementos.criteriosLista.querySelectorAll('.criterio-input-puntaje');
+    let total = 0;
+    inputs.forEach(input => {
+        const valor = parseFloat(input.value) || 0;
+        total += valor;
+    });
+    modalConfigElementos.totalPuntos.textContent = total.toFixed(1);
+}
+
+// Guardar configuración
+async function guardarConfigInstrumento() {
+    const valor = parseFloat(modalConfigElementos.valorActividad.value);
+    const tipoInstrumento = document.querySelector('input[name="tipoInstrumento"]:checked').value;
+    
+    if (!valor || valor <= 0) {
+        alert('⚠️ Por favor ingresa un valor válido para la actividad');
+        return;
+    }
+    
+    if (tipoInstrumento !== 'sin_instrumento') {
+        const criterios = modalConfigElementos.criteriosLista.querySelectorAll('.criterio-item-config');
+        if (criterios.length === 0) {
+            alert('⚠️ Debes agregar al menos un criterio');
+            return;
+        }
+        
+        // Validar que todos los criterios tengan nombre y puntaje
+        let valido = true;
+        criterios.forEach(criterio => {
+            const nombre = criterio.querySelector('.criterio-input-nombre').value.trim();
+            const puntaje = parseFloat(criterio.querySelector('.criterio-input-puntaje').value);
+            if (!nombre || !puntaje || puntaje <= 0) {
+                valido = false;
+            }
+        });
+        
+        if (!valido) {
+            alert('⚠️ Todos los criterios deben tener nombre y puntaje válido');
+            return;
+        }
+    }
+    
+    modalConfigElementos.btnGuardar.disabled = true;
+    modalConfigElementos.btnGuardar.textContent = '⏳ Guardando...';
+    
+    try {
+        // Guardar configuración del instrumento
+        const dataInstrumento = {
+            action: 'guardarInstrumentoActividad',
+            moduloId: modalConfigState.moduloId,
+            raId: modalConfigState.raId,
+            numActividad: modalConfigState.numActividad,
+            tipoInstrumento: tipoInstrumento,
+            valorActividad: valor
+        };
+        
+        const respInstrumento = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(dataInstrumento)
+        });
+        
+        const resultInstrumento = await respInstrumento.json();
+        
+        if (!resultInstrumento.success) {
+            throw new Error('Error al guardar configuración del instrumento');
+        }
+        
+        // Guardar criterios si no es sin_instrumento
+        if (tipoInstrumento !== 'sin_instrumento') {
+            const criteriosArray = [];
+            const criterios = modalConfigElementos.criteriosLista.querySelectorAll('.criterio-item-config');
+            
+            criterios.forEach((criterio, index) => {
+                criteriosArray.push({
+                    orden: index + 1,
+                    criterio: criterio.querySelector('.criterio-input-nombre').value.trim(),
+                    puntajeMax: parseFloat(criterio.querySelector('.criterio-input-puntaje').value)
+                });
+            });
+            
+            const dataCriterios = {
+                action: 'guardarCriteriosActividad',
+                moduloId: modalConfigState.moduloId,
+                raId: modalConfigState.raId,
+                numActividad: modalConfigState.numActividad,
+                criterios: criteriosArray
+            };
+            
+            const respCriterios = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(dataCriterios)
+            });
+            
+            const resultCriterios = await respCriterios.json();
+            
+            if (!resultCriterios.success) {
+                throw new Error('Error al guardar criterios');
+            }
+        }
+        
+        console.log('✅ Configuración guardada exitosamente');
+        console.log('📍 Vista actual:', state.vistaActual);
+        console.log('📍 Módulo seleccionado:', state.moduloSeleccionado);
+        console.log('📍 RA seleccionado:', state.raSeleccionado);
+        
+        // ACTUALIZAR CACHÉ INMEDIATAMENTE
+        const clave = `${modalConfigState.moduloId}_${modalConfigState.raId}_${modalConfigState.numActividad}`;
+        
+        if (tipoInstrumento === 'sin_instrumento') {
+            // Eliminar del caché si se configura "sin instrumento"
+            delete instrumentosCache.configuraciones[clave];
+            console.log(`🗑️ Instrumento eliminado del caché: ${clave}`);
+        } else {
+            // Agregar/actualizar en caché
+            instrumentosCache.configuraciones[clave] = {
+                tipoInstrumento: tipoInstrumento,
+                valorActividad: valor
+            };
+            console.log(`💾 Caché actualizado para ${clave}:`, instrumentosCache.configuraciones[clave]);
+            console.log('📦 Estado completo del caché:', Object.keys(instrumentosCache.configuraciones));
+        }
+        
+        // FORZAR regeneración de tabla (sin condición)
+        console.log('🔄 FORZANDO regeneración de tabla...');
+        generarTablaActividades();
+        console.log('✅ Tabla regenerada');
+        
+        // Verificar que los iconos aparezcan
+        setTimeout(() => {
+            const iconos = document.querySelectorAll('.icono-instrumento');
+            console.log(`📋 Total de iconos en la página: ${iconos.length}`);
+            if (iconos.length === 0) {
+                console.error('❌ ERROR: No se encontraron iconos después de regenerar');
+                console.error('🔍 Verificando caché nuevamente:', instrumentosCache.configuraciones);
+            }
+        }, 200);
+        
+        cerrarModalConfigInstrumento();
+        
+        // Mostrar mensaje elegante
+        mostrarMensajeExito('¡Configuración Guardada!', 'El instrumento ha sido configurado exitosamente');
+        
+    } catch (error) {
+        console.error('Error al guardar configuración:', error);
+        alert('❌ Error al guardar la configuración. Intenta de nuevo.');
+    } finally {
+        modalConfigElementos.btnGuardar.disabled = false;
+        modalConfigElementos.btnGuardar.textContent = '💾 Guardar Configuración';
+    }
+}
+
+// Event listeners del modal de configuración
+modalConfigElementos.btnCerrar.addEventListener('click', cerrarModalConfigInstrumento);
+modalConfigElementos.btnCancelar.addEventListener('click', cerrarModalConfigInstrumento);
+modalConfigElementos.overlay.addEventListener('click', cerrarModalConfigInstrumento);
+modalConfigElementos.btnGuardar.addEventListener('click', guardarConfigInstrumento);
+modalConfigElementos.btnAgregarCriterio.addEventListener('click', () => agregarCriterioConfig());
+
+// ==========================================
+// MODAL DE EVALUACIÓN CON INSTRUMENTO
+// ==========================================
+
+const modalEvalState = {
+    estudianteId: null,
+    moduloId: null,
+    raId: null,
+    numActividad: null,
+    tipoInstrumento: null,
+    valorActividad: null,
+    criterios: [],
+    evaluaciones: {}
+};
+
+const modalEvalElementos = {
+    modal: document.getElementById('modalEvaluacion'),
+    overlay: document.querySelector('.modal-overlay-evaluacion'),
+    btnCerrar: document.getElementById('btnCerrarEvaluacion'),
+    btnCancelar: document.getElementById('btnCancelarEvaluacion'),
+    btnGuardar: document.getElementById('btnGuardarEvaluacion'),
+    titulo: document.getElementById('tituloEvaluacion'),
+    nombreEstudiante: document.getElementById('evalNombreEstudiante'),
+    detalleActividad: document.getElementById('evalDetalleActividad'),
+    valorActividad: document.getElementById('evalValorActividad'),
+    listaCotejo: document.getElementById('listaCriteriosCotejo'),
+    listaRubrica: document.getElementById('listaCriteriosRubrica'),
+    listaEscala: document.getElementById('listaCriteriosEscala'),
+    instrumentoCotejo: document.getElementById('instrumentoListaCotejo'),
+    instrumentoRubrica: document.getElementById('instrumentoRubrica'),
+    instrumentoEscala: document.getElementById('instrumentoEscala'),
+    puntosObtenidos: document.getElementById('evalPuntosObtenidos'),
+    puntosMaximos: document.getElementById('evalPuntosMaximos'),
+    valorBase: document.getElementById('evalValorBase'),
+    notaFinal: document.getElementById('evalNotaFinal')
+};
+
+// Abrir modal de evaluación
+async function abrirModalEvaluacion(estudianteId, moduloId, raId, numActividad) {
+    console.log(`📝 Abriendo evaluación para Estudiante ${estudianteId}, Ac.${numActividad}`);
+    
+    modalEvalState.estudianteId = estudianteId;
+    modalEvalState.moduloId = moduloId;
+    modalEvalState.raId = raId;
+    modalEvalState.numActividad = numActividad;
+    modalEvalState.evaluaciones = {};
+    
+    const estudiante = state.estudiantes.find(e => e.id == estudianteId);
+    const modulo = state.modulos.find(m => m.id == moduloId);
+    const ra = state.ras.find(r => r.id == raId);
+    
+    modalEvalElementos.nombreEstudiante.textContent = estudiante ? estudiante.nombre : '-';
+    modalEvalElementos.detalleActividad.textContent = `${modulo ? modulo.nombre : '-'} • ${ra ? ra.nombre : '-'} • Ac.${numActividad}`;
+    
+    // INTENTAR OBTENER DEL CACHÉ PRIMERO ⚡
+    const clave = `${moduloId}_${raId}_${numActividad}`;
+    const instrumentoCache = instrumentosCache.configuraciones[clave];
+    
+    if (instrumentoCache) {
+        console.log('⚡ Usando instrumento desde caché');
+        modalEvalState.tipoInstrumento = instrumentoCache.tipoInstrumento;
+        modalEvalState.valorActividad = instrumentoCache.valorActividad;
+        
+        modalEvalElementos.valorActividad.textContent = instrumentoCache.valorActividad;
+        modalEvalElementos.valorBase.textContent = instrumentoCache.valorActividad;
+        
+        const titulos = {
+            'lista_cotejo': '✓ Lista de Cotejo',
+            'rubrica': '⭐ Rúbrica',
+            'escala': '📊 Escala de Valoración'
+        };
+        modalEvalElementos.titulo.textContent = titulos[instrumentoCache.tipoInstrumento] || 'Evaluar Actividad';
+        
+        // ABRIR MODAL INMEDIATAMENTE ⚡⚡⚡
+        ocultarTodosInstrumentos();
+        modalEvalElementos.modal.style.display = 'flex';
+        
+        // Mostrar mensaje de carga
+        const loadingHTML = '<div style="text-align: center; padding: 40px;"><div style="font-size: 2rem;">⏳</div><div>Cargando criterios...</div></div>';
+        modalEvalElementos.listaCotejo.innerHTML = loadingHTML;
+        modalEvalElementos.listaRubrica.innerHTML = loadingHTML;
+        modalEvalElementos.listaEscala.innerHTML = loadingHTML;
+        
+        switch (modalEvalState.tipoInstrumento) {
+            case 'lista_cotejo':
+                modalEvalElementos.instrumentoCotejo.style.display = 'block';
+                break;
+            case 'rubrica':
+                modalEvalElementos.instrumentoRubrica.style.display = 'block';
+                break;
+            case 'escala':
+                modalEvalElementos.instrumentoEscala.style.display = 'block';
+                break;
+        }
+    }
+    
+    try {
+        // Cargar criterios y evaluaciones EN PARALELO ⚡
+        const [dataCriterios, dataEvaluacion] = await Promise.all([
+            fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getCriteriosActividad&moduloId=${moduloId}&raId=${raId}&numActividad=${numActividad}`).then(r => r.json()),
+            fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEvaluacionDetallada&estudianteId=${estudianteId}&moduloId=${moduloId}&raId=${raId}&numActividad=${numActividad}`).then(r => r.json())
+        ]);
+        
+        if (!dataCriterios.success || dataCriterios.criterios.length === 0) {
+            alert('⚠️ Esta actividad no tiene criterios configurados');
+            modalEvalElementos.modal.style.display = 'none';
+            return;
+        }
+        
+        modalEvalState.criterios = dataCriterios.criterios;
+        
+        const totalPuntos = dataCriterios.criterios.reduce((sum, c) => sum + c.puntajeMax, 0);
+        modalEvalElementos.puntosMaximos.textContent = totalPuntos.toFixed(1);
+        
+        if (dataEvaluacion.success && dataEvaluacion.evaluaciones.length > 0) {
+            dataEvaluacion.evaluaciones.forEach(ev => {
+                modalEvalState.evaluaciones[ev.orden] = ev.calificacion;
+            });
+        }
+        
+        // Si no se abrió desde caché, abrir ahora
+        if (!instrumentoCache) {
+            // Cargar info del instrumento si no estaba en caché
+            const dataInstrumento = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getInstrumentoActividad&moduloId=${moduloId}&raId=${raId}&numActividad=${numActividad}`).then(r => r.json());
+            
+            if (!dataInstrumento.success || !dataInstrumento.configurado) {
+                alert('⚠️ Esta actividad no tiene instrumento configurado');
+                return;
+            }
+            
+            modalEvalState.tipoInstrumento = dataInstrumento.tipoInstrumento;
+            modalEvalState.valorActividad = dataInstrumento.valorActividad;
+            
+            modalEvalElementos.valorActividad.textContent = dataInstrumento.valorActividad;
+            modalEvalElementos.valorBase.textContent = dataInstrumento.valorActividad;
+            
+            const titulos = {
+                'lista_cotejo': '✓ Lista de Cotejo',
+                'rubrica': '⭐ Rúbrica',
+                'escala': '📊 Escala de Valoración'
+            };
+            modalEvalElementos.titulo.textContent = titulos[dataInstrumento.tipoInstrumento] || 'Evaluar Actividad';
+            
+            ocultarTodosInstrumentos();
+        }
+        
+        // Generar el instrumento correspondiente
+        switch (modalEvalState.tipoInstrumento) {
+            case 'lista_cotejo':
+                generarListaCotejo();
+                modalEvalElementos.instrumentoCotejo.style.display = 'block';
+                break;
+            case 'rubrica':
+                generarRubrica();
+                modalEvalElementos.instrumentoRubrica.style.display = 'block';
+                break;
+            case 'escala':
+                generarEscala();
+                modalEvalElementos.instrumentoEscala.style.display = 'block';
+                break;
+        }
+        
+        calcularNotaFinal();
+        
+        // Si no se abrió desde caché, abrir ahora
+        if (!instrumentoCache) {
+            modalEvalElementos.modal.style.display = 'flex';
+        }
+        
+        console.log('✅ Modal de evaluación cargado completamente');
+        
+    } catch (error) {
+        console.error('Error al abrir modal de evaluación:', error);
+        alert('❌ Error al cargar la evaluación');
+        modalEvalElementos.modal.style.display = 'none';
+    }
+}
+
+function ocultarTodosInstrumentos() {
+    modalEvalElementos.instrumentoCotejo.style.display = 'none';
+    modalEvalElementos.instrumentoRubrica.style.display = 'none';
+    modalEvalElementos.instrumentoEscala.style.display = 'none';
+}
+
+function generarListaCotejo() {
+    modalEvalElementos.listaCotejo.innerHTML = '';
+    
+    modalEvalState.criterios.forEach((criterio) => {
+        const checked = modalEvalState.evaluaciones[criterio.orden] === criterio.puntajeMax ? 'checked' : '';
+        
+        const div = document.createElement('div');
+        div.className = 'eval-criterio-item lista-cotejo';
+        div.innerHTML = `
+            <div class="eval-criterio-header">
+                <span class="eval-criterio-nombre">${criterio.criterio}</span>
+                <span class="eval-criterio-puntaje">${criterio.puntajeMax} pts</span>
+            </div>
+            <label class="eval-checkbox-container">
+                <input type="checkbox" class="eval-checkbox" data-orden="${criterio.orden}" data-puntaje="${criterio.puntajeMax}" ${checked}>
+                <span class="eval-checkbox-label">Criterio cumplido</span>
+            </label>
+        `;
+        
+        const checkbox = div.querySelector('.eval-checkbox');
+        checkbox.addEventListener('change', function() {
+            modalEvalState.evaluaciones[criterio.orden] = this.checked ? criterio.puntajeMax : 0;
+            calcularNotaFinal();
+        });
+        
+        if (checked) {
+            modalEvalState.evaluaciones[criterio.orden] = criterio.puntajeMax;
+        } else if (!(criterio.orden in modalEvalState.evaluaciones)) {
+            modalEvalState.evaluaciones[criterio.orden] = 0;
+        }
+        
+        modalEvalElementos.listaCotejo.appendChild(div);
+    });
+}
+
+function generarRubrica() {
+    modalEvalElementos.listaRubrica.innerHTML = '';
+    
+    modalEvalState.criterios.forEach((criterio) => {
+        const evalActual = modalEvalState.evaluaciones[criterio.orden] || 0;
+        
+        const niveles = [
+            { nombre: 'Excelente', valor: criterio.puntajeMax, clase: 'nivel-excelente' },
+            { nombre: 'Bueno', valor: criterio.puntajeMax * 0.8, clase: 'nivel-bueno' },
+            { nombre: 'Regular', valor: criterio.puntajeMax * 0.5, clase: 'nivel-regular' },
+            { nombre: 'Deficiente', valor: 0, clase: 'nivel-deficiente' }
+        ];
+        
+        const div = document.createElement('div');
+        div.className = 'eval-criterio-item rubrica';
+        div.innerHTML = `
+            <div class="eval-criterio-header">
+                <span class="eval-criterio-nombre">${criterio.criterio}</span>
+                <span class="eval-criterio-puntaje">${criterio.puntajeMax} pts</span>
+            </div>
+            <div class="eval-niveles-rubrica">
+                ${niveles.map(nivel => `
+                    <button type="button" class="eval-nivel-btn ${nivel.clase} ${evalActual === nivel.valor ? 'selected' : ''}" 
+                            data-orden="${criterio.orden}" 
+                            data-valor="${nivel.valor}">
+                        <span class="eval-nivel-nombre">${nivel.nombre}</span>
+                        <span class="eval-nivel-puntos">(${nivel.valor.toFixed(1)} pts)</span>
+                    </button>
+                `).join('')}
+            </div>
+        `;
+        
+        div.querySelectorAll('.eval-nivel-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const orden = parseInt(this.dataset.orden);
+                const valor = parseFloat(this.dataset.valor);
+                
+                this.closest('.eval-niveles-rubrica').querySelectorAll('.eval-nivel-btn').forEach(b => {
+                    b.classList.remove('selected');
+                });
+                
+                this.classList.add('selected');
+                modalEvalState.evaluaciones[orden] = valor;
+                calcularNotaFinal();
+            });
+        });
+        
+        if (!(criterio.orden in modalEvalState.evaluaciones)) {
+            modalEvalState.evaluaciones[criterio.orden] = 0;
+        }
+        
+        modalEvalElementos.listaRubrica.appendChild(div);
+    });
+}
+
+function generarEscala() {
+    modalEvalElementos.listaEscala.innerHTML = '';
+    
+    modalEvalState.criterios.forEach((criterio) => {
+        const evalActual = modalEvalState.evaluaciones[criterio.orden];
+        let nivelActual = 0;
+        
+        if (evalActual !== undefined) {
+            nivelActual = Math.round((evalActual / criterio.puntajeMax) * 5);
+        }
+        
+        const div = document.createElement('div');
+        div.className = 'eval-criterio-item escala';
+        div.innerHTML = `
+            <div class="eval-criterio-header">
+                <span class="eval-criterio-nombre">${criterio.criterio}</span>
+                <span class="eval-criterio-puntaje">${criterio.puntajeMax} pts</span>
+            </div>
+            <div class="eval-escala-container">
+                <div class="eval-escala-numeros">
+                    ${[1,2,3,4,5].map(n => `
+                        <button type="button" class="eval-escala-btn ${nivelActual === n ? 'selected' : ''}" 
+                                data-orden="${criterio.orden}" 
+                                data-nivel="${n}" 
+                                data-puntaje-max="${criterio.puntajeMax}">
+                            ${n}
+                        </button>
+                    `).join('')}
+                </div>
+                <span class="eval-escala-valor">${nivelActual}/5</span>
+            </div>
+        `;
+        
+        div.querySelectorAll('.eval-escala-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const orden = parseInt(this.dataset.orden);
+                const nivel = parseInt(this.dataset.nivel);
+                const puntajeMax = parseFloat(this.dataset.puntajeMax);
+                
+                this.closest('.eval-escala-numeros').querySelectorAll('.eval-escala-btn').forEach(b => {
+                    b.classList.remove('selected');
+                });
+                
+                this.classList.add('selected');
+                this.closest('.eval-escala-container').querySelector('.eval-escala-valor').textContent = `${nivel}/5`;
+                
+                const puntaje = (nivel / 5) * puntajeMax;
+                modalEvalState.evaluaciones[orden] = puntaje;
+                calcularNotaFinal();
+            });
+        });
+        
+        if (!(criterio.orden in modalEvalState.evaluaciones)) {
+            modalEvalState.evaluaciones[criterio.orden] = 0;
+        }
+        
+        modalEvalElementos.listaEscala.appendChild(div);
+    });
+}
+
+function calcularNotaFinal() {
+    let puntosObtenidos = 0;
+    Object.values(modalEvalState.evaluaciones).forEach(val => {
+        puntosObtenidos += val || 0;
+    });
+    
+    const puntosMaximos = modalEvalState.criterios.reduce((sum, c) => sum + c.puntajeMax, 0);
+    const notaFinal = puntosMaximos > 0 ? (puntosObtenidos / puntosMaximos) * modalEvalState.valorActividad : 0;
+    
+    modalEvalElementos.puntosObtenidos.textContent = puntosObtenidos.toFixed(1);
+    modalEvalElementos.notaFinal.textContent = notaFinal.toFixed(2);
+}
+
+function cerrarModalEvaluacion() {
+    modalEvalElementos.modal.style.display = 'none';
+    modalEvalState.evaluaciones = {};
+}
+
+async function guardarEvaluacion() {
+    modalEvalElementos.btnGuardar.disabled = true;
+    modalEvalElementos.btnGuardar.textContent = '⏳ Guardando...';
+    
+    try {
+        const evaluaciones = [];
+        modalEvalState.criterios.forEach(criterio => {
+            evaluaciones.push({
+                orden: criterio.orden,
+                calificacion: modalEvalState.evaluaciones[criterio.orden] || 0
+            });
+        });
+        
+        const puntosObtenidos = Object.values(modalEvalState.evaluaciones).reduce((sum, val) => sum + (val || 0), 0);
+        const puntosMaximos = modalEvalState.criterios.reduce((sum, c) => sum + c.puntajeMax, 0);
+        const notaFinal = puntosMaximos > 0 ? (puntosObtenidos / puntosMaximos) * modalEvalState.valorActividad : 0;
+        
+        const dataEval = {
+            action: 'guardarEvaluacionDetallada',
+            estudianteId: modalEvalState.estudianteId,
+            moduloId: modalEvalState.moduloId,
+            raId: modalEvalState.raId,
+            numActividad: modalEvalState.numActividad,
+            evaluaciones: evaluaciones
+        };
+        
+        const respEval = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(dataEval)
+        });
+        
+        const resultEval = await respEval.json();
+        
+        if (!resultEval.success) {
+            throw new Error('Error al guardar evaluación detallada');
+        }
+        
+        const dataActividad = {
+            action: 'guardarActividad',
+            estudianteId: modalEvalState.estudianteId,
+            raId: modalEvalState.raId,
+            actividadNumero: modalEvalState.numActividad,
+            valor: parseFloat(notaFinal.toFixed(2))
+        };
+        
+        const respActividad = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify(dataActividad)
+        });
+        
+        const resultActividad = await respActividad.json();
+        
+        if (!resultActividad.success) {
+            throw new Error('Error al guardar calificación en Actividades');
+        }
+        
+        const notaFinalRedondeada = parseFloat(notaFinal.toFixed(2));
+        
+        let actividadEnState = state.actividades.find(a => 
+            a.estudianteId == modalEvalState.estudianteId && 
+            a.numero == modalEvalState.numActividad && 
+            a.raId == modalEvalState.raId
+        );
+        
+        if (actividadEnState) {
+            actividadEnState.valor = notaFinalRedondeada;
+        } else {
+            state.actividades.push({
+                estudianteId: modalEvalState.estudianteId,
+                raId: modalEvalState.raId,
+                numero: modalEvalState.numActividad,
+                valor: notaFinalRedondeada
+            });
+        }
+        
+        const input = document.querySelector(`input[data-estudiante="${modalEvalState.estudianteId}"][data-actividad="${modalEvalState.numActividad}"][data-ra="${modalEvalState.raId}"]`);
+        if (input) {
+            input.value = notaFinalRedondeada;
+            
+            const fila = input.closest('tr');
+            if (fila) {
+                const inputs = fila.querySelectorAll('.input-actividad');
+                let total = 0;
+                inputs.forEach(inp => {
+                    const val = parseFloat(inp.value);
+                    if (!isNaN(val)) total += val;
+                });
+                const celdaTotal = fila.querySelector('.celda-total');
+                if (celdaTotal) {
+                    celdaTotal.textContent = total.toFixed(2);
+                }
+            }
+        }
+        
+        cerrarModalEvaluacion();
+        
+        // Mostrar mensaje elegante
+        mostrarMensajeExito('¡Evaluación Guardada!', `Calificación registrada: ${notaFinalRedondeada} pts`);
+        
+    } catch (error) {
+        console.error('Error al guardar evaluación:', error);
+        alert('❌ Error al guardar la evaluación');
+    } finally {
+        modalEvalElementos.btnGuardar.disabled = false;
+        modalEvalElementos.btnGuardar.textContent = '💾 Guardar Evaluación';
+    }
+}
+
+modalEvalElementos.btnCerrar.addEventListener('click', cerrarModalEvaluacion);
+modalEvalElementos.btnCancelar.addEventListener('click', cerrarModalEvaluacion);
+modalEvalElementos.overlay.addEventListener('click', cerrarModalEvaluacion);
+modalEvalElementos.btnGuardar.addEventListener('click', guardarEvaluacion);
+
+// ==========================================
+// CACHÉ Y CARGA DE INSTRUMENTOS
+// ==========================================
+
+const instrumentosCache = {
+    configuraciones: {}
+};
+
+async function cargarInstrumentosRA(moduloId, raId) {
+    console.log('📋 Precargando instrumentos configurados...');
+    
+    try {
+        const promesas = [];
+        
+        for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
+            const clave = `${moduloId}_${raId}_${i}`;
+            
+            const promesa = (async () => {
+                try {
+                    const url = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getInstrumentoActividad&moduloId=${moduloId}&raId=${raId}&numActividad=${i}`;
+                    const response = await fetchConTimeout(url);
+                    const data = await response.json();
+                    
+                    if (data.success && data.configurado && data.tipoInstrumento !== 'sin_instrumento') {
+                        instrumentosCache.configuraciones[clave] = {
+                            tipoInstrumento: data.tipoInstrumento,
+                            valorActividad: data.valorActividad
+                        };
+                    }
+                } catch (error) {
+                    console.error(`Error al cargar instrumento Ac.${i}:`, error);
+                }
+            })();
+            
+            promesas.push(promesa);
+        }
+        
+        await Promise.all(promesas);
+        console.log('✅ Instrumentos precargados:', Object.keys(instrumentosCache.configuraciones).length);
+        
+    } catch (error) {
+        console.error('Error al precargar instrumentos:', error);
+    }
+}
+
+function tieneInstrumentoConfigurado(moduloId, raId, numActividad) {
+    const clave = `${moduloId}_${raId}_${numActividad}`;
+    return instrumentosCache.configuraciones[clave] || null;
+}
+
+function limpiarCacheInstrumentos() {
+    instrumentosCache.configuraciones = {};
+}
+
+// ==========================================
+// INTEGRACIÓN CON TABLA DE ACTIVIDADES
+// ==========================================
+
+document.addEventListener('mousedown', function(e) {
+    if (e.target.classList.contains('input-actividad')) {
+        const input = e.target;
+        const celda = input.closest('.celda-actividad-eval');
+        
+        if (celda) {
+            const estudianteId = celda.dataset.estudiante;
+            const numActividad = parseInt(celda.dataset.actividad);
+            const raId = celda.dataset.ra;
+            const moduloId = celda.dataset.modulo;
+            
+            const instrumento = tieneInstrumentoConfigurado(moduloId, raId, numActividad);
+            
+            if (instrumento) {
+                e.preventDefault();
+                e.stopPropagation();
+                input.blur();
+                abrirModalEvaluacion(estudianteId, moduloId, raId, numActividad);
+            }
+        }
+    }
+});
+
+// ==========================================
+// MENSAJE DE CONFIRMACIÓN ELEGANTE
+// ==========================================
+
+function mostrarMensajeExito(titulo, texto) {
+    // Crear overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'mensaje-confirmacion-overlay';
+    
+    // Crear mensaje
+    const mensaje = document.createElement('div');
+    mensaje.className = 'mensaje-confirmacion';
+    mensaje.innerHTML = `
+        <div class="mensaje-confirmacion-icono">✅</div>
+        <div class="mensaje-confirmacion-titulo">${titulo}</div>
+        <div class="mensaje-confirmacion-texto">${texto}</div>
+        <button class="mensaje-confirmacion-btn" onclick="cerrarMensajeExito(this)">Aceptar</button>
+    `;
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(mensaje);
+    
+    // Auto-cerrar después de 3 segundos
+    setTimeout(() => {
+        if (document.body.contains(mensaje)) {
+            cerrarMensajeExito(mensaje.querySelector('.mensaje-confirmacion-btn'));
+        }
+    }, 3000);
+}
+
+function cerrarMensajeExito(btn) {
+    const mensaje = btn.closest('.mensaje-confirmacion');
+    const overlay = document.querySelector('.mensaje-confirmacion-overlay');
+    
+    if (mensaje) mensaje.remove();
+    if (overlay) overlay.remove();
+}
+
+// ==========================================
+// PWA - SERVICE WORKER Y MODO OFFLINE
+// ==========================================
+
+// Registrar Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('✅ Service Worker registrado:', registration.scope);
+                
+                // Verificar actualizaciones periódicamente
+                setInterval(() => {
+                    registration.update();
+                }, 60000); // Cada minuto
+                
+                // Escuchar mensajes del Service Worker
+                navigator.serviceWorker.addEventListener('message', event => {
+                    if (event.data && event.data.type === 'SYNC_COMPLETE') {
+                        console.log(`✅ ${event.data.count} peticiones sincronizadas`);
+                        mostrarNotificacionSincronizacion(event.data.count);
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('❌ Error al registrar Service Worker:', error);
+            });
+    });
+    
+    // Detectar cuando el Service Worker se actualiza
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        console.log('🔄 Nueva versión disponible, recargando...');
+        window.location.reload();
+    });
+}
+
+// Detectar estado de conexión
+let isOnline = navigator.onLine;
+let offlineQueue = [];
+
+window.addEventListener('online', () => {
+    console.log('🌐 Conexión restaurada');
+    isOnline = true;
+    mostrarMensajeConexion('online');
+    
+    // Sincronizar datos pendientes
+    if ('serviceWorker' in navigator && 'sync' in registration) {
+        navigator.serviceWorker.ready.then(registration => {
+            return registration.sync.register('sync-offline-data');
+        });
+    } else {
+        // Fallback si no hay Background Sync
+        sincronizarColaOffline();
+    }
+});
+
+window.addEventListener('offline', () => {
+    console.log('📡 Sin conexión');
+    isOnline = false;
+    mostrarMensajeConexion('offline');
+});
+
+// Mostrar mensaje de conexión
+function mostrarMensajeConexion(status) {
+    const mensaje = document.createElement('div');
+    mensaje.className = 'mensaje-conexion';
+    mensaje.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 10px;
+        color: white;
+        font-weight: 600;
+        z-index: 10003;
+        animation: slideInRight 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    `;
+    
+    if (status === 'online') {
+        mensaje.style.background = 'linear-gradient(135deg, #66BB6A, #81C784)';
+        mensaje.textContent = '🌐 Conexión restaurada';
+    } else {
+        mensaje.style.background = 'linear-gradient(135deg, #EF5350, #E57373)';
+        mensaje.textContent = '📡 Modo offline - Los datos se guardarán localmente';
+    }
+    
+    document.body.appendChild(mensaje);
+    
+    setTimeout(() => {
+        mensaje.style.animation = 'slideOutRight 0.3s ease';
+        setTimeout(() => mensaje.remove(), 300);
+    }, 4000);
+}
+
+// Mostrar notificación de sincronización
+function mostrarNotificacionSincronizacion(count) {
+    mostrarMensajeExito(
+        '✅ Datos Sincronizados',
+        `${count} ${count === 1 ? 'registro' : 'registros'} sincronizado${count === 1 ? '' : 's'} con el servidor`
+    );
+}
+
+// Sincronizar cola offline (fallback)
+async function sincronizarColaOffline() {
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+            type: 'SYNC_NOW'
+        });
+    }
+}
+
+// Wrapper para fetch que maneja offline
+async function fetchConOffline(url, options = {}) {
+    if (!isOnline) {
+        console.log('📡 Modo offline, guardando en cola:', url);
+        // Intentar desde caché
+        const cachedResponse = await caches.match(url);
+        if (cachedResponse) {
+            return cachedResponse;
+        }
+        throw new Error('Sin conexión y sin caché disponible');
+    }
+    
+    try {
+        return await fetch(url, options);
+    } catch (error) {
+        console.error('❌ Error en fetch:', error);
+        // Intentar desde caché
+        const cachedResponse = await caches.match(url);
+        if (cachedResponse) {
+            console.log('📦 Usando respuesta cacheada');
+            return cachedResponse;
+        }
+        throw error;
+    }
+}
+
+// Botón de instalación PWA
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    mostrarBotonInstalar();
+});
+
+function mostrarBotonInstalar() {
+    const btnInstalar = document.createElement('button');
+    btnInstalar.id = 'btnInstalarPWA';
+    btnInstalar.innerHTML = '📱 Instalar App';
+    btnInstalar.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        background: linear-gradient(135deg, #5C6BC0, #7986CB);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(92, 107, 192, 0.4);
+        z-index: 1000;
+        animation: pulse 2s infinite;
+    `;
+    
+    btnInstalar.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`Usuario ${outcome === 'accepted' ? 'aceptó' : 'rechazó'} instalar la app`);
+            deferredPrompt = null;
+            btnInstalar.remove();
+        }
+    });
+    
+    document.body.appendChild(btnInstalar);
+    
+    // Auto-ocultar después de 10 segundos
+    setTimeout(() => {
+        if (btnInstalar.parentNode) {
+            btnInstalar.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => btnInstalar.remove(), 300);
+        }
+    }, 10000);
+}
+
+// Agregar animaciones CSS
+const style = document.createElement('style');
+style.textContent = `
+@keyframes slideInRight {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+`;
+document.head.appendChild(style);
+
+console.log('🚀 PWA inicializado - Estado de conexión:', isOnline ? 'Online' : 'Offline');
