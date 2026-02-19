@@ -2279,26 +2279,25 @@ if (document.readyState === 'loading') {
 // ==========================================
 
 function actualizarResumenDiasTrabajados() {
-    // Contar días totales
-    const diasClases = asistenciaState.diasDelMes.length;
+    // Contar días que tienen al menos una asistencia registrada (P, E, A)
+    // NO contamos los días marcados como F (feriado)
     
-    // Contar días feriados (columnas marcadas como F)
     const inputsAsistencia = document.querySelectorAll('.input-asistencia');
-    const diasConFeriado = new Set();
+    const diasConAsistencia = new Set();
     
     inputsAsistencia.forEach(input => {
         const estado = input.value.toUpperCase();
-        if (estado === 'F') {
+        // Solo contamos días con P, E, o A (no F ni vacío)
+        if (estado === 'P' || estado === 'E' || estado === 'A') {
             const dia = input.dataset.dia;
-            diasConFeriado.add(dia);
+            diasConAsistencia.add(dia);
         }
     });
     
-    const diasFeriados = diasConFeriado.size;
-    const diasTrabajados = diasClases - diasFeriados;
+    const diasTrabajados = diasConAsistencia.size;
     
     // Actualizar el HTML
     document.getElementById('diasTrabajados').textContent = diasTrabajados;
     
-    console.log(`📊 Días trabajados: ${diasTrabajados} (${diasClases} - ${diasFeriados} feriados)`);
+    console.log(`📊 Días trabajados: ${diasTrabajados} (contando solo días con P/E/A)`);
 }
