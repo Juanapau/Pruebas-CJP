@@ -1,16 +1,19 @@
 // Service Worker para Sistema PNSA
 // Versión del caché - incrementar cuando actualices archivos
-const CACHE_VERSION = 'pnsa-v1.0.0';
+const CACHE_VERSION = 'pnsa-v1.0.1';
 const CACHE_NAME = `${CACHE_VERSION}-static`;
 const DATA_CACHE_NAME = `${CACHE_VERSION}-data`;
 
+// Base path para GitHub Pages
+const BASE_PATH = '/Sistema-CJP';
+
 // Archivos estáticos para cachear
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/script.js',
-  '/manifest.json'
+  `${BASE_PATH}/`,
+  `${BASE_PATH}/index.html`,
+  `${BASE_PATH}/styles.css`,
+  `${BASE_PATH}/script.js`,
+  `${BASE_PATH}/manifest.json`
 ];
 
 // URLs de datos que se cachean dinámicamente
