@@ -2005,6 +2005,8 @@ body.dark-mode .filtro-tarjeta input[type="month"]:hover {
     z-index: 1001;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .menu-lateral.active {
@@ -2246,7 +2248,16 @@ body:not(.dark-mode) .icono-luna-menu {
 @media (max-width: 768px) {
     .menu-lateral {
         width: 100%;
-        right: -100%;
+        max-width: 100%;
+        left: -100%;
+        height: 100vh;
+        height: 100dvh; /* Altura dinámica del viewport para móviles */
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch; /* Scroll suave en iOS */
+    }
+    
+    .menu-lateral.active {
+        left: 0;
     }
     
     .btn-menu-flotante {
