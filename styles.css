@@ -1561,6 +1561,14 @@ html {
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 30px;
+}
+
+.leyenda-izquierda {
+    flex: 1;
 }
 
 .leyenda-asistencia strong {
@@ -1614,6 +1622,51 @@ html {
     font-size: 0.85rem;
     color: var(--color-texto-secundario);
     font-style: italic;
+}
+
+/* Resumen de días trabajados */
+.resumen-dias {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 12px 20px;
+    border-radius: 8px;
+    min-width: 200px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.resumen-item-simple {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1rem;
+}
+
+.resumen-label-simple {
+    font-weight: 600;
+    opacity: 0.95;
+}
+
+.resumen-valor-simple {
+    font-weight: 700;
+    font-size: 1.8rem;
+    padding: 4px 16px;
+    border-radius: 6px;
+    background: rgba(102, 187, 106, 0.4);
+    min-width: 50px;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .leyenda-asistencia {
+        flex-direction: column;
+    }
+    
+    .resumen-dias {
+        width: 100%;
+    }
 }
 
 th.header-dia {
@@ -1730,6 +1783,10 @@ body.dark-mode .leyenda-asistencia {
 
 body.dark-mode .leyenda-nota {
     color: #9AA0A6;
+}
+
+body.dark-mode .resumen-dias {
+    background: linear-gradient(135deg, #1e3a8a 0%, #4c1d95 100%);
 }
 
 /* Filtros de asistencia en tarjetas */
