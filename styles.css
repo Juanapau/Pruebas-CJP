@@ -1624,38 +1624,36 @@ html {
     font-style: italic;
 }
 
-/* Resumen de días trabajados */
-.resumen-dias {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    padding: 12px 20px;
-    border-radius: 8px;
-    min-width: 200px;
-    color: white;
+/* Resumen de días trabajados - Diseño sutil */
+.resumen-dias-trabajados {
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: transparent;
+    border-left: 3px solid #66BB6A;
 }
 
-.resumen-item-simple {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1rem;
+.resumen-label-trabajados {
+    color: var(--color-texto);
+    font-size: 0.95rem;
+    font-weight: 500;
 }
 
-.resumen-label-simple {
-    font-weight: 600;
-    opacity: 0.95;
-}
-
-.resumen-valor-simple {
+.resumen-numero-trabajados {
+    color: #66BB6A;
+    font-size: 1.4rem;
     font-weight: 700;
-    font-size: 1.8rem;
-    padding: 4px 16px;
-    border-radius: 6px;
-    background: rgba(102, 187, 106, 0.4);
-    min-width: 50px;
+    min-width: 35px;
     text-align: center;
+}
+
+body.dark-mode .resumen-dias-trabajados {
+    border-left-color: #81C784;
+}
+
+body.dark-mode .resumen-numero-trabajados {
+    color: #81C784;
 }
 
 /* Responsive */
@@ -1664,8 +1662,17 @@ html {
         flex-direction: column;
     }
     
-    .resumen-dias {
+    .resumen-dias-trabajados {
         width: 100%;
+        justify-content: center;
+        border-left: none;
+        border-top: 3px solid #66BB6A;
+        padding-top: 12px;
+        margin-top: 10px;
+    }
+    
+    body.dark-mode .resumen-dias-trabajados {
+        border-top-color: #81C784;
     }
 }
 
@@ -1783,10 +1790,6 @@ body.dark-mode .leyenda-asistencia {
 
 body.dark-mode .leyenda-nota {
     color: #9AA0A6;
-}
-
-body.dark-mode .resumen-dias {
-    background: linear-gradient(135deg, #1e3a8a 0%, #4c1d95 100%);
 }
 
 /* Filtros de asistencia en tarjetas */
