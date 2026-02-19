@@ -1692,6 +1692,9 @@ function generarTablaAsistencia() {
     asistenciaElementos.tablaBody.innerHTML = bodyHTML;
     agregarEventosAsistencia();
     configurarNavegacion('tablaScrollAsistencia', 'scrollLeftAsistencia', 'scrollRightAsistencia');
+    
+    // Actualizar resumen de días trabajados
+    actualizarResumenDiasTrabajados();
 }
 
 function obtenerAsistencia(estudianteId, dia) {
@@ -1755,6 +1758,9 @@ function agregarEventosAsistencia() {
             this.className = 'input-asistencia ' + obtenerClaseEstado(valor);
             actualizarAsistenciaState(estudianteId, dia, valor);
             actualizarTotalesEstudiante(estudianteId);
+            
+            // Actualizar resumen de días trabajados
+            actualizarResumenDiasTrabajados();
         });
     });
 }
@@ -2266,4 +2272,33 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', inicializarEventoDescripcionRA);
 } else {
     inicializarEventoDescripcionRA();
+}
+
+// ==========================================
+// RESUMEN DE DÍAS TRABAJADOS
+// ==========================================
+
+function actualizarResumenDiasTrabajados() {
+    // Contar días totales
+    const diasClases = asistenciaState.diasDelMes.length;
+    
+    // Contar días feriados (columnas marcadas como F)
+    const inputsAsistencia = document.querySelectorAll('.input-asistencia');
+    const diasConFeriado = new Set();
+    
+    inputsAsistencia.forEach(input => {
+        const estado = input.value.toUpperCase();
+        if (estado === 'F') {
+            const dia = input.dataset.dia;
+            diasConFeriado.add(dia);
+        }
+    });
+    
+    const diasFeriados = diasConFeriado.size;
+    const diasTrabajados = diasClases - diasFeriados;
+    
+    // Actualizar el HTML
+    document.getElementById('diasTrabajados').textContent = diasTrabajados;
+    
+    console.log(`📊 Días trabajados: ${diasTrabajados} (${diasClases} - ${diasFeriados} feriados)`);
 }
