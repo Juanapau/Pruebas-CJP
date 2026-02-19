@@ -1,6 +1,6 @@
-// Service Worker para Sistema PNSA
+// Service Worker para Sistema SCJP
 // Versión del caché - incrementar cuando actualices archivos
-const CACHE_VERSION = 'pnsa-v1.0.2';
+const CACHE_VERSION = 'scjp-v1.0.2';
 const CACHE_NAME = `${CACHE_VERSION}-static`;
 const DATA_CACHE_NAME = `${CACHE_VERSION}-data`;
 
@@ -51,7 +51,7 @@ self.addEventListener('activate', event => {
         // Eliminar cachés antiguos
         return Promise.all(
           cacheNames
-            .filter(cacheName => cacheName.startsWith('pnsa-') && cacheName !== CACHE_NAME && cacheName !== DATA_CACHE_NAME)
+            .filter(cacheName => cacheName.startsWith('scjp-') && cacheName !== CACHE_NAME && cacheName !== DATA_CACHE_NAME)
             .map(cacheName => {
               console.log('🗑️ Eliminando caché antiguo:', cacheName);
               return caches.delete(cacheName);
@@ -197,7 +197,7 @@ async function saveToOfflineQueue(request) {
 // Abrir base de datos IndexedDB
 function openOfflineDB() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('PNSA_Offline', 1);
+    const request = indexedDB.open('SCJP_Offline', 1);
     
     request.onerror = () => reject(request.error);
     request.onsuccess = () => resolve(request.result);
