@@ -1,7 +1,7 @@
 {
-  "name": "Sistema de Calificaciones PNSA",
-  "short_name": "PNSA Calificaciones",
-  "description": "Sistema de gestión de calificaciones y actividades para Centro Educativo PNSA",
+  "name": "Sistema de Calificaciones SCJP",
+  "short_name": "SCJP Calificaciones",
+  "description": "Sistema de gestión de calificaciones y actividades para Centro Educativo SCJP",
   "start_url": "/Sistema-CJP/",
   "scope": "/Sistema-CJP/",
   "display": "standalone",
