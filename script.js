@@ -18,7 +18,7 @@ const CachePersistente = {
                 datos: datos,
                 timestamp: Date.now()
             };
-            localStorage.setItem(`pnsa_cache_${clave}`, JSON.stringify(item));
+            localStorage.setItem(`scjp_cache_${clave}`, JSON.stringify(item));
             console.log(`💾 Cache guardado: ${clave}`);
         } catch (error) {
             console.warn('Error al guardar en localStorage:', error);
@@ -27,7 +27,7 @@ const CachePersistente = {
     
     obtener(clave) {
         try {
-            const item = localStorage.getItem(`pnsa_cache_${clave}`);
+            const item = localStorage.getItem(`scjp_cache_${clave}`);
             if (!item) return null;
             
             const parsed = JSON.parse(item);
@@ -35,7 +35,7 @@ const CachePersistente = {
             
             if (ahora - parsed.timestamp > this.DURACION) {
                 console.log(`⏰ Cache expirado: ${clave}`);
-                localStorage.removeItem(`pnsa_cache_${clave}`);
+                localStorage.removeItem(`scjp_cache_${clave}`);
                 return null;
             }
             
@@ -48,14 +48,14 @@ const CachePersistente = {
     },
     
     invalidar(clave) {
-        localStorage.removeItem(`pnsa_cache_${clave}`);
+        localStorage.removeItem(`scjp_cache_${clave}`);
         console.log(`🗑️ Cache invalidado: ${clave}`);
     },
     
     limpiarTodo() {
         const keys = Object.keys(localStorage);
         keys.forEach(key => {
-            if (key.startsWith('pnsa_cache_')) {
+            if (key.startsWith('scjp_cache_')) {
                 localStorage.removeItem(key);
             }
         });
