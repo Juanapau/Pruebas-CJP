@@ -242,27 +242,36 @@
             </div>
 
             <div class="leyenda-asistencia">
-                <strong>Leyenda de estados:</strong>
-                <div class="leyenda-items">
-                    <div class="leyenda-item">
-                        <div class="leyenda-cuadro estado-presente"></div>
-                        <span>P = Presente</span>
+                <div class="leyenda-izquierda">
+                    <strong>Leyenda de estados:</strong>
+                    <div class="leyenda-items">
+                        <div class="leyenda-item">
+                            <div class="leyenda-cuadro estado-presente"></div>
+                            <span>P = Presente</span>
+                        </div>
+                        <div class="leyenda-item">
+                            <div class="leyenda-cuadro estado-excusa"></div>
+                            <span>E = Excusa</span>
+                        </div>
+                        <div class="leyenda-item">
+                            <div class="leyenda-cuadro estado-ausente"></div>
+                            <span>A = Ausente</span>
+                        </div>
+                        <div class="leyenda-item">
+                            <div class="leyenda-cuadro estado-feriado"></div>
+                            <span>F = Feriado</span>
+                        </div>
                     </div>
-                    <div class="leyenda-item">
-                        <div class="leyenda-cuadro estado-excusa"></div>
-                        <span>E = Excusa</span>
-                    </div>
-                    <div class="leyenda-item">
-                        <div class="leyenda-cuadro estado-ausente"></div>
-                        <span>A = Ausente</span>
-                    </div>
-                    <div class="leyenda-item">
-                        <div class="leyenda-cuadro estado-feriado"></div>
-                        <span>F = Feriado</span>
+                    <div class="leyenda-nota">
+                        Nota: 3 excusas = 1 ausencia. Se requiere 70% de asistencia.
                     </div>
                 </div>
-                <div class="leyenda-nota">
-                    Nota: 3 excusas = 1 ausencia. Se requiere 70% de asistencia.
+                
+                <div class="resumen-dias">
+                    <div class="resumen-item-simple">
+                        <span class="resumen-label-simple">Días trabajados:</span>
+                        <span class="resumen-valor-simple" id="diasTrabajados">-</span>
+                    </div>
                 </div>
             </div>
 
