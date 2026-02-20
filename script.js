@@ -2055,22 +2055,41 @@ function calcularTotalesAsistencia(estudianteId) {
     // Se calculan globalmente: días donde AL MENOS un estudiante tiene registro P/E/A
     const diasTrabajados = calcularDiasTrabajadosGlobal();
 
-    const excusasComoAusencias = Math.floor(excusas / 3);
-    const total = presentes + (excusas - (excusasComoAusencias * 3));
+    // Cada grupo de 3 excusas = 1 ausencia (no 3).
+    // Excusas sueltas (que no completan grupo de 3) cuentan como presencia.
+    const excusasComoAusencias = Math.floor(excusas / 3); // grupos completos de 3E
+    const excusasSueltas = excusas % 3;                   // excusas que no forman grupo
+    const total = presentes + excusasSueltas + (excusasComoAusencias * 2);
+    // Explicación: cada grupo de 3E ocupa 3 días pero solo 1 cuenta como ausencia,
+    // o sea 2 de esos 3 días "cuentan" → presentes + 2 por cada grupo + excusas sueltas
     // El 100% se basa en los días trabajados (no en el total de columnas)
     const porcentaje = diasTrabajados > 0 ? Math.round((total / diasTrabajados) * 100) : 0;
     return {total, porcentaje};
 }
 
 function calcularDiasTrabajadosGlobal() {
-    // Cuenta los días que tienen al menos un registro P, E o A de cualquier estudiante
+    // Cuenta los días que tienen al menos un registro P, E o A de cualquier estudiante.
+    // F (feriado) y vacío NO cuentan como día trabajado.
     const diasConActividad = new Set();
     asistenciaState.asistencias.forEach(a => {
         const estado = (a.estado || '').toUpperCase();
+        // P = Presente, E = Excusa, A = Ausente → todos son días trabajados
+        // F = Feriado → NO es día trabajado
         if (estado === 'P' || estado === 'E' || estado === 'A') {
             diasConActividad.add(Number(a.dia));
         }
     });
+
+    // Fallback: leer directamente del DOM por si el state aún no está sincronizado
+    if (diasConActividad.size === 0) {
+        document.querySelectorAll('.input-asistencia').forEach(input => {
+            const estado = input.value.toUpperCase();
+            if (estado === 'P' || estado === 'E' || estado === 'A') {
+                diasConActividad.add(Number(input.dataset.dia));
+            }
+        });
+    }
+
     return diasConActividad.size;
 }
 
@@ -2619,27 +2638,11 @@ if (document.readyState === 'loading') {
 // ==========================================
 
 function actualizarResumenDiasTrabajados() {
-    // Contar días que tienen al menos una asistencia registrada (P, E, A)
-    // NO contamos los días marcados como F (feriado)
-    
-    const inputsAsistencia = document.querySelectorAll('.input-asistencia');
-    const diasConAsistencia = new Set();
-    
-    inputsAsistencia.forEach(input => {
-        const estado = input.value.toUpperCase();
-        // Solo contamos días con P, E, o A (no F ni vacío)
-        if (estado === 'P' || estado === 'E' || estado === 'A') {
-            const dia = input.dataset.dia;
-            diasConAsistencia.add(dia);
-        }
-    });
-    
-    const diasTrabajados = diasConAsistencia.size;
-    
-    // Actualizar el HTML
+    // Usa la misma lógica que el cálculo de porcentaje:
+    // días trabajados = días con al menos un P, E o A (F no cuenta)
+    const diasTrabajados = calcularDiasTrabajadosGlobal();
     document.getElementById('diasTrabajados').textContent = diasTrabajados;
-    
-    console.log(`📊 Días trabajados: ${diasTrabajados} (contando solo días con P/E/A)`);
+    console.log(`📊 Días trabajados: ${diasTrabajados} (P, E o A cuentan; F no cuenta)`);
 }
 
 // ==========================================
