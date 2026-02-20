@@ -1480,6 +1480,59 @@ function invalidarCache(tipo = null, clave = null) {
 document.addEventListener('paste', function(e) {
     const target = e.target;
     
+    // Procesar si es input de asistencia
+    if (target.matches('.input-asistencia')) {
+        e.preventDefault();
+        const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+        if (!pastedData) return;
+
+        const rows = pastedData.split(/\r?\n/).filter(row => row.trim());
+        const parsedRows = rows.map(row => row.split('\t'));
+
+        const currentCell = target.closest('td');
+        if (!currentCell) return;
+        const currentRow = currentCell.closest('tr');
+        const tbody = currentRow.parentElement;
+        const allRows = Array.from(tbody.querySelectorAll('tr'));
+        const currentRowIndex = allRows.indexOf(currentRow);
+        const allCellsInRow = Array.from(currentRow.querySelectorAll('td'));
+        const currentCellIndex = allCellsInRow.indexOf(currentCell);
+
+        console.log(`📋 Pegando asistencia: ${parsedRows.length} filas × ${parsedRows[0].length} columnas`);
+
+        parsedRows.forEach((rowData, rowOffset) => {
+            const targetRowIndex = currentRowIndex + rowOffset;
+            if (targetRowIndex >= allRows.length) return;
+
+            const targetRow = allRows[targetRowIndex];
+            const cellsInTargetRow = Array.from(targetRow.querySelectorAll('td'));
+
+            rowData.forEach((cellValue, colOffset) => {
+                const targetCellIndex = currentCellIndex + colOffset;
+                if (targetCellIndex >= cellsInTargetRow.length) return;
+
+                const targetCell = cellsInTargetRow[targetCellIndex];
+                const input = targetCell.querySelector('.input-asistencia');
+
+                if (input) {
+                    const valor = cellValue.trim().toUpperCase();
+                    if (['P', 'E', 'A', 'F', ''].includes(valor)) {
+                        input.value = valor;
+                        input.className = 'input-asistencia ' + obtenerClaseEstado(valor);
+                        const estudianteId = input.dataset.estudiante;
+                        const dia = parseInt(input.dataset.dia);
+                        actualizarAsistenciaState(estudianteId, dia, valor);
+                        actualizarTotalesEstudiante(estudianteId);
+                    }
+                }
+            });
+        });
+
+        actualizarResumenDiasTrabajados();
+        console.log('✅ Asistencia pegada correctamente');
+        return;
+    }
+
     // Solo procesar si es un input de calificación o actividad
     if (!target.matches('.input-oportunidad-simple') && !target.matches('.input-actividad')) {
         return;
@@ -1997,11 +2050,28 @@ function calcularTotalesAsistencia(estudianteId) {
         else if (estado === 'A') ausentes++;
         else if (estado === 'F') feriados++;
     });
+
+    // Días trabajados = días con P, E o A (excluyendo feriados y vacíos)
+    // Se calculan globalmente: días donde AL MENOS un estudiante tiene registro P/E/A
+    const diasTrabajados = calcularDiasTrabajadosGlobal();
+
     const excusasComoAusencias = Math.floor(excusas / 3);
     const total = presentes + (excusas - (excusasComoAusencias * 3));
-    const diasValidos = asistenciaState.diasDelMes.length - feriados;
-    const porcentaje = diasValidos > 0 ? Math.round((total / diasValidos) * 100) : 0;
+    // El 100% se basa en los días trabajados (no en el total de columnas)
+    const porcentaje = diasTrabajados > 0 ? Math.round((total / diasTrabajados) * 100) : 0;
     return {total, porcentaje};
+}
+
+function calcularDiasTrabajadosGlobal() {
+    // Cuenta los días que tienen al menos un registro P, E o A de cualquier estudiante
+    const diasConActividad = new Set();
+    asistenciaState.asistencias.forEach(a => {
+        const estado = (a.estado || '').toUpperCase();
+        if (estado === 'P' || estado === 'E' || estado === 'A') {
+            diasConActividad.add(Number(a.dia));
+        }
+    });
+    return diasConActividad.size;
 }
 
 function agregarEventosAsistencia() {
