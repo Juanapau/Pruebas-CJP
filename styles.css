@@ -287,6 +287,48 @@ body.dark-mode .icono-sol {
     gap: 8px;
 }
 
+/* Contenedor para múltiples botones en la barra de tabla */
+.btns-tabla-acciones {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Botón Exportar PDF - verde */
+.btn-exportar-pdf {
+    background-color: #43A047;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(67, 160, 71, 0.35);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-exportar-pdf:hover {
+    background-color: #2E7D32;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(67, 160, 71, 0.45);
+}
+
+.btn-exportar-pdf:active {
+    transform: translateY(0);
+}
+
+.btn-exportar-pdf:disabled {
+    background-color: #A5D6A7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 .btn-guardar:hover {
     background-color: #1E88E5;
     transform: translateY(-2px);
@@ -1129,6 +1171,15 @@ body.dark-mode .btn-guardar {
 
 body.dark-mode .btn-guardar:hover {
     background-color: #1565C0;
+}
+
+body.dark-mode .btn-exportar-pdf {
+    background-color: #388E3C;
+    color: #FFFFFF;
+}
+
+body.dark-mode .btn-exportar-pdf:hover {
+    background-color: #1B5E20;
 }
 
 body.dark-mode .btn-volver-nuevo {
