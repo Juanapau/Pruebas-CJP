@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistema de Calificaciones JP — Politécnico NSA</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700&family=Space+Mono:wght@400;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  min-height: 100vh;
+  background: #0a0e1a;
+  font-family: 'Sora', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Orbes de fondo */
+.bg-orbs { position: fixed; inset: 0; pointer-events: none; }
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.10;
+}
+.orb-1 { width: 700px; height: 700px; background: #1565c0; top: -20%; left: -15%; }
+.orb-2 { width: 450px; height: 450px; background: #0288d1; bottom: -15%; right: -10%; }
+.orb-3 { width: 350px; height: 350px; background: #42a5f5; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+
+/* Tarjeta principal */
+.card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 960px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(100,181,246,0.12),
+    0 40px 100px rgba(0,0,0,0.55),
+    0 0 60px rgba(21,101,192,0.08);
+  margin: 24px;
+  animation: fadeUp 0.6s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Panel izquierdo (Marca) ── */
+.brand {
+  background: linear-gradient(145deg, #0d2b5e, #091828);
+  padding: 64px 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.brand::after {
+  content: 'JP';
+  position: absolute;
+  bottom: -30px;
+  right: -16px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11rem;
+  color: rgba(255,255,255,0.03);
+  pointer-events: none;
+  line-height: 1;
+}
+
+.logo-wrap {
+  width: 60px; height: 60px;
+  border-radius: 14px;
+  background: rgba(100,181,246,0.12);
+  border: 1px solid rgba(100,181,246,0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  color: #90caf9;
+  letter-spacing: 0.05em;
+  margin-bottom: 36px;
+}
+
+.brand-title {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.7rem, 2.5vw, 2.4rem);
+  line-height: 1.12;
+  color: #e3f2fd;
+}
+
+.brand-accent {
+  color: #64b5f6;
+  font-weight: 300;
+  display: block;
+  font-size: 0.58em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.brand-desc {
+  font-size: 0.83rem;
+  color: rgba(144,202,249,0.4);
+  line-height: 1.75;
+  margin-top: 20px;
+}
+
+.brand-footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(100,181,246,0.08);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  color: rgba(100,181,246,0.2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── Panel derecho (Login) ── */
+.login {
+  background: #060a14;
+  padding: 64px 52px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-header { margin-bottom: 40px; }
+
+.login-title {
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: #e3f2fd;
+}
+
+.login-sub {
+  font-size: 0.81rem;
+  color: #1565c0;
+  margin-top: 5px;
+}
+
+/* Campos */
+.field { margin-bottom: 20px; }
+
+.field label {
+  display: block;
+  font-size: 0.7rem;
+  color: #1976d2;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.field input {
+  width: 100%;
+  background: rgba(100,181,246,0.04);
+  border: 1px solid rgba(100,181,246,0.1);
+  border-radius: 10px;
+  padding: 13px 16px;
+  color: #bbdefb;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field input:focus {
+  border-color: rgba(100,181,246,0.45);
+  box-shadow: 0 0 0 3px rgba(100,181,246,0.07);
+}
+
+.field input::placeholder { color: #0d2b5e; }
+
+/* Error */
+.error-msg {
+  display: none;
+  background: rgba(239,83,80,0.08);
+  border: 1px solid rgba(239,83,80,0.2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  color: #ef9a9a;
+  margin-bottom: 18px;
+  animation: shake 0.35s ease;
+}
+.error-msg.visible { display: block; }
+
+@keyframes shake {
+  0%,100%{ transform: translateX(0); }
+  25%    { transform: translateX(-6px); }
+  75%    { transform: translateX(6px); }
+}
+
+/* Botón */
+.btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #1565c0, #1976d2);
+  border: none;
+  border-radius: 10px;
+  color: #e3f2fd;
+  font-family: 'Sora', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 6px;
+  letter-spacing: 0.02em;
+  transition: opacity 0.2s, transform 0.1s;
+  box-shadow: 0 4px 24px rgba(21,101,192,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn:hover  { opacity: 0.88; }
+.btn:active { transform: scale(0.99); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn .spinner {
+  display: none;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.login-footer {
+  margin-top: 32px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(100,181,246,0.06);
+  font-size: 0.7rem;
+  color: #0d2140;
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.04em;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .card { grid-template-columns: 1fr; margin: 16px; }
+  .brand { padding: 40px 32px 32px; }
+  .brand::after { display: none; }
+  .login { padding: 40px 32px; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<div class="card">
+
+  <!-- ── Marca ── -->
+  <div class="brand">
+    <div>
+      <div class="logo-wrap">SCJP</div>
+      <div class="brand-title">
+        <span class="brand-accent">Sistema de Calificaciones</span>
+        Prof.<br>Juana Alt.<br>Paulino
+      </div>
+      <p class="brand-desc">
+        Registro de calificaciones, asistencia y actividades de módulos formativos.
+      </p>
+    </div>
+    <div class="brand-footer">SCJP v2.0 · 2025</div>
+  </div>
+
+  <!-- ── Login ── -->
+  <div class="login">
+    <div class="login-header">
+      <h2 class="login-title">Bienvenido de vuelta</h2>
+      <p class="login-sub">Ingresa con tus credenciales</p>
+    </div>
+
+    <div class="error-msg" id="errorMsg">
+      ⚠️ Usuario o contraseña incorrectos. Intente de nuevo.
+    </div>
+
+    <div class="field">
+      <label for="usuario">Usuario</label>
+      <input id="usuario" type="text" placeholder="tu.usuario" autocomplete="username" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="password">Contraseña</label>
+      <input id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <button class="btn" id="btnLogin" onclick="login()">
+      <span class="spinner" id="spinner"></span>
+      <span id="btnText">Ingresar al sistema</span>
+    </button>
+
+    <div class="login-footer">
+      <span>SCJP v2.0</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ─── Credenciales ────────────────────────────────────────────────────────────
+  // Para agregar más usuarios en el futuro, añadir objetos a este arreglo.
+  const USUARIOS = [
+    { usuario: 'jpaulino', password: 'nacional1070' }
+  ];
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  // Si ya hay sesión activa, ir directo al sistema
+  if (sessionStorage.getItem('scjp_auth')) {
+    window.location.replace('app.html');
+  }
+
+  function login() {
+    const usuario  = document.getElementById('usuario').value.trim();
+    const password = document.getElementById('password').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const btn      = document.getElementById('btnLogin');
+    const spinner  = document.getElementById('spinner');
+    const btnText  = document.getElementById('btnText');
+
+    errorMsg.classList.remove('visible');
+
+    if (!usuario || !password) {
+      errorMsg.textContent = '⚠️ Por favor complete todos los campos.';
+      errorMsg.classList.add('visible');
+      return;
+    }
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = 'Verificando...';
+
+    setTimeout(() => {
+      const match = USUARIOS.find(u => u.usuario === usuario && u.password === password);
+
+      if (match) {
+        // Guardar sesión
+        sessionStorage.setItem('scjp_auth', 'true');
+        sessionStorage.setItem('scjp_usuario', usuario);
+
+        btnText.textContent = '✓ Acceso concedido';
+        spinner.style.display = 'none';
+        btn.style.background = 'linear-gradient(135deg, #1b5e20, #2e7d32)';
+
+        setTimeout(() => {
+          window.location.replace('app.html');
+        }, 700);
+      } else {
+        spinner.style.display = 'none';
+        btn.disabled = false;
+        btnText.textContent = 'Ingresar al sistema';
+        errorMsg.textContent = '⚠️ Usuario o contraseña incorrectos. Intente de nuevo.';
+        errorMsg.classList.add('visible');
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+      }
+    }, 700);
+  }
+
+  // Enter para hacer login
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') login();
+  });
+</script>
+</body>
+</html>
