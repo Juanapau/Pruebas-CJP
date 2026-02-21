@@ -16,8 +16,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: auto;
   position: relative;
+  padding: 16px 0;
 }
 
 /* Orbes de fondo */
@@ -254,7 +255,11 @@ body {
 
 /* Responsive */
 @media (max-width: 640px) {
-  .card { grid-template-columns: 1fr; margin: 16px; }
+  body {
+    align-items: flex-start;
+    padding: 16px;
+  }
+  .card { grid-template-columns: 1fr; margin: 0; width: 100%; }
   .brand { padding: 40px 32px 32px; }
   .brand::after { display: none; }
   .login { padding: 40px 32px; }
