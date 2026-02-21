@@ -1903,17 +1903,25 @@ function mostrarVistaAsistencia() {
     elementos.vistaRegistro.style.display = 'none';
     elementos.vistaActividades.style.display = 'none';
     asistenciaElementos.vistaAsistencia.style.display = 'block';
-    poblarSelectModulosAsistencia();
-    asistenciaElementos.selectModulo.value = '';
+    // Resetear todos los filtros y tabla
     asistenciaElementos.selectCurso.value = '';
+    asistenciaElementos.selectModulo.innerHTML = '<option value="">Seleccione un módulo</option>';
+    asistenciaElementos.selectModulo.value = '';
     asistenciaElementos.selectMes.value = '';
     asistenciaElementos.tablaHead.innerHTML = '';
     asistenciaElementos.tablaBody.innerHTML = '';
+    // Limpiar estado
+    asistenciaState.cursoSeleccionado = null;
+    asistenciaState.moduloSeleccionado = null;
+    asistenciaState.mesSeleccionado = null;
 }
 
-function poblarSelectModulosAsistencia() {
+function poblarSelectModulosAsistencia(curso) {
     asistenciaElementos.selectModulo.innerHTML = '<option value="">Seleccione un módulo</option>';
-    state.modulos.forEach(modulo => {
+    const modulosFiltrados = curso
+        ? state.modulos.filter(m => m.curso === curso)
+        : state.modulos;
+    modulosFiltrados.forEach(modulo => {
         const option = document.createElement('option');
         option.value = modulo.id;
         option.textContent = modulo.nombre;
@@ -1940,14 +1948,23 @@ async function manejarCambioModuloAsistencia(e) {
 
 async function manejarCambioCursoAsistencia(e) {
     const curso = e.target.value;
+    // Resetear módulo y tabla al cambiar curso
+    asistenciaElementos.selectModulo.value = '';
+    asistenciaElementos.selectMes.value = '';
+    asistenciaElementos.tablaHead.innerHTML = '';
+    asistenciaElementos.tablaBody.innerHTML = '';
+    asistenciaState.moduloSeleccionado = null;
+    asistenciaState.mesSeleccionado = null;
+
     if (!curso) {
-        asistenciaElementos.tablaHead.innerHTML = '';
-        asistenciaElementos.tablaBody.innerHTML = '';
+        asistenciaState.cursoSeleccionado = null;
+        asistenciaElementos.selectModulo.innerHTML = '<option value="">Seleccione un módulo</option>';
         return;
     }
     asistenciaState.cursoSeleccionado = curso;
+    // Cargar estudiantes y poblar módulos filtrados por curso
     await cargarEstudiantesAsistencia(curso);
-    verificarYCargarAsistencia();
+    poblarSelectModulosAsistencia(curso);
 }
 
 async function manejarCambioMesAsistencia(e) {
@@ -2199,7 +2216,7 @@ function actualizarTotalesEstudiante(estudianteId) {
 
 async function guardarAsistencia() {
     if (asistenciaState.asistencias.length === 0) {
-        alert('No hay datos de asistencia para guardar.');
+        mostrarMensajeExito('Sin datos', 'No hay datos de asistencia para guardar.');
         return;
     }
     asistenciaElementos.btnGuardar.disabled = true;
@@ -2217,16 +2234,24 @@ async function guardarAsistencia() {
         });
         const data = await response.json();
         if (data.success) {
-            alert('✅ Asistencia guardada exitosamente');
+            asistenciaElementos.btnGuardar.textContent = '✅ Guardado';
+            mostrarMensajeExito('¡Asistencia Guardada!', 'El registro de asistencia se guardó exitosamente.');
+            setTimeout(() => {
+                asistenciaElementos.btnGuardar.textContent = '💾 Guardar';
+                asistenciaElementos.btnGuardar.disabled = false;
+            }, 2000);
+            return;
         } else {
-            alert('❌ Error al guardar: ' + (data.error || 'Error desconocido'));
+            mostrarMensajeError('Error al guardar', data.error || 'Error desconocido. Intente de nuevo.');
         }
     } catch (error) {
         console.error('Error al guardar asistencia:', error);
-        alert('❌ Error de conexión al guardar la asistencia');
+        mostrarMensajeError('Error de conexión', 'No se pudo conectar con el servidor. Verifique su conexión.');
     } finally {
-        asistenciaElementos.btnGuardar.disabled = false;
-        asistenciaElementos.btnGuardar.textContent = '💾 Guardar';
+        if (asistenciaElementos.btnGuardar.textContent !== '✅ Guardado') {
+            asistenciaElementos.btnGuardar.disabled = false;
+            asistenciaElementos.btnGuardar.textContent = '💾 Guardar';
+        }
     }
 }
 
@@ -3596,6 +3621,30 @@ function cerrarMensajeExito(btn) {
     
     if (mensaje) mensaje.remove();
     if (overlay) overlay.remove();
+}
+
+function mostrarMensajeError(titulo, texto) {
+    const overlay = document.createElement('div');
+    overlay.className = 'mensaje-confirmacion-overlay';
+
+    const mensaje = document.createElement('div');
+    mensaje.className = 'mensaje-confirmacion';
+    mensaje.innerHTML = `
+        <div class="mensaje-confirmacion-icono">❌</div>
+        <div class="mensaje-confirmacion-titulo">${titulo}</div>
+        <div class="mensaje-confirmacion-texto">${texto}</div>
+        <button class="mensaje-confirmacion-btn" onclick="cerrarMensajeExito(this)">Aceptar</button>
+    `;
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(mensaje);
+
+    // Auto-cerrar después de 4 segundos
+    setTimeout(() => {
+        if (document.body.contains(mensaje)) {
+            cerrarMensajeExito(mensaje.querySelector('.mensaje-confirmacion-btn'));
+        }
+    }, 4000);
 }
 
 // ==========================================
