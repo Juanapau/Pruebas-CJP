@@ -380,6 +380,7 @@ function inicializarEventos() {
     elementos.btnVolverRegistro.addEventListener('click', volverARegistro);
     elementos.btnGuardarRegistro.addEventListener('click', guardarTodoElRegistro);
     elementos.btnGuardarActividades.addEventListener('click', guardarTodasLasActividades);
+    document.getElementById('btnExportarPDFActividades').addEventListener('click', exportarReporteActividades);
     
     // Modo oscuro
     const btnModoOscuro = document.getElementById('btnModoOscuro');
@@ -4004,6 +4005,248 @@ function mostrarMensajeError(titulo, texto) {
 }
 
 // ==========================================
+// ==========================================
+// EXPORTAR REPORTE PDF - ACTIVIDADES
+// ==========================================
+
+async function exportarReporteActividades() {
+    // Validar que haya datos
+    if (!state.raSeleccionado || !state.moduloSeleccionado || state.estudiantes.length === 0) {
+        mostrarMensajeError('Sin datos', 'Seleccione un módulo y RA con datos antes de exportar.');
+        return;
+    }
+
+    const btn = document.getElementById('btnExportarPDFActividades');
+    btn.disabled = true;
+    btn.textContent = '⏳ Generando...';
+
+    try {
+        const { jsPDF } = window.jspdf;
+
+        const raActual    = state.ras.find(r => r.id == state.raSeleccionado);
+        const moduloActual = state.modulos.find(m => m.id == state.moduloSeleccionado);
+        const nombreRA     = raActual    ? raActual.codigo    : 'RA';
+        const descripRA    = raActual    ? (raActual.descripcion || '') : '';
+        const nombreModulo = moduloActual ? moduloActual.nombre : 'Módulo';
+        const curso        = state.cursoSeleccionado || '';
+        const fecha        = new Date().toLocaleDateString('es-DO', { day: '2-digit', month: 'long', year: 'numeric' });
+        const anioEscolar  = (() => {
+            const hoy = new Date(); const anio = hoy.getFullYear();
+            return hoy.getMonth() >= 8 ? `${anio}-${anio + 1}` : `${anio - 1}-${anio}`;
+        })();
+
+        const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'letter' });
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        const margen = 14;
+
+        // ── ENCABEZADO (idéntico al de calificaciones) ────────────────────────
+        const logoSize  = 22;
+        const topMargen = 8;
+        const headerH   = topMargen + logoSize + 6;
+        const logoY     = topMargen;
+
+        try {
+            const logoDataUrl = await cargarLogoComoDataURL('logo.png');
+            doc.addImage(logoDataUrl, 'PNG', margen, logoY, logoSize, logoSize);
+        } catch (e) {
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.setTextColor(30, 90, 180);
+            doc.text('JP', margen + logoSize / 2, logoY + logoSize / 2, { align: 'center', baseline: 'middle' });
+        }
+
+        const textX     = margen + logoSize + 5;
+        const textLine1Y = logoY + 8;
+        const textLine2Y = logoY + 16;
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(13);
+        doc.setTextColor(30, 90, 180);
+        doc.text('SISTEMA DE CALIFICACIONES JP', textX, textLine1Y);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(30, 30, 30);
+        doc.text('Politécnico Nuestra Señora de la Altagracia', textX, textLine2Y);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(30, 90, 180);
+        doc.text(`Año Escolar: ${anioEscolar}`, pageW - margen, textLine1Y, { align: 'right' });
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(30, 30, 30);
+        doc.text(fecha, pageW - margen, textLine2Y, { align: 'right' });
+
+        doc.setDrawColor(30, 90, 180);
+        doc.setLineWidth(0.5);
+        doc.line(margen, headerH, pageW - margen, headerH);
+
+        // ── INFO DEL REPORTE ──────────────────────────────────────────────────
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(9.5);
+        doc.setTextColor(30, 90, 180);
+        doc.text('REPORTE DE ACTIVIDADES', pageW / 2, headerH + 7, { align: 'center' });
+
+        const infoY = headerH + 12;
+        doc.setFontSize(8);
+        doc.setTextColor(50, 50, 50);
+
+        doc.setFont('helvetica', 'bold');
+        doc.text('Módulo:', margen, infoY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(nombreModulo, margen + 15, infoY);
+
+        doc.setFont('helvetica', 'bold');
+        doc.text('RA:', margen + 95, infoY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(nombreRA, margen + 101, infoY);
+
+        doc.setFont('helvetica', 'bold');
+        doc.text('Curso:', margen + 130, infoY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(curso, margen + 142, infoY);
+
+        // Descripción del RA si existe
+        let startY = headerH + 14.5;
+        if (descripRA) {
+            doc.setFont('helvetica', 'italic');
+            doc.setFontSize(7.5);
+            doc.setTextColor(80, 80, 80);
+            const descLines = doc.splitTextToSize(`Descripción: ${descripRA}`, pageW - margen * 2);
+            doc.text(descLines, margen, infoY + 5.5);
+            startY = headerH + 20 + (descLines.length - 1) * 3.5;
+        }
+
+        doc.setDrawColor(30, 90, 180);
+        doc.setLineWidth(0.4);
+        doc.line(margen, startY, pageW - margen, startY);
+
+        // ── LEER VALORES DE ACTIVIDADES DESDE EL DOM ─────────────────────────
+        const valoresActividades = {};
+        document.querySelectorAll('.input-actividad').forEach(input => {
+            const estId = input.dataset.estudiante;
+            const numAc = input.dataset.actividad;
+            if (!valoresActividades[estId]) valoresActividades[estId] = {};
+            valoresActividades[estId][numAc] = input.value !== '' ? parseFloat(input.value) : null;
+        });
+
+        // Determinar qué actividades tienen al menos un valor
+        const actividadesConDatos = [];
+        for (let i = 1; i <= CONFIG.NUM_ACTIVIDADES; i++) {
+            const tieneDatos = state.estudiantes.some(e => {
+                const v = valoresActividades[e.id]?.[i];
+                return v !== null && v !== undefined;
+            });
+            if (tieneDatos) actividadesConDatos.push(i);
+        }
+
+        // ── ENCABEZADO DE TABLA ───────────────────────────────────────────────
+        const headRow = [
+            { content: '#',      styles: { halign: 'center', fontStyle: 'bold', fillColor: [44, 62, 80], textColor: 255, fontSize: 8 } },
+            { content: 'Nombre', styles: { halign: 'left',   fontStyle: 'bold', fillColor: [44, 62, 80], textColor: 255, fontSize: 8 } },
+            ...actividadesConDatos.map(i => {
+                const desc = descripcionesActividades[i] || '';
+                return {
+                    content: desc ? `Ac.${i}
+${desc.substring(0, 30)}${desc.length > 30 ? '…' : ''}` : `Ac.${i}`,
+                    styles: { halign: 'center', fontStyle: 'bold', fillColor: [44, 62, 80], textColor: 255, fontSize: 7.5, cellWidth: 'auto' }
+                };
+            }),
+            { content: 'Total', styles: { halign: 'center', fontStyle: 'bold', fillColor: [26, 37, 47], textColor: 255, fontSize: 8 } }
+        ];
+
+        // ── FILAS DE ESTUDIANTES ──────────────────────────────────────────────
+        const bodyRows = state.estudiantes.map((est, idx) => {
+            let total = 0;
+            const celdas = actividadesConDatos.map(i => {
+                const v = valoresActividades[est.id]?.[i];
+                if (v !== null && v !== undefined) total += v;
+                return {
+                    content: (v !== null && v !== undefined) ? v.toFixed(2) : '—',
+                    styles: { halign: 'center', fontSize: 8, textColor: (v !== null && v !== undefined) ? [30,30,30] : [180,180,180] }
+                };
+            });
+            return [
+                { content: idx + 1,         styles: { halign: 'center', fontStyle: 'bold', fontSize: 8 } },
+                { content: est.nombre,       styles: { halign: 'left',   fontSize: 8 } },
+                ...celdas,
+                { content: total.toFixed(2), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [240, 245, 255] } }
+            ];
+        });
+
+        // Fila de promedio grupal
+        const promediosCol = actividadesConDatos.map(i => {
+            const vals = state.estudiantes
+                .map(e => valoresActividades[e.id]?.[i])
+                .filter(v => v !== null && v !== undefined);
+            const prom = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+            return {
+                content: prom !== null ? prom.toFixed(2) : '—',
+                styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [220, 230, 245], textColor: [30,30,30] }
+            };
+        });
+        const totalPromedios = actividadesConDatos.reduce((sum, i) => {
+            const vals = state.estudiantes.map(e => valoresActividades[e.id]?.[i]).filter(v => v !== null && v !== undefined);
+            return sum + (vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0);
+        }, 0);
+
+        bodyRows.push([
+            { content: '',               styles: { fillColor: [220, 230, 245] } },
+            { content: 'Promedio grupo', styles: { halign: 'left', fontStyle: 'bold', fontSize: 8, fillColor: [220, 230, 245], textColor: [30, 90, 180] } },
+            ...promediosCol,
+            { content: totalPromedios.toFixed(2), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [200, 220, 255], textColor: [30,30,30] } }
+        ]);
+
+        doc.autoTable({
+            head: [headRow],
+            body: bodyRows,
+            startY: startY + 3,
+            margin: { left: margen, right: margen },
+            styles: {
+                overflow: 'linebreak',
+                cellPadding: 2.5,
+                lineColor: [180, 180, 180],
+                lineWidth: 0.3,
+                fontSize: 8,
+            },
+            alternateRowStyles: { fillColor: [248, 250, 255] },
+            tableLineColor: [130, 130, 160],
+            tableLineWidth: 0.3,
+            didDrawPage: (data) => {
+                const pageCount = doc.internal.getNumberOfPages();
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(7.5);
+                doc.setTextColor(120, 120, 120);
+                doc.text(
+                    `Página ${data.pageNumber} de ${pageCount} · Sistema de Calificaciones JP — Politécnico Nuestra Señora de la Altagracia · Generado el ${fecha}`,
+                    pageW / 2, pageH - 6, { align: 'center' }
+                );
+                doc.setDrawColor(200, 200, 210);
+                doc.setLineWidth(0.3);
+                doc.line(margen, pageH - 9, pageW - margen, pageH - 9);
+            }
+        });
+
+        const nombreArchivo = `Actividades_${nombreModulo.replace(/\s+/g, '_')}_${nombreRA}_${curso}_${new Date().toISOString().slice(0, 10)}.pdf`;
+        doc.save(nombreArchivo);
+
+        btn.textContent = '✅ Exportado';
+        setTimeout(() => {
+            btn.textContent = '📄 Exportar PDF';
+            btn.disabled = false;
+        }, 2500);
+
+    } catch (error) {
+        console.error('Error al exportar PDF actividades:', error);
+        mostrarMensajeError('Error al exportar', 'No se pudo generar el PDF. Verifica que jsPDF esté cargado.');
+        btn.textContent = '📄 Exportar PDF';
+        btn.disabled = false;
+    }
+}
+
 // Carga el logo desde su ruta relativa y retorna un dataURL (sin base64 hardcodeado)
 async function cargarLogoComoDataURL(ruta) {
     return new Promise((resolve, reject) => {
