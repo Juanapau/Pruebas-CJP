@@ -2016,6 +2016,10 @@ function inicializarEventosAsistencia() {
     asistenciaElementos.selectMes.addEventListener('input', manejarCambioMesAsistencia);
     asistenciaElementos.btnVolver.addEventListener('click', volverDesdeAsistencia);
     asistenciaElementos.btnGuardar.addEventListener('click', guardarAsistencia);
+
+    // Resumen anual
+    document.getElementById('btnResumenAnual').addEventListener('click', abrirResumenAnual);
+    document.getElementById('btnCerrarResumenAnual').addEventListener('click', cerrarResumenAnual);
 }
 
 /* DESHABILITADO - Acceso a asistencia solo desde menú
@@ -2382,6 +2386,167 @@ async function guardarAsistencia() {
             asistenciaElementos.btnGuardar.disabled = false;
             asistenciaElementos.btnGuardar.textContent = '💾 Guardar';
         }
+    }
+}
+
+// ==========================================
+// RESUMEN DE ASISTENCIA ANUAL
+// ==========================================
+
+const MESES_ES = [
+    'Enero','Febrero','Marzo','Abril','Mayo','Junio',
+    'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'
+];
+
+function abrirResumenAnual() {
+    const modulo = asistenciaState.moduloSeleccionado;
+    const curso  = asistenciaState.cursoSeleccionado;
+
+    if (!modulo || !curso) {
+        mostrarMensajeError('Sin selección', 'Seleccione un curso y módulo antes de ver el resumen anual.');
+        return;
+    }
+
+    const panel = document.getElementById('panelResumenAnual');
+    panel.style.display = 'block';
+    panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    calcularResumenAnual(modulo, curso);
+}
+
+function cerrarResumenAnual() {
+    document.getElementById('panelResumenAnual').style.display = 'none';
+}
+
+async function calcularResumenAnual(moduloId, curso) {
+    const contenido = document.getElementById('resumenAnualContenido');
+    const subtitulo = document.getElementById('resumenAnualSubtitulo');
+
+    // Mostrar módulo/curso en subtítulo
+    const moduloActual = (typeof state !== 'undefined' && state.modulos)
+        ? state.modulos.find(m => m.id == moduloId)
+        : null;
+    const nombreModulo = moduloActual ? moduloActual.nombre : `Módulo ${moduloId}`;
+    subtitulo.textContent = `${nombreModulo}  ·  ${curso}`;
+
+    // Mostrar spinner
+    contenido.innerHTML = `
+        <div class="resumen-anual-cargando">
+            <div class="resumen-spinner"></div>
+            <span>Consultando datos de los 12 meses…</span>
+        </div>`;
+
+    // Determinar año escolar actual (sep–ago)
+    const hoy = new Date();
+    const anio = hoy.getMonth() >= 8 ? hoy.getFullYear() : hoy.getFullYear() - 1;
+    // Año escolar: sep anio → ago anio+1
+    const mesesEscolares = [];
+    for (let i = 8; i <= 11; i++) mesesEscolares.push({ anio, mes: i });
+    for (let i = 0; i <= 7;  i++) mesesEscolares.push({ anio: anio + 1, mes: i });
+
+    // Cargar todos los meses en paralelo
+    const promesas = mesesEscolares.map(({ anio: a, mes: m }) => {
+        const mesStr = `${a}-${String(m + 1).padStart(2, '0')}`;
+        return cargarAsistenciasMesParaResumen(moduloId, curso, mesStr);
+    });
+
+    const resultados = await Promise.all(promesas);
+
+    // Filtrar meses sin datos
+    const mesesConDatos = resultados.filter(r => r.tieneDatos);
+
+    if (mesesConDatos.length === 0) {
+        contenido.innerHTML = `
+            <div class="resumen-anual-vacio">
+                <p>📭 No se encontraron registros de asistencia para este módulo y curso.</p>
+            </div>`;
+        return;
+    }
+
+    // Calcular promedio general
+    const promedioGeneral = Math.round(
+        mesesConDatos.reduce((sum, r) => sum + r.porcentajePromedio, 0) / mesesConDatos.length
+    );
+
+    // Construir cards de meses
+    const cardsHTML = resultados.map(r => {
+        if (!r.tieneDatos) return ''; // Omitir meses sin datos
+        const pct = r.porcentajePromedio;
+        const cls = pct >= 70 ? 'alto' : pct >= 50 ? 'medio' : 'bajo';
+        const width = Math.min(pct, 100);
+        return `
+            <div class="resumen-mes-card card-${cls}">
+                <span class="resumen-mes-nombre">${r.nombreMes}</span>
+                <span class="resumen-mes-porciento pct-${cls}">${pct}%</span>
+                <div class="resumen-mes-barra-bg">
+                    <div class="resumen-mes-barra-fill barra-${cls}" style="width:${width}%"></div>
+                </div>
+                <span class="resumen-mes-detalle">${r.diasTrabajados} días · ${r.totalEstudiantes} estudiantes</span>
+            </div>`;
+    }).join('');
+
+    const promCls = promedioGeneral >= 70 ? 'alto' : promedioGeneral >= 50 ? 'medio' : 'bajo';
+
+    contenido.innerHTML = `
+        <div class="resumen-meses-grid">${cardsHTML}</div>
+        <div class="resumen-anual-promedio">
+            <span class="resumen-anual-promedio-label">Promedio general de asistencia</span>
+            <span class="resumen-anual-promedio-valor pct-${promCls}">${promedioGeneral}%</span>
+        </div>`;
+}
+
+async function cargarAsistenciasMesParaResumen(moduloId, curso, mes) {
+    const [anioStr, mesStr] = mes.split('-');
+    const nombreMes = MESES_ES[parseInt(mesStr) - 1] + ' ' + anioStr;
+
+    try {
+        const url = `${CONFIG.GOOGLE_SCRIPT_URL}?action=getAsistencias&moduloId=${moduloId}&curso=${curso}&mes=${mes}`;
+        const response = await fetchConTimeout(url);
+        const data = await response.json();
+        const asistencias = data.asistencias || [];
+
+        if (asistencias.length === 0) {
+            return { mes, nombreMes, tieneDatos: false };
+        }
+
+        // Calcular días trabajados para este mes
+        const diasConActividad = new Set();
+        asistencias.forEach(a => {
+            const e = (a.estado || '').toUpperCase();
+            if (e === 'P' || e === 'E' || e === 'A') diasConActividad.add(Number(a.dia));
+        });
+        const diasTrabajados = diasConActividad.size;
+
+        if (diasTrabajados === 0) return { mes, nombreMes, tieneDatos: false };
+
+        // Calcular porcentaje por estudiante
+        const estudiantesIds = [...new Set(asistencias.map(a => a.estudianteId))];
+        let sumaTotal = 0;
+
+        estudiantesIds.forEach(id => {
+            let presentes = 0, excusas = 0;
+            asistencias.filter(a => String(a.estudianteId) === String(id)).forEach(a => {
+                const e = (a.estado || '').toUpperCase();
+                if (e === 'P') presentes++;
+                else if (e === 'E') excusas++;
+            });
+            const excusasComoAusencias = Math.floor(excusas / 3);
+            const excusasSueltas = excusas % 3;
+            const total = presentes + excusasSueltas + (excusasComoAusencias * 2);
+            const pct = diasTrabajados > 0 ? Math.round((total / diasTrabajados) * 100) : 0;
+            sumaTotal += pct;
+        });
+
+        const porcentajePromedio = Math.round(sumaTotal / estudiantesIds.length);
+
+        return {
+            mes, nombreMes, tieneDatos: true,
+            porcentajePromedio, diasTrabajados,
+            totalEstudiantes: estudiantesIds.length
+        };
+
+    } catch {
+        return { mes, nombreMes, tieneDatos: false };
     }
 }
 
