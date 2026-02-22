@@ -1928,7 +1928,7 @@ body.dark-mode .btn-resumen-anual:hover {
 
 /* Encabezado */
 .tabla-resumen-anual thead tr {
-    background: #2c3e50;
+    background: #3949AB;
 }
 
 .tabla-resumen-anual th {
@@ -1937,7 +1937,7 @@ body.dark-mode .btn-resumen-anual:hover {
     padding: 12px 14px;
     text-align: center;
     white-space: nowrap;
-    border-right: 1px solid rgba(255,255,255,0.08);
+    border-right: 1px solid rgba(255,255,255,0.12);
     font-size: 0.82rem;
     letter-spacing: 0.02em;
 }
@@ -1954,7 +1954,7 @@ body.dark-mode .btn-resumen-anual:hover {
 }
 
 .tabla-resumen-anual th.col-promedio {
-    background: #1a252f;
+    background: #283593;
     min-width: 90px;
 }
 
