@@ -337,8 +337,18 @@ body.dark-mode .btn-exportar-pdf-actividades:hover {
 .btns-tabla-acciones {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+/* En móvil los botones dentro de btns-tabla-acciones nunca se apilan ni se estiran */
+.btns-tabla-acciones .btn-guardar,
+.btns-tabla-acciones .btn-exportar-pdf {
+    width: auto !important;
+    flex: 1;
+    white-space: nowrap;
+    font-size: 0.85rem;
+    padding: 10px 12px;
 }
 
 /* Botón Exportar PDF - verde */
