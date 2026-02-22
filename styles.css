@@ -343,7 +343,9 @@ body.dark-mode .btn-exportar-pdf-actividades:hover {
 
 /* En móvil los botones dentro de btns-tabla-acciones nunca se apilan ni se estiran */
 .btns-tabla-acciones .btn-guardar,
-.btns-tabla-acciones .btn-exportar-pdf {
+.btns-tabla-acciones .btn-exportar-pdf,
+.botones-asistencia .btn-guardar,
+.botones-asistencia .btn-volver-asistencia {
     width: auto !important;
     flex: 1;
     white-space: nowrap;
@@ -2368,11 +2370,13 @@ body.dark-mode .filtro-tarjeta input[type="month"]:hover {
 /* Botones de asistencia */
 .botones-asistencia {
     display: flex;
-    gap: 15px;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
 }
 
 .btn-volver-asistencia {
-    background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+    background-color: #66BB6A;
     color: white;
     border: none;
     padding: 12px 24px;
@@ -2381,20 +2385,19 @@ body.dark-mode .filtro-tarjeta input[type="month"]:hover {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
 }
 
 .btn-volver-asistencia:hover {
-    background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
-    box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
-    transform: translateY(-2px);
+    background-color: #4CAF50;
+    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.4);
 }
 
 .btn-volver-asistencia:active {
-    transform: translateY(0);
     box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
 }
 
