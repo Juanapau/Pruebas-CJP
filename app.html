@@ -302,8 +302,32 @@
                 </div>
                 
                 <div class="resumen-dias-trabajados">
+                    <button id="btnResumenAnual" class="btn-resumen-anual" title="Ver resumen anual de asistencia">
+                        📊 Resumen anual
+                    </button>
                     <span class="resumen-label-trabajados">Días trabajados:</span>
                     <span class="resumen-numero-trabajados" id="diasTrabajados">0</span>
+                </div>
+            </div>
+
+            <!-- Panel: Resumen de Asistencia Anual -->
+            <div id="panelResumenAnual" class="panel-resumen-anual" style="display:none;">
+                <div class="resumen-anual-header">
+                    <div class="resumen-anual-titulo">
+                        <span class="resumen-anual-icono">📊</span>
+                        <div>
+                            <h3>Resumen de Asistencia Anual</h3>
+                            <p id="resumenAnualSubtitulo" class="resumen-anual-subtitulo">—</p>
+                        </div>
+                    </div>
+                    <button id="btnCerrarResumenAnual" class="btn-cerrar-resumen-anual" title="Cerrar resumen">✕</button>
+                </div>
+
+                <div id="resumenAnualContenido" class="resumen-anual-contenido">
+                    <div class="resumen-anual-cargando">
+                        <div class="resumen-spinner"></div>
+                        <span>Calculando resumen anual…</span>
+                    </div>
                 </div>
             </div>
 
