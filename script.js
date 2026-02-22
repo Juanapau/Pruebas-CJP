@@ -3771,7 +3771,9 @@ async function exportarReporteCalificaciones() {
         };
 
         // ── CONSTRUIR DATOS DE LA TABLA ─────────────────────────────────────────
-        // Encabezados: #, Nombre, [Op1 Op2 Op3 Min por cada RA], Total
+        // Encabezados: #, Nombre, [Op1 Op2 Op3 por cada RA], Total
+        // Fila 1: código RA (colspan 3)
+        // Fila 2: Valor (colspan 2, negro) | Min 70% (1 celda, gris) — igual que en pantalla
         const headRow1 = [
             { content: '#', rowSpan: 2, styles: { halign: 'center', valign: 'middle', fillColor: [30, 90, 160], textColor: 255, fontStyle: 'bold', fontSize: 8 } },
             { content: 'Nombre', rowSpan: 2, styles: { halign: 'left', valign: 'middle', fillColor: [30, 90, 160], textColor: 255, fontStyle: 'bold', fontSize: 8 } }
@@ -3780,7 +3782,7 @@ async function exportarReporteCalificaciones() {
         state.ras.forEach(ra => {
             headRow1.push({
                 content: ra.codigo,
-                colSpan: 4,
+                colSpan: 3,
                 styles: { halign: 'center', fillColor: [30, 90, 160], textColor: 255, fontStyle: 'bold', fontSize: 7.5 }
             });
         });
@@ -3790,19 +3792,44 @@ async function exportarReporteCalificaciones() {
             styles: { halign: 'center', valign: 'middle', fillColor: [20, 60, 120], textColor: 255, fontStyle: 'bold', fontSize: 8 }
         });
 
+        // Fila 2: Valor (colspan 2, negro) | Min (1 celda, gris) — replica encabezado de pantalla
         const headRow2 = [];
         state.ras.forEach(ra => {
             const min = Math.round((ra.valorTotal || 0) * 70 / 100);
-            headRow2.push({ content: 'Op.1', styles: { halign: 'center', fillColor: [50, 115, 190], textColor: 255, fontStyle: 'bold', fontSize: 7 } });
-            headRow2.push({ content: 'Op.2', styles: { halign: 'center', fillColor: [50, 115, 190], textColor: 255, fontStyle: 'bold', fontSize: 7 } });
-            headRow2.push({ content: 'Op.3', styles: { halign: 'center', fillColor: [50, 115, 190], textColor: 255, fontStyle: 'bold', fontSize: 7 } });
+            // Celda "Valor: X" — ocupa las dos primeras columnas (Op1 + Op2)
             headRow2.push({
-                content: `Valor: ${ra.valorTotal || 0}\nMin: ${min}`,
-                styles: { halign: 'center', fillColor: [20, 70, 140], textColor: 255, fontStyle: 'bold', fontSize: 6.5 }
+                content: `${ra.valorTotal || 0}\nValor`,
+                colSpan: 2,
+                styles: { halign: 'center', valign: 'middle', fillColor: [30, 30, 30], textColor: 255, fontStyle: 'bold', fontSize: 7.5 }
+            });
+            // Celda "Min (70%)" — ocupa la tercera columna (Op3)
+            headRow2.push({
+                content: `${min}\n70%`,
+                styles: { halign: 'center', valign: 'middle', fillColor: [80, 100, 110], textColor: 255, fontStyle: 'bold', fontSize: 7.5 }
             });
         });
 
-        // Filas de datos — leyendo del DOM
+        // Calcular ancho de columnas dinámicamente — 3 cols por RA
+        const numRAs = state.ras.length;
+        const colNameWidth = 52;
+        const colNumWidth = 8;
+        const colTotalWidth = 14;
+        const colOpWidth = Math.min(14, Math.max(10, (pageW - 2 * margen - colNumWidth - colNameWidth - colTotalWidth) / (numRAs * 3)));
+
+        const columnStyles = {
+            0: { cellWidth: colNumWidth },
+            1: { cellWidth: colNameWidth }
+        };
+        let colIdx = 2;
+        state.ras.forEach(() => {
+            columnStyles[colIdx]     = { cellWidth: colOpWidth };
+            columnStyles[colIdx + 1] = { cellWidth: colOpWidth };
+            columnStyles[colIdx + 2] = { cellWidth: colOpWidth };
+            colIdx += 3;
+        });
+        columnStyles[colIdx] = { cellWidth: colTotalWidth };
+
+        // ── FILAS DE DATOS ───────────────────────────────────────────────────────
         const bodyRows = state.estudiantes.map((est, idx) => {
             const fila = [
                 { content: String(est.numero || idx + 1), styles: { halign: 'center', fontSize: 8 } },
@@ -3812,7 +3839,6 @@ async function exportarReporteCalificaciones() {
             let total = 0;
             state.ras.forEach(ra => {
                 const min = Math.round((ra.valorTotal || 0) * 70 / 100);
-
                 const colorCelda = (v) => {
                     if (v === '' || v === null || v === undefined) return [255, 255, 255];
                     return Number(v) >= min ? [200, 230, 200] : [255, 210, 210];
@@ -3822,15 +3848,12 @@ async function exportarReporteCalificaciones() {
                 const v2 = getVal(est.id, ra.id, 2);
                 const v3 = getVal(est.id, ra.id, 3);
 
-                // Calcular valor final para el total (última op con valor)
                 const valorFinal = v3 !== '' ? Number(v3) : v2 !== '' ? Number(v2) : v1 !== '' ? Number(v1) : 0;
                 total += valorFinal;
 
                 fila.push({ content: v1, styles: { halign: 'center', fontSize: 8, fillColor: colorCelda(v1) } });
                 fila.push({ content: v2, styles: { halign: 'center', fontSize: 8, fillColor: colorCelda(v2) } });
                 fila.push({ content: v3, styles: { halign: 'center', fontSize: 8, fillColor: colorCelda(v3) } });
-                // Celda Min — valor fijo informativo
-                fila.push({ content: String(min), styles: { halign: 'center', fontSize: 7.5, fillColor: [235, 240, 255], textColor: [50, 70, 140], fontStyle: 'bold' } });
             });
 
             const totalPosible = state.ras.reduce((s, ra) => s + (ra.valorTotal || 0), 0);
@@ -3838,18 +3861,15 @@ async function exportarReporteCalificaciones() {
             fila.push({
                 content: String(total),
                 styles: {
-                    halign: 'center',
-                    fontStyle: 'bold',
-                    fontSize: 8,
+                    halign: 'center', fontStyle: 'bold', fontSize: 8,
                     fillColor: aprobado ? [180, 230, 180] : [255, 190, 190],
                     textColor: aprobado ? [20, 100, 20] : [160, 20, 20]
                 }
             });
-
             return fila;
         });
 
-        // ── FILA DE TOTALES / RESUMEN ────────────────────────────────────────────
+        // ── FILA DE PROMEDIOS ────────────────────────────────────────────────────
         const resumenFila = [
             { content: '', styles: { fillColor: [230, 240, 255] } },
             { content: 'Promedio grupo', styles: { fontStyle: 'bold', fontSize: 8, fillColor: [230, 240, 255] } }
@@ -3862,7 +3882,6 @@ async function exportarReporteCalificaciones() {
             resumenFila.push({ content: prom(vals1), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [215, 230, 255] } });
             resumenFila.push({ content: prom(vals2), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [215, 230, 255] } });
             resumenFila.push({ content: prom(vals3), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [215, 230, 255] } });
-            resumenFila.push({ content: '', styles: { fillColor: [215, 230, 255] } });
         });
         const totalPromedios = state.ras.reduce((sum, ra) => {
             const finales = state.estudiantes.map(e => {
@@ -3874,30 +3893,6 @@ async function exportarReporteCalificaciones() {
             return sum + (finales.length ? finales.reduce((a, b) => a + b, 0) / finales.length : 0);
         }, 0);
         resumenFila.push({ content: totalPromedios.toFixed(1), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [200, 220, 255] } });
-
-        // Calcular ancho de columnas dinámicamente — 4 cols por RA: Op1, Op2, Op3, Min
-        const numRAs = state.ras.length;
-        const colNameWidth = 50;
-        const colNumWidth = 8;
-        const colTotalWidth = 13;
-        const colMinWidth = 11; // columna Min fija
-        const colOpWidth = Math.min(13, Math.max(9, (pageW - 2 * margen - colNumWidth - colNameWidth - colTotalWidth - numRAs * colMinWidth) / (numRAs * 3)));
-
-        const columnStyles = {
-            0: { cellWidth: colNumWidth },
-            1: { cellWidth: colNameWidth }
-        };
-        let colIdx = 2;
-        state.ras.forEach(() => {
-            columnStyles[colIdx]     = { cellWidth: colOpWidth };
-            columnStyles[colIdx + 1] = { cellWidth: colOpWidth };
-            columnStyles[colIdx + 2] = { cellWidth: colOpWidth };
-            columnStyles[colIdx + 3] = { cellWidth: colMinWidth };
-            colIdx += 4;
-        });
-        columnStyles[colIdx] = { cellWidth: colTotalWidth };
-
-        // ── DIBUJAR TABLA ────────────────────────────────────────────────────────
         doc.autoTable({
             head: [headRow1, headRow2],
             body: [...bodyRows, resumenFila],
