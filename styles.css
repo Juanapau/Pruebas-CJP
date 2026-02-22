@@ -1826,6 +1826,260 @@ body.dark-mode .resumen-numero-trabajados {
     }
 }
 
+/* ── BOTÓN RESUMEN ANUAL ─────────────────────────────────────── */
+.btn-resumen-anual {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #5090d0;
+    background: rgba(64, 132, 210, 0.10);
+    border: 1px solid rgba(64, 132, 210, 0.28);
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, color 0.2s;
+    white-space: nowrap;
+    letter-spacing: 0.01em;
+}
+
+.btn-resumen-anual:hover {
+    background: rgba(64, 132, 210, 0.20);
+    border-color: rgba(64, 132, 210, 0.50);
+    color: #3070bb;
+}
+
+body.dark-mode .btn-resumen-anual {
+    color: #7ab4e8;
+    background: rgba(100, 160, 220, 0.12);
+    border-color: rgba(100, 160, 220, 0.30);
+}
+
+body.dark-mode .btn-resumen-anual:hover {
+    background: rgba(100, 160, 220, 0.22);
+    border-color: rgba(100, 160, 220, 0.55);
+    color: #a0ccf0;
+}
+
+/* ── PANEL RESUMEN ANUAL ─────────────────────────────────────── */
+.panel-resumen-anual {
+    background: var(--color-blanco);
+    border-radius: 10px;
+    border: 1px solid rgba(64, 132, 210, 0.20);
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    overflow: hidden;
+    animation: fadeInDown 0.25s ease;
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.resumen-anual-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, rgba(64,132,210,0.10) 0%, rgba(64,132,210,0.04) 100%);
+    border-bottom: 1px solid rgba(64, 132, 210, 0.15);
+}
+
+.resumen-anual-titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.resumen-anual-icono {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.resumen-anual-titulo h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-texto);
+}
+
+.resumen-anual-subtitulo {
+    margin: 2px 0 0;
+    font-size: 0.82rem;
+    color: var(--color-texto-secundario);
+}
+
+.btn-cerrar-resumen-anual {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--color-texto-secundario);
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.15s, color 0.15s;
+    line-height: 1;
+}
+
+.btn-cerrar-resumen-anual:hover {
+    background: rgba(0,0,0,0.07);
+    color: var(--color-texto);
+}
+
+.resumen-anual-contenido {
+    padding: 18px;
+}
+
+/* Estado de carga */
+.resumen-anual-cargando {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    color: var(--color-texto-secundario);
+    font-size: 0.9rem;
+}
+
+.resumen-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(64, 132, 210, 0.25);
+    border-top-color: #4084d2;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Grid de meses */
+.resumen-meses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+}
+
+.resumen-mes-card {
+    border-radius: 8px;
+    padding: 12px 14px;
+    border: 1px solid rgba(0,0,0,0.07);
+    background: var(--color-fondo, #f8f8f8);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: box-shadow 0.2s;
+}
+
+.resumen-mes-card:hover {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.10);
+}
+
+.resumen-mes-nombre {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-texto-secundario);
+}
+
+.resumen-mes-porciento {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.resumen-mes-barra-bg {
+    height: 5px;
+    border-radius: 3px;
+    background: rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.resumen-mes-barra-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.6s ease;
+}
+
+.resumen-mes-detalle {
+    font-size: 0.76rem;
+    color: var(--color-texto-secundario);
+}
+
+/* Colores según porcentaje */
+.pct-alto  { color: #43A047; }
+.pct-medio { color: #FB8C00; }
+.pct-bajo  { color: #E53935; }
+
+.barra-alto  { background: #66BB6A; }
+.barra-medio { background: #FFA726; }
+.barra-bajo  { background: #EF5350; }
+
+.card-alto  { border-left: 3px solid #66BB6A; }
+.card-medio { border-left: 3px solid #FFA726; }
+.card-bajo  { border-left: 3px solid #EF5350; }
+
+/* Fila de promedio general */
+.resumen-anual-promedio {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: rgba(64, 132, 210, 0.07);
+    border: 1px solid rgba(64, 132, 210, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.resumen-anual-promedio-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-texto);
+}
+
+.resumen-anual-promedio-valor {
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+/* Sin datos */
+.resumen-anual-vacio {
+    text-align: center;
+    padding: 28px;
+    color: var(--color-texto-secundario);
+    font-size: 0.9rem;
+}
+
+/* Dark mode */
+body.dark-mode .panel-resumen-anual {
+    border-color: rgba(100, 160, 220, 0.20);
+}
+
+body.dark-mode .resumen-anual-header {
+    background: linear-gradient(135deg, rgba(100,160,220,0.12) 0%, rgba(100,160,220,0.04) 100%);
+    border-bottom-color: rgba(100,160,220,0.18);
+}
+
+body.dark-mode .resumen-mes-card {
+    background: rgba(255,255,255,0.04);
+    border-color: rgba(255,255,255,0.08);
+}
+
+body.dark-mode .resumen-anual-promedio {
+    background: rgba(100,160,220,0.10);
+    border-color: rgba(100,160,220,0.22);
+}
+
+@media (max-width: 768px) {
+    .resumen-meses-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 th.header-dia {
     background-color: #64B5F6;
     color: white;
