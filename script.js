@@ -3735,6 +3735,41 @@ async function exportarReporteCalificaciones() {
         doc.setFont('helvetica', 'normal');
         doc.text(fecha, pageW - margen - 35, 49);
 
+        // ── LEER VALORES DIRECTAMENTE DEL DOM (igual que guardarTodoElRegistro) ──
+        // Construir mapa: { "estudianteId_raId" : { op1, op2, op3 } }
+        const valoresDom = {};
+        document.querySelectorAll('.input-oportunidad-simple').forEach(input => {
+            const estId  = input.dataset.estudiante;
+            const raId   = input.dataset.ra;
+            const op     = input.dataset.oportunidad;
+            const val    = input.value !== '' ? input.value : '';
+            const key    = `${estId}_${raId}`;
+            if (!valoresDom[key]) valoresDom[key] = { op1: '', op2: '', op3: '' };
+            valoresDom[key][`op${op}`] = val;
+        });
+
+        // Helper: obtener valor del DOM con fallback a state
+        const getVal = (estId, raId, op) => {
+            const key = `${estId}_${raId}`;
+            if (valoresDom[key] && valoresDom[key][`op${op}`] !== undefined) {
+                return valoresDom[key][`op${op}`];
+            }
+            // Fallback a state si el input no existe en DOM
+            const cal = obtenerCalificacion(estId, raId);
+            const v = cal[`op${op}`];
+            return (v !== null && v !== undefined) ? String(v) : '';
+        };
+
+        // Obtener valor de la celda Total directamente del DOM
+        const getTotalDOM = (idx) => {
+            const filas = document.querySelectorAll('#tablaRegistroBody tr');
+            if (filas[idx]) {
+                const totalCell = filas[idx].querySelector('.celda-total');
+                if (totalCell) return totalCell.textContent.trim();
+            }
+            return '0';
+        };
+
         // ── CONSTRUIR DATOS DE LA TABLA ─────────────────────────────────────────
         // Encabezados: #, Nombre, [Op1 Op2 Op3 por cada RA], Total
         const headRow1 = [
@@ -3763,7 +3798,7 @@ async function exportarReporteCalificaciones() {
             headRow2.push({ content: `Op.3\n(Min: ${min})`, styles: { halign: 'center', fillColor: [50, 115, 190], textColor: 255, fontStyle: 'bold', fontSize: 7 } });
         });
 
-        // Filas de datos
+        // Filas de datos — leyendo del DOM
         const bodyRows = state.estudiantes.map((est, idx) => {
             const fila = [
                 { content: String(est.numero || idx + 1), styles: { halign: 'center', fontSize: 8 } },
@@ -3772,24 +3807,24 @@ async function exportarReporteCalificaciones() {
 
             let total = 0;
             state.ras.forEach(ra => {
-                const cal = obtenerCalificacion(est.id, ra.id);
-                const valorFinal = obtenerUltimoValor(cal);
-                total += valorFinal;
-
                 const min = Math.round((ra.valorTotal || 0) * 70 / 100);
 
-                const colorCelda = (v, max) => {
-                    if (v === null || v === undefined || v === '') return [255, 255, 255];
+                const colorCelda = (v) => {
+                    if (v === '' || v === null || v === undefined) return [255, 255, 255];
                     return Number(v) >= min ? [200, 230, 200] : [255, 210, 210];
                 };
 
-                const v1 = cal.op1 !== null && cal.op1 !== undefined ? cal.op1 : '';
-                const v2 = cal.op2 !== null && cal.op2 !== undefined ? cal.op2 : '';
-                const v3 = cal.op3 !== null && cal.op3 !== undefined ? cal.op3 : '';
+                const v1 = getVal(est.id, ra.id, 1);
+                const v2 = getVal(est.id, ra.id, 2);
+                const v3 = getVal(est.id, ra.id, 3);
 
-                fila.push({ content: String(v1), styles: { halign: 'center', fontSize: 8, fillColor: colorCelda(v1, ra.valorTotal) } });
-                fila.push({ content: String(v2), styles: { halign: 'center', fontSize: 8, fillColor: colorCelda(v2, ra.valorTotal) } });
-                fila.push({ content: String(v3), styles: { halign: 'center', fontSize: 8, fillColor: colorCelda(v3, ra.valorTotal) } });
+                // Calcular valor final para el total (última op con valor)
+                const valorFinal = v3 !== '' ? Number(v3) : v2 !== '' ? Number(v2) : v1 !== '' ? Number(v1) : 0;
+                total += valorFinal;
+
+                fila.push({ content: v1, styles: { halign: 'center', fontSize: 8, fillColor: colorCelda(v1) } });
+                fila.push({ content: v2, styles: { halign: 'center', fontSize: 8, fillColor: colorCelda(v2) } });
+                fila.push({ content: v3, styles: { halign: 'center', fontSize: 8, fillColor: colorCelda(v3) } });
             });
 
             const totalPosible = state.ras.reduce((s, ra) => s + (ra.valorTotal || 0), 0);
@@ -3814,16 +3849,21 @@ async function exportarReporteCalificaciones() {
             { content: 'Promedio grupo', styles: { fontStyle: 'bold', fontSize: 8, fillColor: [230, 240, 255] } }
         ];
         state.ras.forEach(ra => {
-            const vals1 = state.estudiantes.map(e => { const c = obtenerCalificacion(e.id, ra.id); return c.op1 ?? null; }).filter(v => v !== null);
-            const vals2 = state.estudiantes.map(e => { const c = obtenerCalificacion(e.id, ra.id); return c.op2 ?? null; }).filter(v => v !== null);
-            const vals3 = state.estudiantes.map(e => { const c = obtenerCalificacion(e.id, ra.id); return c.op3 ?? null; }).filter(v => v !== null);
+            const vals1 = state.estudiantes.map(e => getVal(e.id, ra.id, 1)).filter(v => v !== '');
+            const vals2 = state.estudiantes.map(e => getVal(e.id, ra.id, 2)).filter(v => v !== '');
+            const vals3 = state.estudiantes.map(e => getVal(e.id, ra.id, 3)).filter(v => v !== '');
             const prom = arr => arr.length ? (arr.reduce((a, b) => a + Number(b), 0) / arr.length).toFixed(1) : '-';
             resumenFila.push({ content: prom(vals1), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [215, 230, 255] } });
             resumenFila.push({ content: prom(vals2), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [215, 230, 255] } });
             resumenFila.push({ content: prom(vals3), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [215, 230, 255] } });
         });
         const totalPromedios = state.ras.reduce((sum, ra) => {
-            const finales = state.estudiantes.map(e => obtenerUltimoValor(obtenerCalificacion(e.id, ra.id)));
+            const finales = state.estudiantes.map(e => {
+                const v3 = getVal(e.id, ra.id, 3);
+                const v2 = getVal(e.id, ra.id, 2);
+                const v1 = getVal(e.id, ra.id, 1);
+                return v3 !== '' ? Number(v3) : v2 !== '' ? Number(v2) : v1 !== '' ? Number(v1) : 0;
+            });
             return sum + (finales.length ? finales.reduce((a, b) => a + b, 0) / finales.length : 0);
         }, 0);
         resumenFila.push({ content: totalPromedios.toFixed(1), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [200, 220, 255] } });
