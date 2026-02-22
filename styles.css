@@ -1932,14 +1932,15 @@ body.dark-mode .btn-resumen-anual:hover {
 }
 
 .tabla-resumen-anual th {
-    color: #fff;
+    color: #1a1a1a;
     font-weight: 600;
     padding: 12px 14px;
     text-align: center;
     white-space: nowrap;
-    border-right: 1px solid rgba(255,255,255,0.12);
+    border-right: 1px solid rgba(0,0,0,0.10);
     font-size: 0.82rem;
     letter-spacing: 0.02em;
+    box-shadow: none !important;
 }
 
 .tabla-resumen-anual th.col-nombre {
@@ -2046,6 +2047,10 @@ body.dark-mode .btn-resumen-anual:hover {
 }
 
 /* Dark mode */
+body.dark-mode .tabla-resumen-anual th {
+    color: #ffffff;
+}
+
 body.dark-mode .resumen-anual-tabla-wrap {
     box-shadow: 0 2px 12px rgba(0,0,0,0.30);
 }
@@ -2074,15 +2079,6 @@ body.dark-mode .tabla-resumen-anual td.col-promedio {
 body.dark-mode .tabla-resumen-anual tr.fila-promedio-grupal {
     background: rgba(100,160,220,0.10);
 }
-/* Encabezado — azul oscuro solo en modo claro */
-body:not(.dark-mode) .tabla-resumen-anual thead tr {
-    background: #2c3e50 !important;
-}
-
-body:not(.dark-mode) .tabla-resumen-anual th.col-promedio {
-    background: #1a252f !important;
-}
-
 @media (max-width: 768px) {
     .vista-resumen-anual {
         padding: 12px;
