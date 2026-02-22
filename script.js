@@ -3838,45 +3838,52 @@ async function exportarReporteCalificaciones() {
         // ── ENCABEZADO ──────────────────────────────────────────────────────────
         // Cargar logo dinámicamente desde archivo (sin base64 hardcodeado)
         const logoSize = 22;
-        const headerH = 28; // altura total del bloque de encabezado
+        const topMargen = 8;  // margen superior de la página
+        const headerH = topMargen + logoSize + 6; // altura total = margen + logo + espacio inferior
+
+        // Logo posicionado respetando el margen superior
+        const logoY = topMargen;
 
         // Intentar cargar el logo desde el archivo logo.png (sin fondo)
         try {
             const logoDataUrl = await cargarLogoComoDataURL('logo.png');
-            doc.addImage(logoDataUrl, 'PNG', margen, (headerH - logoSize) / 2, logoSize, logoSize);
+            doc.addImage(logoDataUrl, 'PNG', margen, logoY, logoSize, logoSize);
         } catch (e) {
             // Placeholder con iniciales si falla la carga
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(13);
             doc.setTextColor(30, 90, 180);
-            doc.text('JP', margen + logoSize / 2, headerH / 2 + 0.5, { align: 'center', baseline: 'middle' });
+            doc.text('JP', margen + logoSize / 2, logoY + logoSize / 2, { align: 'center', baseline: 'middle' });
         }
 
         const textX = margen + logoSize + 5;
+        // Textos alineados verticalmente con el centro del logo
+        const textLine1Y = logoY + 8;   // primera línea: ~1/3 del logo desde arriba
+        const textLine2Y = logoY + 16;  // segunda línea: ~2/3 del logo desde arriba
 
         // Título principal — azul
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(13);
         doc.setTextColor(30, 90, 180);
-        doc.text('SISTEMA DE CALIFICACIONES JP', textX, 10);
+        doc.text('SISTEMA DE CALIFICACIONES JP', textX, textLine1Y);
 
         // Subtítulo institución — negro
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.setTextColor(30, 30, 30);
-        doc.text('Politécnico Nuestra Señora de la Altagracia', textX, 17);
+        doc.text('Politécnico Nuestra Señora de la Altagracia', textX, textLine2Y);
 
         // Año escolar alineado a la derecha — azul
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8);
         doc.setTextColor(30, 90, 180);
-        doc.text(`Año Escolar: ${anioEscolar}`, pageW - margen, 10, { align: 'right' });
+        doc.text(`Año Escolar: ${anioEscolar}`, pageW - margen, textLine1Y, { align: 'right' });
 
         // Fecha alineada a la derecha — negro
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(8);
         doc.setTextColor(30, 30, 30);
-        doc.text(fecha, pageW - margen, 17, { align: 'right' });
+        doc.text(fecha, pageW - margen, textLine2Y, { align: 'right' });
 
         // Línea divisoria azul delgada
         doc.setDrawColor(30, 90, 180);
@@ -4071,7 +4078,7 @@ async function exportarReporteCalificaciones() {
         doc.autoTable({
             head: [headRow1, headRow2],
             body: [...bodyRows, resumenFila],
-            startY: 50,
+            startY: 55,
             margin: { left: margen, right: margen },
             columnStyles: columnStyles,
             styles: {
