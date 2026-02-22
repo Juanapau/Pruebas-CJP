@@ -271,6 +271,52 @@ body.dark-mode .icono-sol {
     font-size: 1.5rem;
 }
 
+/* Grupo de botones en actividades */
+.botones-actividades-grupo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Botón exportar PDF actividades — verde */
+.btn-exportar-pdf-actividades {
+    background-color: #43A047;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(67, 160, 71, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.btn-exportar-pdf-actividades:hover {
+    background-color: #388E3C;
+    box-shadow: 0 4px 12px rgba(67, 160, 71, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-exportar-pdf-actividades:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+body.dark-mode .btn-exportar-pdf-actividades {
+    background-color: #2E7D32;
+    box-shadow: 0 2px 6px rgba(46, 125, 50, 0.4);
+}
+
+body.dark-mode .btn-exportar-pdf-actividades:hover {
+    background-color: #1B5E20;
+}
+
 .btn-guardar {
     background-color: #42A5F5;
     color: white;
