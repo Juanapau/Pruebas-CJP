@@ -4143,20 +4143,31 @@ async function exportarReporteActividades() {
             if (tieneDatos) actividadesConDatos.push(i);
         }
 
-        // ── ENCABEZADO DE TABLA ───────────────────────────────────────────────
-        const headRow = [
-            { content: '#',      styles: { halign: 'center', fontStyle: 'bold', fillColor: [44, 62, 80], textColor: 255, fontSize: 8 } },
-            { content: 'Nombre', styles: { halign: 'left',   fontStyle: 'bold', fillColor: [44, 62, 80], textColor: 255, fontSize: 8 } },
-            ...actividadesConDatos.map(i => {
-                const desc = descripcionesActividades[i] || '';
-                return {
-                    content: desc ? `Ac.${i}
-${desc.substring(0, 30)}${desc.length > 30 ? '…' : ''}` : `Ac.${i}`,
-                    styles: { halign: 'center', fontStyle: 'bold', fillColor: [44, 62, 80], textColor: 255, fontSize: 7.5, cellWidth: 'auto' }
-                };
-            }),
-            { content: 'Total', styles: { halign: 'center', fontStyle: 'bold', fillColor: [26, 37, 47], textColor: 255, fontSize: 8 } }
+        // ── ENCABEZADO DE TABLA (2 filas: número + descripción) ─────────────
+        const colorHead   = [44, 62, 80];
+        const colorHead2  = [55, 75, 95];
+        const colorTotal  = [26, 37, 47];
+
+        // Fila 1: # | Nombre | Ac.1 | Ac.2 … | Total
+        const headRow1 = [
+            { content: '#',      rowSpan: 2, styles: { halign: 'center', valign: 'middle', fontStyle: 'bold', fillColor: colorHead, textColor: 255, fontSize: 8 } },
+            { content: 'Nombre', rowSpan: 2, styles: { halign: 'left',   valign: 'middle', fontStyle: 'bold', fillColor: colorHead, textColor: 255, fontSize: 8 } },
+            ...actividadesConDatos.map(i => ({
+                content: `Ac.${i}`,
+                styles: { halign: 'center', valign: 'bottom', fontStyle: 'bold', fillColor: colorHead, textColor: 255, fontSize: 8 }
+            })),
+            { content: 'Total', rowSpan: 2, styles: { halign: 'center', valign: 'middle', fontStyle: 'bold', fillColor: colorTotal, textColor: 255, fontSize: 8 } }
         ];
+
+        // Fila 2: descripción de cada actividad en letra pequeña e itálica
+        const headRow2 = actividadesConDatos.map(i => {
+            const desc = descripcionesActividades[i] || '';
+            const texto = desc ? (desc.length > 28 ? desc.substring(0, 28) + '…' : desc) : '—';
+            return {
+                content: texto,
+                styles: { halign: 'center', valign: 'top', fontStyle: 'italic', fillColor: colorHead2, textColor: [200, 215, 230], fontSize: 6 }
+            };
+        });
 
         // ── FILAS DE ESTUDIANTES ──────────────────────────────────────────────
         const bodyRows = state.estudiantes.map((est, idx) => {
@@ -4200,17 +4211,31 @@ ${desc.substring(0, 30)}${desc.length > 30 ? '…' : ''}` : `Ac.${i}`,
             { content: totalPromedios.toFixed(2), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [200, 220, 255], textColor: [30,30,30] } }
         ]);
 
+        // Anchos de columna: # angosto, Nombre más ancho, actividades compactas
+        const colStyles = {};
+        colStyles[0] = { cellWidth: 8 };   // #
+        colStyles[1] = { cellWidth: 48 };  // Nombre
+        actividadesConDatos.forEach((_, idx) => {
+            colStyles[idx + 2] = { cellWidth: 16 }; // cada Ac.
+        });
+        colStyles[actividadesConDatos.length + 2] = { cellWidth: 18 }; // Total
+
         doc.autoTable({
-            head: [headRow],
+            head: [headRow1, headRow2],
             body: bodyRows,
             startY: startY + 3,
             margin: { left: margen, right: margen },
+            columnStyles: colStyles,
             styles: {
                 overflow: 'linebreak',
-                cellPadding: 2.5,
+                cellPadding: { top: 2, right: 2, bottom: 2, left: 2 },
                 lineColor: [180, 180, 180],
                 lineWidth: 0.3,
                 fontSize: 8,
+                valign: 'middle',
+            },
+            headStyles: {
+                minCellHeight: 6,
             },
             alternateRowStyles: { fillColor: [248, 250, 255] },
             tableLineColor: [130, 130, 160],
