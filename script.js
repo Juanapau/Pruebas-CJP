@@ -4143,31 +4143,41 @@ async function exportarReporteActividades() {
             if (tieneDatos) actividadesConDatos.push(i);
         }
 
-        // ── ENCABEZADO DE TABLA (2 filas: número + descripción) ─────────────
-        const colorHead   = [44, 62, 80];
-        const colorHead2  = [55, 75, 95];
-        const colorTotal  = [26, 37, 47];
+        // ── ENCABEZADO DE TABLA ───────────────────────────────────────────────
+        const colorHead  = [44, 62, 80];
+        const colorTotal = [26, 37, 47];
 
-        // Fila 1: # | Nombre | Ac.1 | Ac.2 … | Total
-        const headRow1 = [
-            { content: '#',      rowSpan: 2, styles: { halign: 'center', valign: 'middle', fontStyle: 'bold', fillColor: colorHead, textColor: 255, fontSize: 8 } },
-            { content: 'Nombre', rowSpan: 2, styles: { halign: 'left',   valign: 'middle', fontStyle: 'bold', fillColor: colorHead, textColor: 255, fontSize: 8 } },
-            ...actividadesConDatos.map(i => ({
-                content: `Ac.${i}`,
-                styles: { halign: 'center', valign: 'bottom', fontStyle: 'bold', fillColor: colorHead, textColor: 255, fontSize: 8 }
-            })),
-            { content: 'Total', rowSpan: 2, styles: { halign: 'center', valign: 'middle', fontStyle: 'bold', fillColor: colorTotal, textColor: 255, fontSize: 8 } }
+        // Calcular ancho disponible y repartirlo entre columnas
+        const anchoTotal  = pageW - margen * 2;
+        const anchoNum    = 8;
+        const anchoNombre = 45;
+        const anchoTot    = 16;
+        const anchoRestante = anchoTotal - anchoNum - anchoNombre - anchoTot;
+        const anchoAc     = Math.max(12, Math.floor(anchoRestante / actividadesConDatos.length));
+
+        // Encabezado: una sola fila con "Ac.X
+descripción corta"
+        const headRow = [
+            { content: '#',      styles: { halign: 'center', valign: 'middle', fontStyle: 'bold', fillColor: colorHead,  textColor: 255, fontSize: 8 } },
+            { content: 'Nombre', styles: { halign: 'left',   valign: 'middle', fontStyle: 'bold', fillColor: colorHead,  textColor: 255, fontSize: 8 } },
+            ...actividadesConDatos.map(i => {
+                // Limpiar posible numeración al inicio de la descripción (ej: "1. Analizar...")
+                let desc = descripcionesActividades[i] || '';
+                desc = desc.replace(/^[0-9]+[.\-]\s*/, '').trim();
+                const resumen = desc.length > 16 ? desc.substring(0, 16) + '…' : desc;
+                const label   = resumen ? 'Ac.' + i + '\n' + resumen : 'Ac.' + i;
+                return {
+                    content: label,
+                    styles: {
+                        halign: 'center', valign: 'middle', fontStyle: 'bold',
+                        fillColor: colorHead, textColor: 255,
+                        fontSize: 6.5, cellPadding: { top: 2, right: 1, bottom: 2, left: 1 },
+                        overflow: 'ellipsize', minCellHeight: 10
+                    }
+                };
+            }),
+            { content: 'Total', styles: { halign: 'center', valign: 'middle', fontStyle: 'bold', fillColor: colorTotal, textColor: 255, fontSize: 8 } }
         ];
-
-        // Fila 2: descripción de cada actividad en letra pequeña e itálica
-        const headRow2 = actividadesConDatos.map(i => {
-            const desc = descripcionesActividades[i] || '';
-            const texto = desc ? (desc.length > 28 ? desc.substring(0, 28) + '…' : desc) : '—';
-            return {
-                content: texto,
-                styles: { halign: 'center', valign: 'top', fontStyle: 'italic', fillColor: colorHead2, textColor: [200, 215, 230], fontSize: 6 }
-            };
-        });
 
         // ── FILAS DE ESTUDIANTES ──────────────────────────────────────────────
         const bodyRows = state.estudiantes.map((est, idx) => {
@@ -4211,31 +4221,32 @@ async function exportarReporteActividades() {
             { content: totalPromedios.toFixed(2), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [200, 220, 255], textColor: [30,30,30] } }
         ]);
 
-        // Anchos de columna: # angosto, Nombre más ancho, actividades compactas
+        // Anchos de columna calculados dinámicamente
         const colStyles = {};
-        colStyles[0] = { cellWidth: 8 };   // #
-        colStyles[1] = { cellWidth: 48 };  // Nombre
+        colStyles[0] = { cellWidth: anchoNum };
+        colStyles[1] = { cellWidth: anchoNombre };
         actividadesConDatos.forEach((_, idx) => {
-            colStyles[idx + 2] = { cellWidth: 16 }; // cada Ac.
+            colStyles[idx + 2] = { cellWidth: anchoAc };
         });
-        colStyles[actividadesConDatos.length + 2] = { cellWidth: 18 }; // Total
+        colStyles[actividadesConDatos.length + 2] = { cellWidth: anchoTot };
 
         doc.autoTable({
-            head: [headRow1, headRow2],
+            head: [headRow],
             body: bodyRows,
             startY: startY + 3,
             margin: { left: margen, right: margen },
             columnStyles: colStyles,
             styles: {
                 overflow: 'linebreak',
-                cellPadding: { top: 2, right: 2, bottom: 2, left: 2 },
+                cellPadding: { top: 2, right: 1, bottom: 2, left: 1 },
                 lineColor: [180, 180, 180],
                 lineWidth: 0.3,
                 fontSize: 8,
                 valign: 'middle',
             },
             headStyles: {
-                minCellHeight: 6,
+                minCellHeight: 12,
+                valign: 'middle',
             },
             alternateRowStyles: { fillColor: [248, 250, 255] },
             tableLineColor: [130, 130, 160],
