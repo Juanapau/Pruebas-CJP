@@ -3778,6 +3778,29 @@ function mostrarMensajeError(titulo, texto) {
 }
 
 // ==========================================
+// Carga el logo desde su ruta relativa y retorna un dataURL (sin base64 hardcodeado)
+async function cargarLogoComoDataURL(ruta) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function () {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            try {
+                resolve(canvas.toDataURL('image/png'));
+            } catch (e) {
+                reject(e);
+            }
+        };
+        img.onerror = () => reject(new Error('No se pudo cargar el logo: ' + ruta));
+        // Añadir timestamp para evitar caché que pueda bloquear el canvas
+        img.src = ruta + '?v=' + Date.now();
+    });
+}
+
 // EXPORTAR REPORTE PDF - CALIFICACIONES
 // ==========================================
 
@@ -3813,56 +3836,91 @@ async function exportarReporteCalificaciones() {
         const margen = 14;
 
         // ── ENCABEZADO ──────────────────────────────────────────────────────────
-        const logoSize = 22;
-        doc.addImage('data:image/png;base64,' + logoBase64, 'PNG', margen, 8, logoSize, logoSize);
+        // Cargar logo dinámicamente desde archivo (sin base64 hardcodeado)
+        const logoSize = 24;
+        const headerH = 36; // altura total del bloque de encabezado
 
-        // Título principal
+        // Fondo del encabezado (rectángulo rojo oscuro institucional)
+        doc.setFillColor(180, 0, 0);
+        doc.rect(0, 0, pageW, headerH, 'F');
+
+        // Franja inferior del encabezado (negro)
+        doc.setFillColor(30, 30, 30);
+        doc.rect(0, headerH, pageW, 1.5, 'F');
+
+        // Intentar cargar el logo desde el archivo logo.png
+        try {
+            const logoDataUrl = await cargarLogoComoDataURL('logo.png');
+            // Logo en círculo blanco (fondo blanco detrás del logo)
+            doc.setFillColor(255, 255, 255);
+            doc.circle(margen + logoSize / 2, headerH / 2, logoSize / 2 + 1, 'F');
+            doc.addImage(logoDataUrl, 'PNG', margen, (headerH - logoSize) / 2, logoSize, logoSize);
+        } catch (e) {
+            // Si falla la carga del logo, dibujar un placeholder con las iniciales
+            doc.setFillColor(255, 255, 255);
+            doc.circle(margen + logoSize / 2, headerH / 2, logoSize / 2 + 1, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(180, 0, 0);
+            doc.text('JP', margen + logoSize / 2, headerH / 2 + 0.5, { align: 'center', baseline: 'middle' });
+        }
+
+        const textX = margen + logoSize + 6;
+
+        // Título principal blanco
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(16);
-        doc.setTextColor(30, 90, 160);
-        doc.text('SISTEMA DE CALIFICACIONES JP', margen + logoSize + 5, 17);
+        doc.setFontSize(15);
+        doc.setTextColor(255, 255, 255);
+        doc.text('SISTEMA DE CALIFICACIONES JP', textX, 12);
 
         // Subtítulo institución
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(10);
-        doc.setTextColor(80, 80, 80);
-        doc.text('Politécnico Nuestra Señora de la Altagracia', margen + logoSize + 5, 24);
+        doc.setFontSize(9.5);
+        doc.setTextColor(255, 220, 220);
+        doc.text('Politécnico Nuestra Señora de la Altagracia', textX, 20);
 
-        // Línea divisoria
-        doc.setDrawColor(30, 90, 160);
-        doc.setLineWidth(0.8);
-        doc.line(margen, 33, pageW - margen, 33);
+        // Año escolar alineado a la derecha
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(255, 255, 255);
+        doc.text(`Año Escolar: ${anioEscolar}`, pageW - margen, 12, { align: 'right' });
+
+        // Fecha alineada a la derecha
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(255, 220, 220);
+        doc.text(fecha, pageW - margen, 20, { align: 'right' });
 
         // ── INFO DEL REPORTE ────────────────────────────────────────────────────
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(11);
-        doc.setTextColor(30, 30, 30);
-        doc.text('REPORTE DE CALIFICACIONES', pageW / 2, 41, { align: 'center' });
-
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(60, 60, 60);
-
-        // Fila info — módulo y curso a la izquierda, fecha a la derecha
-        doc.setFont('helvetica', 'bold');
-        doc.text('Módulo:', margen, 49);
-        doc.setFont('helvetica', 'normal');
-        doc.text(nombreModulo, margen + 16, 49);
+        // Banda gris claro de información
+        doc.setFillColor(245, 245, 245);
+        doc.rect(0, headerH + 1.5, pageW, 14, 'F');
 
         doc.setFont('helvetica', 'bold');
-        doc.text('Curso:', margen + 90, 49);
+        doc.setFontSize(10);
+        doc.setTextColor(180, 0, 0);
+        doc.text('REPORTE DE CALIFICACIONES', pageW / 2, headerH + 9, { align: 'center' });
+
+        // Segunda línea info compacta
         doc.setFont('helvetica', 'normal');
-        doc.text(curso, margen + 103, 49);
+        doc.setFontSize(8);
+        doc.setTextColor(50, 50, 50);
+
+        const infoY = headerH + 13.5;
+        doc.setFont('helvetica', 'bold');
+        doc.text('Módulo:', margen, infoY);
+        doc.setFont('helvetica', 'normal');
+        doc.text(nombreModulo, margen + 15, infoY);
 
         doc.setFont('helvetica', 'bold');
-        doc.text('Año escolar:', margen + 155, 49);
+        doc.text('Curso:', margen + 95, infoY);
         doc.setFont('helvetica', 'normal');
-        doc.text(anioEscolar, margen + 178, 49);
+        doc.text(curso, margen + 107, infoY);
 
-        doc.setFont('helvetica', 'bold');
-        doc.text('Fecha:', pageW - margen - 50, 49);
-        doc.setFont('helvetica', 'normal');
-        doc.text(fecha, pageW - margen - 35, 49);
+        // Separador antes de tabla
+        doc.setDrawColor(180, 0, 0);
+        doc.setLineWidth(0.5);
+        doc.line(margen, headerH + 16, pageW - margen, headerH + 16);
 
         // ── LEER VALORES DIRECTAMENTE DEL DOM (igual que guardarTodoElRegistro) ──
         // Construir mapa: { "estudianteId_raId" : { op1, op2, op3 } }
@@ -4025,7 +4083,7 @@ async function exportarReporteCalificaciones() {
         doc.autoTable({
             head: [headRow1, headRow2],
             body: [...bodyRows, resumenFila],
-            startY: 55,
+            startY: 57,
             margin: { left: margen, right: margen },
             columnStyles: columnStyles,
             styles: {
