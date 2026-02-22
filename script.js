@@ -4155,8 +4155,7 @@ async function exportarReporteActividades() {
         const anchoRestante = anchoTotal - anchoNum - anchoNombre - anchoTot;
         const anchoAc     = Math.max(12, Math.floor(anchoRestante / actividadesConDatos.length));
 
-        // Encabezado: una sola fila con "Ac.X
-descripción corta"
+        // Encabezado: una sola fila con "Ac.X + descripcion corta"
         const headRow = [
             { content: '#',      styles: { halign: 'center', valign: 'middle', fontStyle: 'bold', fillColor: colorHead,  textColor: 255, fontSize: 8 } },
             { content: 'Nombre', styles: { halign: 'left',   valign: 'middle', fontStyle: 'bold', fillColor: colorHead,  textColor: 255, fontSize: 8 } },
