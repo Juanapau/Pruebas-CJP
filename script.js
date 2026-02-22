@@ -2202,8 +2202,9 @@ function generarTablaAsistencia() {
             bodyHTML += `<td class="celda-asistencia${claseExtra}"><input type="text" maxlength="1" data-estudiante="${estudiante.id}" data-dia="${dia}" value="${asistencia}" class="input-asistencia ${obtenerClaseEstado(asistencia)}"></td>`;
         });
         const totales = calcularTotalesAsistencia(estudiante.id);
+        const clsPct = totales.porcentaje < 80 ? ' pct-reprobado' : '';
         bodyHTML += `<td class="celda-total-asistencia">${totales.total}</td>`;
-        bodyHTML += `<td class="celda-porcentaje-asistencia">${totales.porcentaje}%</td>`;
+        bodyHTML += `<td class="celda-porcentaje-asistencia${clsPct}">${totales.porcentaje}%</td>`;
         bodyHTML += '</tr>';
     });
     asistenciaElementos.tablaBody.innerHTML = bodyHTML;
@@ -2346,6 +2347,7 @@ function actualizarTotalesEstudiante(estudianteId) {
     const celdaPorcentaje = fila.querySelector('.celda-porcentaje-asistencia');
     celdaTotal.textContent = totales.total;
     celdaPorcentaje.textContent = `${totales.porcentaje}%`;
+    celdaPorcentaje.classList.toggle('pct-reprobado', totales.porcentaje < 80);
 }
 
 async function guardarAsistencia() {
@@ -2503,7 +2505,7 @@ async function construirTablaResumenAnual(moduloId, curso) {
             const datosEst = mes.estudiantes.find(e => String(e.id) === String(est.id));
             if (datosEst) {
                 const pct = datosEst.porcentaje;
-                const cls = pct >= 70 ? 'pct-alto' : pct >= 50 ? 'pct-medio' : 'pct-bajo';
+                const cls = pct >= 80 ? 'pct-alto' : 'pct-bajo';
                 fila += `<td class="${cls}">${pct.toFixed(2)}</td>`;
                 sumaPromedios += pct;
                 countMesesConPct++;
@@ -2516,7 +2518,7 @@ async function construirTablaResumenAnual(moduloId, curso) {
 
         // Promedio final del estudiante
         const promFinal = countMesesConPct > 0 ? (sumaPromedios / countMesesConPct) : 0;
-        const promCls = promFinal >= 70 ? 'pct-alto' : promFinal >= 50 ? 'pct-medio' : 'pct-bajo';
+        const promCls = promFinal >= 80 ? 'pct-alto' : 'pct-bajo';
         const promDisplay = Number.isInteger(promFinal) ? promFinal.toString() : promFinal.toFixed(2);
         fila += `<td class="col-promedio ${promCls}">${promDisplay}</td>`;
         fila += '</tr>';
@@ -2533,7 +2535,7 @@ async function construirTablaResumenAnual(moduloId, curso) {
     mesesConDatos.forEach((_, mi) => {
         const prom = countMeses[mi] > 0 ? Math.round(promediosMeses[mi] / countMeses[mi]) : null;
         if (prom !== null) {
-            const cls = prom >= 70 ? 'pct-alto' : prom >= 50 ? 'pct-medio' : 'pct-bajo';
+            const cls = prom >= 80 ? 'pct-alto' : 'pct-bajo';
             filaGrupal += `<td class="${cls}">${prom}%</td>`;
             sumaPromediosGrupales += prom;
             countGrupal++;
@@ -2543,7 +2545,7 @@ async function construirTablaResumenAnual(moduloId, curso) {
     });
 
     const promedioGeneral = countGrupal > 0 ? Math.round(sumaPromediosGrupales / countGrupal) : 0;
-    const promGenCls = promedioGeneral >= 70 ? 'pct-alto' : promedioGeneral >= 50 ? 'pct-medio' : 'pct-bajo';
+    const promGenCls = promedioGeneral >= 80 ? 'pct-alto' : 'pct-bajo';
     filaGrupal += `<td class="col-promedio ${promGenCls}">${promedioGeneral}%</td>`;
     filaGrupal += '</tr>';
     tbody += filaGrupal;
