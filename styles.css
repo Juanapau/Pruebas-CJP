@@ -1994,18 +1994,14 @@ body.dark-mode .btn-resumen-anual:hover {
 }
 
 /* Colores semáforo para porcentajes */
-.tabla-resumen-anual td.pct-alto {
-    color: #43A047;
-    font-weight: 600;
-}
-
-.tabla-resumen-anual td.pct-medio {
-    color: #FB8C00;
+.tabla-resumen-anual td.pct-alto,
+.tabla-resumen-anual td.pct-medio,
+.tabla-resumen-anual td.pct-bajo {
+    color: #1a1a1a;
     font-weight: 600;
 }
 
 .tabla-resumen-anual td.pct-bajo {
-    color: #E53935;
     font-weight: 700;
 }
 
@@ -2043,6 +2039,12 @@ body.dark-mode .btn-resumen-anual:hover {
 /* Dark mode */
 body.dark-mode .resumen-anual-tabla-wrap {
     box-shadow: 0 2px 12px rgba(0,0,0,0.30);
+}
+
+body.dark-mode .tabla-resumen-anual td.pct-alto,
+body.dark-mode .tabla-resumen-anual td.pct-medio,
+body.dark-mode .tabla-resumen-anual td.pct-bajo {
+    color: #ffffff;
 }
 
 body.dark-mode .tabla-resumen-anual tbody tr:hover {
