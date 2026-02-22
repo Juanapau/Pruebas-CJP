@@ -283,7 +283,7 @@ body.dark-mode .icono-sol {
     background-color: #43A047;
     color: white;
     border: none;
-    padding: 12px 20px;
+    padding: 12px 24px;
     border-radius: 8px;
     font-size: 1rem;
     font-weight: 600;
@@ -345,12 +345,14 @@ body.dark-mode .btn-exportar-pdf-actividades:hover {
 .btns-tabla-acciones .btn-guardar,
 .btns-tabla-acciones .btn-exportar-pdf,
 .botones-asistencia .btn-guardar,
-.botones-asistencia .btn-volver-asistencia {
+.botones-asistencia .btn-volver-asistencia,
+.botones-actividades-grupo .btn-guardar,
+.botones-actividades-grupo .btn-exportar-pdf-actividades {
     width: auto !important;
     flex: 1;
     white-space: nowrap;
-    font-size: 0.85rem;
-    padding: 10px 12px;
+    font-size: 0.9rem;
+    padding: 12px 16px;
 }
 
 /* Botón Exportar PDF - verde */
@@ -372,7 +374,6 @@ body.dark-mode .btn-exportar-pdf-actividades:hover {
 
 .btn-exportar-pdf:hover {
     background-color: #2E7D32;
-    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(67, 160, 71, 0.45);
 }
 
@@ -1606,8 +1607,7 @@ td {
     }
     
     .btn-guardar {
-        width: 100%;
-        padding: 14px;
+        padding: 12px 16px;
     }
     
     /* Descripción del RA en móvil */
@@ -1712,7 +1712,7 @@ td {
     }
     
     .btn-guardar {
-        padding: 12px;
+        padding: 12px 16px;
         font-size: 0.9rem;
     }
 }
