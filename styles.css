@@ -1994,14 +1994,23 @@ body.dark-mode .btn-resumen-anual:hover {
 }
 
 /* Colores semáforo para porcentajes */
+/* Porcentajes: negro en modo claro, cubre todas las combinaciones de clases */
 .tabla-resumen-anual td.pct-alto,
 .tabla-resumen-anual td.pct-medio,
-.tabla-resumen-anual td.pct-bajo {
+.tabla-resumen-anual td.pct-bajo,
+.tabla-resumen-anual td.col-promedio.pct-alto,
+.tabla-resumen-anual td.col-promedio.pct-medio,
+.tabla-resumen-anual td.col-promedio.pct-bajo,
+.tabla-resumen-anual tr.fila-promedio-grupal td.pct-alto,
+.tabla-resumen-anual tr.fila-promedio-grupal td.pct-medio,
+.tabla-resumen-anual tr.fila-promedio-grupal td.pct-bajo {
     color: #1a1a1a;
     font-weight: 600;
 }
 
-.tabla-resumen-anual td.pct-bajo {
+.tabla-resumen-anual td.pct-bajo,
+.tabla-resumen-anual td.col-promedio.pct-bajo,
+.tabla-resumen-anual tr.fila-promedio-grupal td.pct-bajo {
     font-weight: 700;
 }
 
@@ -2041,9 +2050,16 @@ body.dark-mode .resumen-anual-tabla-wrap {
     box-shadow: 0 2px 12px rgba(0,0,0,0.30);
 }
 
+/* Porcentajes: blanco en modo oscuro, cubre todas las combinaciones de clases */
 body.dark-mode .tabla-resumen-anual td.pct-alto,
 body.dark-mode .tabla-resumen-anual td.pct-medio,
-body.dark-mode .tabla-resumen-anual td.pct-bajo {
+body.dark-mode .tabla-resumen-anual td.pct-bajo,
+body.dark-mode .tabla-resumen-anual td.col-promedio.pct-alto,
+body.dark-mode .tabla-resumen-anual td.col-promedio.pct-medio,
+body.dark-mode .tabla-resumen-anual td.col-promedio.pct-bajo,
+body.dark-mode .tabla-resumen-anual tr.fila-promedio-grupal td.pct-alto,
+body.dark-mode .tabla-resumen-anual tr.fila-promedio-grupal td.pct-medio,
+body.dark-mode .tabla-resumen-anual tr.fila-promedio-grupal td.pct-bajo {
     color: #ffffff;
 }
 
