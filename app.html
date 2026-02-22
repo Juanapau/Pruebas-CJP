@@ -310,27 +310,6 @@
                 </div>
             </div>
 
-            <!-- Panel: Resumen de Asistencia Anual -->
-            <div id="panelResumenAnual" class="panel-resumen-anual" style="display:none;">
-                <div class="resumen-anual-header">
-                    <div class="resumen-anual-titulo">
-                        <span class="resumen-anual-icono">📊</span>
-                        <div>
-                            <h3>Resumen de Asistencia Anual</h3>
-                            <p id="resumenAnualSubtitulo" class="resumen-anual-subtitulo">—</p>
-                        </div>
-                    </div>
-                    <button id="btnCerrarResumenAnual" class="btn-cerrar-resumen-anual" title="Cerrar resumen">✕</button>
-                </div>
-
-                <div id="resumenAnualContenido" class="resumen-anual-contenido">
-                    <div class="resumen-anual-cargando">
-                        <div class="resumen-spinner"></div>
-                        <span>Calculando resumen anual…</span>
-                    </div>
-                </div>
-            </div>
-
             <div class="tabla-scroll-container">
                 <div class="scroll-nav-buttons scroll-nav-left">
                     <button class="scroll-nav-btn" id="scrollLeftAsistencia">◀</button>
@@ -343,6 +322,35 @@
                     <table id="tablaAsistencia">
                         <thead id="tablaAsistenciaHead"></thead>
                         <tbody id="tablaAsistenciaBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Resumen Anual de Asistencia -->
+        <div id="vistaResumenAnual" class="vista-resumen-anual" style="display:none;">
+            <div class="tabla-header-con-boton resumen-anual-vista-header">
+                <div class="resumen-anual-vista-titulo">
+                    <h2>📊 Resumen Anual de Asistencia</h2>
+                    <p id="resumenAnualInfo" class="resumen-anual-info-texto">—</p>
+                </div>
+                <div class="botones-asistencia">
+                    <button id="btnVolverDesdeResumen" class="btn-volver-asistencia">
+                        ← Volver
+                    </button>
+                </div>
+            </div>
+
+            <div id="resumenAnualCargando" class="resumen-anual-loading">
+                <div class="resumen-spinner-grande"></div>
+                <span>Consultando datos de asistencia de todos los meses…</span>
+            </div>
+
+            <div id="resumenAnualTablaWrap" class="resumen-anual-tabla-wrap" style="display:none;">
+                <div class="resumen-anual-tabla-scroll">
+                    <table id="tablaResumenAnual" class="tabla-resumen-anual">
+                        <thead id="tablaResumenAnualHead"></thead>
+                        <tbody id="tablaResumenAnualBody"></tbody>
                     </table>
                 </div>
             </div>
