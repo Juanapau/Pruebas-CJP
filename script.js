@@ -2349,8 +2349,11 @@ function actualizarTotalesEstudiante(estudianteId) {
 }
 
 async function guardarAsistencia() {
-    if (asistenciaState.asistencias.length === 0) {
-        mostrarMensajeExito('Sin datos', 'No hay datos de asistencia para guardar.');
+    // Validar que haya un mes y módulo seleccionados, pero permitir guardar
+    // aunque el array esté vacío (el usuario pudo haber borrado todos los registros
+    // y necesita que el servidor los elimine de la base de datos).
+    if (!asistenciaState.mesSeleccionado || !asistenciaState.moduloSeleccionado || !asistenciaState.cursoSeleccionado) {
+        mostrarMensajeError('Sin selección', 'Seleccione un módulo, curso y mes antes de guardar.');
         return;
     }
     asistenciaElementos.btnGuardar.disabled = true;
@@ -2369,6 +2372,8 @@ async function guardarAsistencia() {
         const data = await response.json();
         if (data.success) {
             asistenciaElementos.btnGuardar.textContent = '✅ Guardado';
+            // FIX: limpiar indicador de cambios sin guardar al guardar exitosamente
+            ControlCambios.limpiar();
             mostrarMensajeExito('¡Asistencia Guardada!', 'El registro de asistencia se guardó exitosamente.');
             setTimeout(() => {
                 asistenciaElementos.btnGuardar.textContent = '💾 Guardar';
