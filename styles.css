@@ -1928,7 +1928,7 @@ body.dark-mode .btn-resumen-anual:hover {
 
 /* Encabezado */
 .tabla-resumen-anual thead tr {
-    background: #3949AB;
+    background: #2c3e50;
 }
 
 .tabla-resumen-anual th {
@@ -1954,7 +1954,7 @@ body.dark-mode .btn-resumen-anual:hover {
 }
 
 .tabla-resumen-anual th.col-promedio {
-    background: #283593;
+    background: #1a252f;
     min-width: 90px;
 }
 
@@ -2057,6 +2057,14 @@ body.dark-mode .tabla-resumen-anual td.col-promedio {
 
 body.dark-mode .tabla-resumen-anual tr.fila-promedio-grupal {
     background: rgba(100,160,220,0.10);
+}
+/* Encabezado — azul oscuro solo en modo claro */
+body:not(.dark-mode) .tabla-resumen-anual thead tr {
+    background: #3949AB;
+}
+
+body:not(.dark-mode) .tabla-resumen-anual th.col-promedio {
+    background: #283593;
 }
 
 @media (max-width: 768px) {
