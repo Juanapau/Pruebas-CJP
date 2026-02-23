@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="styles.css">
     <!-- PDF Export Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
@@ -135,6 +136,9 @@
                 <div class="tabla-header-con-boton">
                     <h2>Registro de Calificaciones - Módulos</h2>
                     <div class="btns-tabla-acciones">
+                        <button id="btnExportarExcelCalificaciones" class="btn-exportar-excel-cal">
+                            📊 Exportar Excel
+                        </button>
                         <button id="btnExportarPDF" class="btn-exportar-pdf" onclick="exportarReporteCalificaciones()">
                             📄 Exportar PDF
                         </button>
@@ -279,6 +283,37 @@
                     <label>📅 Mes</label>
                     <input type="month" id="selectMesAsistencia" />
                 </div>
+
+                <div class="filtro-compacto filtro-dias-semana">
+                    <label>📆 Días de clase</label>
+                    <div class="dias-semana-checks">
+                        <label class="dia-semana-check">
+                            <input type="checkbox" class="cb-dia-semana" value="1" id="diaLunes" checked>
+                            <span class="dia-semana-btn">L</span>
+                            <span class="dia-semana-abrev">Lun</span>
+                        </label>
+                        <label class="dia-semana-check">
+                            <input type="checkbox" class="cb-dia-semana" value="2" id="diaMartes" checked>
+                            <span class="dia-semana-btn">M</span>
+                            <span class="dia-semana-abrev">Mar</span>
+                        </label>
+                        <label class="dia-semana-check">
+                            <input type="checkbox" class="cb-dia-semana" value="3" id="diaMiercoles" checked>
+                            <span class="dia-semana-btn">M</span>
+                            <span class="dia-semana-abrev">Mié</span>
+                        </label>
+                        <label class="dia-semana-check">
+                            <input type="checkbox" class="cb-dia-semana" value="4" id="diaJueves" checked>
+                            <span class="dia-semana-btn">J</span>
+                            <span class="dia-semana-abrev">Jue</span>
+                        </label>
+                        <label class="dia-semana-check">
+                            <input type="checkbox" class="cb-dia-semana" value="5" id="diaViernes" checked>
+                            <span class="dia-semana-btn">V</span>
+                            <span class="dia-semana-abrev">Vie</span>
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <div class="leyenda-asistencia">
@@ -303,7 +338,7 @@
                         </div>
                     </div>
                     <div class="leyenda-nota">
-                        Nota: 3 excusas = 1 ausencia. Se requiere 70% de asistencia.
+                        Nota: 3 excusas = 1 ausencia. Se requiere 80% de asistencia.
                     </div>
                 </div>
                 
@@ -343,6 +378,9 @@
                 <div class="botones-asistencia">
                     <button id="btnVolverDesdeResumen" class="btn-volver-asistencia">
                         ← Volver
+                    </button>
+                    <button id="btnExportarExcelResumen" class="btn-exportar-excel-resumen">
+                        📊 Exportar Excel
                     </button>
                 </div>
             </div>
