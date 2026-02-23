@@ -317,6 +317,43 @@ body.dark-mode .btn-exportar-pdf-actividades:hover {
     background-color: #1B5E20;
 }
 
+/* Botón Exportar Excel — Calificaciones (verde) */
+.btn-exportar-excel-cal {
+    background-color: #43A047;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(67, 160, 71, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.btn-exportar-excel-cal:hover {
+    background-color: #388E3C;
+    box-shadow: 0 4px 10px rgba(67, 160, 71, 0.4);
+}
+
+.btn-exportar-excel-cal:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+body.dark-mode .btn-exportar-excel-cal {
+    background-color: #2E7D32;
+    box-shadow: 0 2px 6px rgba(46, 125, 50, 0.4);
+}
+
+body.dark-mode .btn-exportar-excel-cal:hover {
+    background-color: #1B5E20;
+}
+
 .btn-guardar {
     background-color: #42A5F5;
     color: white;
@@ -344,8 +381,10 @@ body.dark-mode .btn-exportar-pdf-actividades:hover {
 /* En móvil los botones dentro de btns-tabla-acciones nunca se apilan ni se estiran */
 .btns-tabla-acciones .btn-guardar,
 .btns-tabla-acciones .btn-exportar-pdf,
+.btns-tabla-acciones .btn-exportar-excel-cal,
 .botones-asistencia .btn-guardar,
 .botones-asistencia .btn-volver-asistencia,
+.botones-asistencia .btn-exportar-excel-resumen,
 .botones-actividades-grupo .btn-guardar,
 .botones-actividades-grupo .btn-exportar-pdf-actividades {
     width: auto !important;
@@ -2401,6 +2440,44 @@ body.dark-mode .filtro-tarjeta input[type="month"]:hover {
     box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);
 }
 
+/* Botón Exportar Excel — resumen anual */
+.btn-exportar-excel-resumen {
+    background-color: #1976D2;
+    color: white;
+    border: none;
+    padding: 0 24px;
+    align-self: stretch;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 6px rgba(25, 118, 210, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.btn-exportar-excel-resumen:hover {
+    background-color: #1565C0;
+    box-shadow: 0 4px 10px rgba(25, 118, 210, 0.4);
+}
+
+.btn-exportar-excel-resumen:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+body.dark-mode .btn-exportar-excel-resumen {
+    background-color: #1565C0;
+    box-shadow: 0 2px 6px rgba(21, 101, 192, 0.4);
+}
+
+body.dark-mode .btn-exportar-excel-resumen:hover {
+    background-color: #0D47A1;
+}
+
 /* ==========================================
    MENÚ LATERAL DESLIZANTE
    ========================================== */
@@ -3145,9 +3222,10 @@ body.dark-mode .filtros-actividades-compactos .filtro-compacto:nth-child(3) sele
 /* Contenedor de filtros de asistencia */
 .filtros-asistencia-compactos {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1.4fr 1fr auto;
     gap: 15px;
     margin-bottom: 20px;
+    align-items: end;
 }
 
 /* Orden correcto: Módulo (verde), Curso (azul), Mes (amarillo) */
@@ -3324,6 +3402,9 @@ body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(3) input
 @media (max-width: 768px) {
     .filtros-asistencia-compactos {
         grid-template-columns: 1fr;
+    }
+    .filtro-dias-semana {
+        flex: 1 1 100% !important;
     }
 }
 
@@ -4749,4 +4830,95 @@ body.dark-mode .mensaje-confirmacion {
 .input-dia-header::placeholder {
     color: #546E7A;
     font-size: 0.8rem;
+}
+
+
+/* ── Selector de días de la semana (asistencia) ─────────────────────────── */
+.filtro-dias-semana {
+    flex: 0 0 auto !important;
+    min-width: 0;
+}
+
+
+
+.dias-semana-checks {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.dia-semana-check {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.dia-semana-check input[type="checkbox"] {
+    display: none;
+}
+
+.dia-semana-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 2px solid var(--color-borde, #37474F);
+    background: rgba(255,255,255,0.05);
+    color: var(--color-texto-secundario, #78909C);
+    font-weight: 700;
+    font-size: 0.88rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.dia-semana-check input:checked + .dia-semana-btn {
+    background: #1565C0;
+    border-color: #42A5F5;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(66,165,245,0.35);
+}
+
+.dia-semana-abrev {
+    font-size: 0.68rem;
+    color: var(--color-texto-secundario, #78909C);
+    font-weight: 600;
+}
+
+.dia-semana-check input:checked ~ .dia-semana-abrev {
+    color: #64B5F6;
+}
+
+body:not(.dark-mode) .dia-semana-btn {
+    border-color: #B0BEC5;
+    background: rgba(0,0,0,0.04);
+    color: #78909C;
+}
+
+body:not(.dark-mode) .dia-semana-check input:checked + .dia-semana-btn {
+    background: #1565C0;
+    border-color: #1565C0;
+    color: #fff;
+}
+
+body:not(.dark-mode) .dia-semana-check input:checked ~ .dia-semana-abrev {
+    color: #1565C0;
+}
+
+@media (max-width: 768px) {
+    .filtro-dias-semana {
+        flex: 1 1 100% !important;
+    }
+    .dias-semana-checks {
+        gap: 6px;
+    }
+    .dia-semana-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 0.82rem;
+    }
 }
