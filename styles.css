@@ -3911,6 +3911,72 @@ body.dark-mode .filtros-asistencia-compactos .filtro-compacto:nth-child(3) input
 }
 
 /* ==========================================
+   HISTORIAL - ILUMINACIÓN HOVER FILTROS
+   ========================================== */
+
+/* Modo claro */
+/* Año escolar (Azul aqua - posición 1) */
+.historial-filtros .filtro-compacto:nth-child(1) select:hover {
+    background: linear-gradient(135deg, #B2EBF2 0%, #80DEEA 100%) !important;
+    border-color: #00ACC1 !important;
+    box-shadow: 0 0 15px rgba(77, 208, 225, 0.6), 0 4px 12px rgba(77, 208, 225, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Curso (Verde - posición 2) */
+.historial-filtros .filtro-compacto:nth-child(2) select:hover {
+    background: linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%) !important;
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 15px rgba(102, 187, 106, 0.6), 0 4px 12px rgba(102, 187, 106, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Módulo (Amarillo - posición 3) */
+.historial-filtros .filtro-compacto:nth-child(3) select:hover {
+    background: linear-gradient(135deg, #FFECB3 0%, #FFE082 100%) !important;
+    border-color: #FFC107 !important;
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6), 0 4px 12px rgba(255, 193, 7, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Modo oscuro */
+/* Año escolar (Azul aqua - posición 1) */
+body.dark-mode .historial-filtros .filtro-compacto:nth-child(1) select:hover {
+    background: linear-gradient(135deg, #266A77 0%, #34808E 100%) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%2380DEEA' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    border-color: #26C6DA !important;
+    box-shadow: 0 0 20px rgba(77, 208, 225, 0.5), 0 4px 12px rgba(77, 208, 225, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Curso (Verde - posición 2) */
+body.dark-mode .historial-filtros .filtro-compacto:nth-child(2) select:hover {
+    background: linear-gradient(135deg, #3a6647 0%, #478056 100%) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23A5D6A7' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    border-color: #4CAF50 !important;
+    box-shadow: 0 0 20px rgba(102, 187, 106, 0.5), 0 4px 12px rgba(102, 187, 106, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Módulo (Amarillo - posición 3) */
+body.dark-mode .historial-filtros .filtro-compacto:nth-child(3) select:hover {
+    background: linear-gradient(135deg, #6B5B42 0%, #7A6A51 100%) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23FFE082' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 15px center !important;
+    background-size: 14px !important;
+    border-color: #FFC107 !important;
+    box-shadow: 0 0 20px rgba(255, 193, 7, 0.5), 0 4px 12px rgba(255, 193, 7, 0.3) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* ==========================================
    TOOLTIPS DE DESCRIPCIONES DE ACTIVIDADES
    ========================================== */
 
