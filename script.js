@@ -2922,6 +2922,7 @@ function irARegistroCalificaciones() {
     elementos.vistaRegistro.style.display = 'block';
     elementos.vistaActividades.style.display = 'none';
     asistenciaElementos.vistaAsistencia.style.display = 'none';
+    document.getElementById('vistaHistorial').style.display = 'none';
     elementos.selectRA.value = '';
 }
 
@@ -2929,6 +2930,7 @@ function irARegistroActividades() {
     elementos.vistaRegistro.style.display = 'none';
     elementos.vistaActividades.style.display = 'block';
     asistenciaElementos.vistaAsistencia.style.display = 'none';
+    document.getElementById('vistaHistorial').style.display = 'none';
     
     // Si no hay RA seleccionado, inicializar filtros independientes
     if (!state.raSeleccionado) {
@@ -2937,6 +2939,7 @@ function irARegistroActividades() {
 }
 
 function irARegistroAsistencia() {
+    document.getElementById('vistaHistorial').style.display = 'none';
     mostrarVistaAsistencia();
 }
 
