@@ -382,7 +382,10 @@ function inicializarEventos() {
     elementos.btnGuardarActividades.addEventListener('click', guardarTodasLasActividades);
     document.getElementById('btnExportarPDFActividades').addEventListener('click', exportarReporteActividades);
     document.getElementById('btnExportarExcelCalificaciones').addEventListener('click', exportarExcelCalificaciones);
-    document.getElementById('menuHistorial').addEventListener('click', abrirHistorial);
+    document.getElementById('menuHistorial').addEventListener('click', () => {
+        abrirHistorial();
+        cerrarMenu();
+    });
     document.getElementById('btnVolverHistorial').addEventListener('click', cerrarHistorial);
     
     // Modo oscuro
