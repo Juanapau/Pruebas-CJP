@@ -3953,6 +3953,9 @@ function calcularNotaFinal() {
     
     modalEvalElementos.puntosObtenidos.textContent = puntosObtenidos.toFixed(1);
     modalEvalElementos.notaFinal.textContent = notaFinal.toFixed(2);
+
+    // Marcar cambios pendientes cada vez que el docente modifica la evaluación
+    ControlCambios.marcarCambio();
 }
 
 function cerrarModalEvaluacion() {
@@ -4055,6 +4058,7 @@ async function guardarEvaluacion() {
         }
         
         cerrarModalEvaluacion();
+        ControlCambios.limpiar();
         
         // Mostrar mensaje elegante
         mostrarMensajeExito('¡Evaluación Guardada!', `Calificación registrada: ${notaFinalRedondeada} pts`);
