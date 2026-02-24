@@ -4929,7 +4929,7 @@ body:not(.dark-mode) .dia-semana-check input:checked ~ .dia-semana-abrev {
    ══════════════════════════════════════════════════════════════════════════ */
 
 .vista-historial {
-    padding: 0 0 40px 0;
+    padding: 0 32px 40px 32px;
 }
 
 /* ── Header ── */
@@ -4981,6 +4981,22 @@ body:not(.dark-mode) .dia-semana-check input:checked ~ .dia-semana-abrev {
     background: var(--color-superficie);
     border-radius: 12px;
     padding: 16px 20px;
+}
+
+.historial-filtros .filtro-compacto select {
+    border: 2px solid transparent !important;
+    background-color: rgba(255,255,255,0.08) !important;
+    color: var(--color-texto) !important;
+}
+
+.historial-filtros .filtro-compacto select:focus {
+    border-color: #42A5F5 !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+body:not(.dark-mode) .historial-filtros .filtro-compacto select {
+    background-color: rgba(0,0,0,0.04) !important;
 }
 
 /* ── Pestañas ── */
@@ -5143,8 +5159,8 @@ body:not(.dark-mode) .dia-semana-check input:checked ~ .dia-semana-abrev {
 }
 
 .historial-tabla th {
-    background: #1E3A6E;
-    color: #fff;
+    background-color: var(--color-header-principal);
+    color: var(--color-texto);
     padding: 9px 12px;
     text-align: center;
     font-weight: 700;
@@ -5158,7 +5174,7 @@ body:not(.dark-mode) .dia-semana-check input:checked ~ .dia-semana-abrev {
 }
 
 .historial-tabla th.col-total-h {
-    background: #142F78;
+    background-color: var(--color-header-ra);
 }
 
 .historial-tabla td {
@@ -5207,8 +5223,7 @@ body:not(.dark-mode) .dia-semana-check input:checked ~ .dia-semana-abrev {
 }
 
 /* Modo claro */
-body:not(.dark-mode) .historial-tabla th { background: #1E5AA0; }
-body:not(.dark-mode) .historial-tabla th.col-total-h { background: #0D3578; }
+/* colores de th en historial ahora usan var(--color-header-principal) */
 body:not(.dark-mode) .historial-tabla tr:nth-child(even) td { background: #F5F7FF; }
 body:not(.dark-mode) .historial-tabla td.h-apro  { background: #E8F5E9; color: #1B5E20; }
 body:not(.dark-mode) .historial-tabla td.h-repr  { background: #FFEBEE; color: #B71C1C; }
