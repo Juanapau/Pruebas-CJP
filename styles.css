@@ -4976,27 +4976,20 @@ body:not(.dark-mode) .dia-semana-check input:checked ~ .dia-semana-abrev {
 .historial-filtros {
     display: grid;
     grid-template-columns: 1fr 1fr 1.4fr;
-    gap: 15px;
+    gap: 12px;
     margin-bottom: 20px;
-    background: var(--color-superficie);
-    border-radius: 12px;
-    padding: 16px 20px;
+    padding-top: 15px;
+    border-top: 1px solid #E0E0E0;
 }
 
-.historial-filtros .filtro-compacto select {
-    border: 2px solid transparent !important;
-    background-color: rgba(255,255,255,0.08) !important;
-    color: var(--color-texto) !important;
+body.dark-mode .historial-filtros {
+    border-top-color: #444;
 }
 
-.historial-filtros .filtro-compacto select:focus {
-    border-color: #42A5F5 !important;
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-body:not(.dark-mode) .historial-filtros .filtro-compacto select {
-    background-color: rgba(0,0,0,0.04) !important;
+@media (max-width: 768px) {
+    .historial-filtros {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ── Pestañas ── */
