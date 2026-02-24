@@ -85,6 +85,10 @@
                     <span class="menu-icono">📋</span>
                     <span class="menu-texto">Registro de Asistencia</span>
                 </button>
+                <button id="menuHistorial" class="menu-item">
+                    <span class="menu-icono">🕓</span>
+                    <span class="menu-texto">Historial</span>
+                </button>
             </div>
 
             <!-- Footer del menú -->
@@ -338,7 +342,7 @@
                         </div>
                     </div>
                     <div class="leyenda-nota">
-                        Nota: 3 excusas = 1 ausencia. Se requiere 80% de asistencia.
+                        Nota: 3 excusas = 1 ausencia. Se requiere 70% de asistencia.
                     </div>
                 </div>
                 
@@ -608,6 +612,118 @@
                     💾 Guardar Evaluación
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- ── VISTA HISTORIAL ─────────────────────────────────────────────── -->
+    <div id="vistaHistorial" class="vista-historial" style="display:none;">
+
+        <!-- Header -->
+        <div class="historial-header">
+            <div class="historial-titulo">
+                <h2>🕓 Historial</h2>
+                <p class="historial-subtitulo">Consulta registros de años escolares anteriores</p>
+            </div>
+            <button id="btnVolverHistorial" class="btn-volver-historial">← Volver</button>
+        </div>
+
+        <!-- Filtros -->
+        <div class="historial-filtros">
+            <div class="filtro-compacto">
+                <label>📅 Año escolar</label>
+                <select id="historialSelectAnio">
+                    <option value="">Seleccione un año</option>
+                </select>
+            </div>
+            <div class="filtro-compacto">
+                <label>🎓 Curso</label>
+                <select id="historialSelectCurso">
+                    <option value="">Seleccione un curso</option>
+                    <option value="4toA">4toA</option>
+                    <option value="4toB">4toB</option>
+                    <option value="5toB">5toB</option>
+                    <option value="6toB">6toB</option>
+                </select>
+            </div>
+            <div class="filtro-compacto">
+                <label>📚 Módulo</label>
+                <select id="historialSelectModulo">
+                    <option value="">Seleccione un módulo</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Pestañas -->
+        <div class="historial-tabs">
+            <button class="historial-tab activo" data-tab="calificaciones">📝 Calificaciones</button>
+            <button class="historial-tab" data-tab="actividades">📊 Actividades</button>
+            <button class="historial-tab" data-tab="asistencia">📋 Asistencia</button>
+        </div>
+
+        <!-- Contenido pestañas -->
+        <div id="historialContenido" class="historial-contenido">
+
+            <!-- Estado vacío inicial -->
+            <div id="historialVacio" class="historial-vacio">
+                <div class="historial-vacio-ico">🕓</div>
+                <p>Selecciona un año escolar, curso y módulo para consultar el historial.</p>
+            </div>
+
+            <!-- Cargando -->
+            <div id="historialCargando" class="historial-cargando" style="display:none;">
+                <div class="spinner-historial"></div>
+                <p>Cargando datos...</p>
+            </div>
+
+            <!-- Panel Calificaciones -->
+            <div id="historialPanelCalificaciones" class="historial-panel" style="display:none;">
+                <div class="historial-panel-header">
+                    <span id="historialCalifInfo" class="historial-panel-info"></span>
+                    <button id="historialBtnExcelCalif" class="btn-historial-excel">📊 Exportar Excel</button>
+                </div>
+                <div class="historial-tabla-scroll">
+                    <table id="historialTablaCalif" class="historial-tabla">
+                        <thead id="historialTablaCalifHead"></thead>
+                        <tbody id="historialTablaCalifBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel Actividades -->
+            <div id="historialPanelActividades" class="historial-panel" style="display:none;">
+                <div class="historial-panel-header">
+                    <span id="historialActInfo" class="historial-panel-info"></span>
+                    <button id="historialBtnExcelAct" class="btn-historial-excel">📊 Exportar Excel</button>
+                </div>
+                <!-- Sub-selector de RA -->
+                <div class="historial-subfilter">
+                    <label>RA:</label>
+                    <select id="historialSelectRA">
+                        <option value="">Todos los RAs</option>
+                    </select>
+                </div>
+                <div class="historial-tabla-scroll">
+                    <table id="historialTablaAct" class="historial-tabla">
+                        <thead id="historialTablaActHead"></thead>
+                        <tbody id="historialTablaActBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel Asistencia -->
+            <div id="historialPanelAsistencia" class="historial-panel" style="display:none;">
+                <div class="historial-panel-header">
+                    <span id="historialAsistInfo" class="historial-panel-info"></span>
+                    <button id="historialBtnExcelAsist" class="btn-historial-excel">📊 Exportar Excel</button>
+                </div>
+                <div class="historial-tabla-scroll">
+                    <table id="historialTablaAsist" class="historial-tabla">
+                        <thead id="historialTablaAsistHead"></thead>
+                        <tbody id="historialTablaAsistBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
         </div>
     </div>
 
