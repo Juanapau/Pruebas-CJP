@@ -5319,6 +5319,23 @@ function abrirHistorial() {
     document.getElementById('vistaActividades').style.display = 'none';
     document.getElementById('vistaAsistencia').style.display = 'none';
     document.getElementById('vistaHistorial').style.display = 'block';
+
+    // Resetear estado e interfaz completamente
+    historialState.anioSeleccionado  = null;
+    historialState.cursoSeleccionado = null;
+    historialState.moduloSeleccionado = null;
+    historialState.tabActiva = 'calificaciones';
+
+    // Limpiar selects dependientes
+    document.getElementById('historialSelectCurso').value = '';
+    document.getElementById('historialSelectModulo').innerHTML = '<option value="">Seleccione un módulo</option>';
+    document.getElementById('historialSelectRA').innerHTML = '<option value="">Todos los RAs</option>';
+
+    // Resetear tab activa visualmente
+    document.querySelectorAll('.historial-tab').forEach(t => t.classList.remove('activo'));
+    document.querySelector('.historial-tab[data-tab="calificaciones"]').classList.add('activo');
+
+    mostrarEstadoHistorial('vacio');
     poblarSelectAnios();
     inicializarTabsHistorial();
     inicializarFiltrosHistorial();
@@ -5350,7 +5367,11 @@ function poblarSelectAnios() {
 
 // ── Inicializar filtros ───────────────────────────────────────────────────────
 
+let _historialListenersInit = false;
+
 function inicializarFiltrosHistorial() {
+    if (_historialListenersInit) return;
+    _historialListenersInit = true;
     document.getElementById('historialSelectAnio').addEventListener('change', onHistorialFiltroChange);
     document.getElementById('historialSelectCurso').addEventListener('change', onHistorialCursoChange);
     document.getElementById('historialSelectModulo').addEventListener('change', onHistorialModuloChange);
@@ -5361,6 +5382,7 @@ function inicializarFiltrosHistorial() {
 }
 
 function inicializarTabsHistorial() {
+    if (_historialListenersInit) return;
     document.querySelectorAll('.historial-tab').forEach(tab => {
         tab.addEventListener('click', function() {
             document.querySelectorAll('.historial-tab').forEach(t => t.classList.remove('activo'));
@@ -5527,25 +5549,26 @@ function renderHistorialCalificaciones() {
         return;
     }
 
-    // Encabezado — fila 1: # | Nombre | RA.codigo (x3) | Total
+    // Encabezado
+    // Fila 1: # | Nombre | RA (colspan 3, con Valor y Mín como subtítulo) | Total
+    // Fila 2: vacío | vacío | Op.1 | Op.2 | Op.3  (sin valores, ya están arriba)
     let thead = '<tr>';
-    thead += '<th style="width:40px">#</th>';
-    thead += '<th class="col-nombre-h">Nombre</th>';
+    thead += '<th rowspan="2" style="width:40px">#</th>';
+    thead += '<th class="col-nombre-h" rowspan="2">Nombre</th>';
     ras.forEach(ra => {
-        thead += `<th colspan="3">${ra.codigo}</th>`;
+        const min = Math.round((ra.valorTotal || 0) * 0.7);
+        thead += `<th colspan="3">${ra.codigo}<br><span style="font-weight:400;font-size:0.72rem;opacity:0.85">Val:${ra.valorTotal||0} · Mín:${min}</span></th>`;
     });
-    thead += '<th class="col-total-h">Total</th>';
+    thead += '<th class="col-total-h" rowspan="2">Total</th>';
     thead += '</tr>';
     // Fila 2: Op.1 Op.2 Op.3 por cada RA
     thead += '<tr>';
-    thead += '<th></th><th></th>';
-    ras.forEach(ra => {
-        const min = Math.round((ra.valorTotal || 0) * 0.7);
-        thead += `<th style="font-size:0.75rem;background:#16305C">Op.1</th>`;
-        thead += `<th style="font-size:0.75rem;background:#16305C">Op.2<br><span style="font-weight:400;opacity:.7">Val:${ra.valorTotal||0}</span></th>`;
-        thead += `<th style="font-size:0.75rem;background:#253A5E">Op.3<br><span style="font-weight:400;opacity:.7">Mín:${min}</span></th>`;
+    ras.forEach(() => {
+        thead += `<th style="font-size:0.75rem">Op.1</th>`;
+        thead += `<th style="font-size:0.75rem">Op.2</th>`;
+        thead += `<th style="font-size:0.75rem">Op.3</th>`;
     });
-    thead += '<th></th></tr>';
+    thead += '</tr>';
     document.getElementById('historialTablaCalifHead').innerHTML = thead;
 
     // Cuerpo
