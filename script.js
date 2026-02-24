@@ -382,6 +382,8 @@ function inicializarEventos() {
     elementos.btnGuardarActividades.addEventListener('click', guardarTodasLasActividades);
     document.getElementById('btnExportarPDFActividades').addEventListener('click', exportarReporteActividades);
     document.getElementById('btnExportarExcelCalificaciones').addEventListener('click', exportarExcelCalificaciones);
+    document.getElementById('menuHistorial').addEventListener('click', abrirHistorial);
+    document.getElementById('btnVolverHistorial').addEventListener('click', cerrarHistorial);
     
     // Modo oscuro
     const btnModoOscuro = document.getElementById('btnModoOscuro');
@@ -1325,6 +1327,7 @@ async function guardarTodasLasActividades() {
                 method: 'POST',
                 body: JSON.stringify({
                     action: 'guardarTodasActividades',
+                    anioEscolar: calcularAnioEscolar(),
                     actividades: actividadesAGuardar
                 })
             });
@@ -1372,6 +1375,7 @@ async function guardarTodasLasActividades() {
                 method: 'POST',
                 body: JSON.stringify({
                     action: 'guardarTodoRegistro',
+                    anioEscolar: calcularAnioEscolar(),
                     calificaciones: calificacionesAGuardar
                 })
             });
@@ -1466,7 +1470,8 @@ async function guardarTodoElRegistro() {
                 method: 'POST',
                 body: JSON.stringify({
                     action: 'guardarTodoRegistro',
-                    moduloId: state.moduloSeleccionado,  // Agregar moduloId para calcular totales
+                    moduloId: state.moduloSeleccionado,
+                    anioEscolar: calcularAnioEscolar(),
                     calificaciones: calificacionesAGuardar
                 })
             });
@@ -2007,6 +2012,13 @@ const asistenciaElementos = {
 };
 
 
+
+// ── Año escolar actual ────────────────────────────────────────────────────────
+function calcularAnioEscolar() {
+    const hoy = new Date();
+    const a = hoy.getFullYear();
+    return hoy.getMonth() >= 8 ? `${a}-${a+1}` : `${a-1}-${a}`;
+}
 // ── Persistencia de días de clase en localStorage ────────────────────────────
 function guardarDiasSemanaLocal(moduloId, dias) {
     if (!moduloId) return;
@@ -5283,3 +5295,568 @@ style.textContent = `
 document.head.appendChild(style);
 
 console.log('🚀 PWA inicializado - Estado de conexión:', isOnline ? 'Online' : 'Offline');
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MÓDULO HISTORIAL
+// ══════════════════════════════════════════════════════════════════════════════
+
+const historialState = {
+    anioSeleccionado: null,
+    cursoSeleccionado: null,
+    moduloSeleccionado: null,
+    tabActiva: 'calificaciones',
+    ras: [],
+    estudiantes: [],
+    calificaciones: [],
+    actividades: [],
+    asistencia: []
+};
+
+// ── Navegación ────────────────────────────────────────────────────────────────
+
+function abrirHistorial() {
+    document.getElementById('vistaRegistro').style.display = 'none';
+    document.getElementById('vistaActividades').style.display = 'none';
+    document.getElementById('vistaAsistencia').style.display = 'none';
+    document.getElementById('vistaHistorial').style.display = 'block';
+    poblarSelectAnios();
+    inicializarTabsHistorial();
+    inicializarFiltrosHistorial();
+}
+
+function cerrarHistorial() {
+    document.getElementById('vistaHistorial').style.display = 'none';
+    document.getElementById('vistaRegistro').style.display = 'block';
+}
+
+// ── Años escolares disponibles ────────────────────────────────────────────────
+
+function poblarSelectAnios() {
+    const sel = document.getElementById('historialSelectAnio');
+    sel.innerHTML = '<option value="">Seleccione un año</option>';
+    // Año actual y los 5 anteriores
+    const hoy = new Date();
+    const anioBase = hoy.getMonth() >= 8 ? hoy.getFullYear() : hoy.getFullYear() - 1;
+    for (let i = 0; i <= 5; i++) {
+        const a = anioBase - i;
+        const label = `${a}-${a+1}`;
+        const opt = document.createElement('option');
+        opt.value = label;
+        opt.textContent = label;
+        if (i === 0) opt.textContent += ' (actual)';
+        sel.appendChild(opt);
+    }
+}
+
+// ── Inicializar filtros ───────────────────────────────────────────────────────
+
+function inicializarFiltrosHistorial() {
+    document.getElementById('historialSelectAnio').addEventListener('change', onHistorialFiltroChange);
+    document.getElementById('historialSelectCurso').addEventListener('change', onHistorialCursoChange);
+    document.getElementById('historialSelectModulo').addEventListener('change', onHistorialModuloChange);
+    document.getElementById('historialSelectRA').addEventListener('change', () => renderHistorialActividades());
+    document.getElementById('historialBtnExcelCalif').addEventListener('click', exportarExcelHistorialCalif);
+    document.getElementById('historialBtnExcelAct').addEventListener('click', exportarExcelHistorialAct);
+    document.getElementById('historialBtnExcelAsist').addEventListener('click', exportarExcelHistorialAsist);
+}
+
+function inicializarTabsHistorial() {
+    document.querySelectorAll('.historial-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            document.querySelectorAll('.historial-tab').forEach(t => t.classList.remove('activo'));
+            this.classList.add('activo');
+            historialState.tabActiva = this.dataset.tab;
+            renderHistorialTab();
+        });
+    });
+}
+
+// ── Cambio de filtros ─────────────────────────────────────────────────────────
+
+function onHistorialFiltroChange() {
+    historialState.anioSeleccionado = document.getElementById('historialSelectAnio').value;
+    resetHistorialDatos();
+}
+
+async function onHistorialCursoChange() {
+    const curso = document.getElementById('historialSelectCurso').value;
+    historialState.cursoSeleccionado = curso;
+    historialState.moduloSeleccionado = null;
+    resetHistorialDatos();
+
+    const selModulo = document.getElementById('historialSelectModulo');
+    selModulo.innerHTML = '<option value="">Seleccione un módulo</option>';
+    if (!curso) return;
+
+    try {
+        const resp = await fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getModulos`);
+        const data = await resp.json();
+        (data.modulos || [])
+            .filter(m => m.curso === curso)
+            .forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.id;
+                opt.textContent = m.nombre;
+                selModulo.appendChild(opt);
+            });
+    } catch(e) {
+        console.error('Error cargando módulos historial:', e);
+    }
+}
+
+async function onHistorialModuloChange() {
+    const moduloId = document.getElementById('historialSelectModulo').value;
+    historialState.moduloSeleccionado = moduloId;
+    resetHistorialDatos();
+    if (!moduloId || !historialState.anioSeleccionado || !historialState.cursoSeleccionado) return;
+    await cargarDatosHistorial();
+}
+
+function resetHistorialDatos() {
+    historialState.ras = [];
+    historialState.estudiantes = [];
+    historialState.calificaciones = [];
+    historialState.actividades = [];
+    historialState.asistencia = [];
+    mostrarEstadoHistorial('vacio');
+}
+
+// ── Carga de datos ────────────────────────────────────────────────────────────
+
+async function cargarDatosHistorial() {
+    if (!historialState.anioSeleccionado || !historialState.cursoSeleccionado || !historialState.moduloSeleccionado) return;
+    mostrarEstadoHistorial('cargando');
+
+    const { anioSeleccionado: anio, cursoSeleccionado: curso, moduloSeleccionado: moduloId } = historialState;
+
+    try {
+        // Carga paralela: RAs, estudiantes, calificaciones, actividades
+        const [dataRAs, dataEst, dataCal, dataAct] = await Promise.all([
+            fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getRAs&moduloId=${moduloId}`).then(r => r.json()),
+            fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getEstudiantes&curso=${curso}`).then(r => r.json()),
+            fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getCalificacionesHistorial&moduloId=${moduloId}&anioEscolar=${encodeURIComponent(anio)}`).then(r => r.json()),
+            fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getActividadesHistorial&moduloId=${moduloId}&anioEscolar=${encodeURIComponent(anio)}`).then(r => r.json())
+        ]);
+
+        historialState.ras         = dataRAs.ras || [];
+        historialState.estudiantes = dataEst.estudiantes || [];
+        historialState.calificaciones = dataCal.calificaciones || [];
+        historialState.actividades    = dataAct.actividades || [];
+
+        // Asistencia: reutiliza resumen anual existente
+        const asistencia = await cargarAsistenciaHistorial(moduloId, curso, anio);
+        historialState.asistencia = asistencia;
+
+        // Poblar select de RAs en pestaña actividades
+        const selRA = document.getElementById('historialSelectRA');
+        selRA.innerHTML = '<option value="">Todos los RAs</option>';
+        historialState.ras.forEach(ra => {
+            const opt = document.createElement('option');
+            opt.value = ra.id;
+            opt.textContent = `${ra.codigo} — ${ra.descripcion || ra.nombre}`;
+            selRA.appendChild(opt);
+        });
+
+        mostrarEstadoHistorial('datos');
+        renderHistorialTab();
+
+    } catch(e) {
+        console.error('Error cargando historial:', e);
+        mostrarEstadoHistorial('vacio');
+    }
+}
+
+async function cargarAsistenciaHistorial(moduloId, curso, anioEscolar) {
+    // Calcula los meses del año escolar (sep → ago)
+    const [y1, y2] = anioEscolar.split('-').map(Number);
+    const meses = [];
+    for (let m = 8; m <= 11; m++) meses.push(`${y1}-${String(m+1).padStart(2,'0')}`);
+    for (let m = 0; m <= 7;  m++) meses.push(`${y2}-${String(m+1).padStart(2,'0')}`);
+
+    const resultados = await Promise.all(
+        meses.map(mes =>
+            fetchConTimeout(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getAsistencias&moduloId=${moduloId}&curso=${curso}&mes=${mes}`)
+                .then(r => r.json())
+                .then(d => ({ mes, asistencias: d.asistencias || [] }))
+                .catch(() => ({ mes, asistencias: [] }))
+        )
+    );
+    return resultados.filter(r => r.asistencias.length > 0);
+}
+
+// ── Estado visual ─────────────────────────────────────────────────────────────
+
+function mostrarEstadoHistorial(estado) {
+    document.getElementById('historialVacio').style.display     = estado === 'vacio'    ? 'flex'  : 'none';
+    document.getElementById('historialCargando').style.display  = estado === 'cargando' ? 'flex'  : 'none';
+    document.getElementById('historialPanelCalificaciones').style.display = estado === 'datos' && historialState.tabActiva === 'calificaciones' ? 'block' : 'none';
+    document.getElementById('historialPanelActividades').style.display    = estado === 'datos' && historialState.tabActiva === 'actividades'    ? 'block' : 'none';
+    document.getElementById('historialPanelAsistencia').style.display     = estado === 'datos' && historialState.tabActiva === 'asistencia'      ? 'block' : 'none';
+}
+
+function renderHistorialTab() {
+    document.getElementById('historialPanelCalificaciones').style.display = 'none';
+    document.getElementById('historialPanelActividades').style.display    = 'none';
+    document.getElementById('historialPanelAsistencia').style.display     = 'none';
+
+    if (historialState.tabActiva === 'calificaciones') {
+        document.getElementById('historialPanelCalificaciones').style.display = 'block';
+        renderHistorialCalificaciones();
+    } else if (historialState.tabActiva === 'actividades') {
+        document.getElementById('historialPanelActividades').style.display = 'block';
+        renderHistorialActividades();
+    } else {
+        document.getElementById('historialPanelAsistencia').style.display = 'block';
+        renderHistorialAsistencia();
+    }
+}
+
+// ── Render Calificaciones ─────────────────────────────────────────────────────
+
+function renderHistorialCalificaciones() {
+    const { ras, estudiantes, calificaciones, anioSeleccionado, moduloSeleccionado } = historialState;
+    const moduloNombre = document.getElementById('historialSelectModulo').selectedOptions[0]?.text || '';
+
+    document.getElementById('historialCalifInfo').textContent =
+        `${moduloNombre} · ${historialState.cursoSeleccionado} · ${anioSeleccionado} · ${estudiantes.length} estudiantes`;
+
+    if (!ras.length || !estudiantes.length) {
+        document.getElementById('historialTablaCalifHead').innerHTML = '';
+        document.getElementById('historialTablaCalifBody').innerHTML =
+            '<tr><td colspan="99" style="text-align:center;padding:30px;color:var(--color-texto-secundario)">No hay calificaciones registradas para este período.</td></tr>';
+        return;
+    }
+
+    // Encabezado — fila 1: # | Nombre | RA.codigo (x3) | Total
+    let thead = '<tr>';
+    thead += '<th style="width:40px">#</th>';
+    thead += '<th class="col-nombre-h">Nombre</th>';
+    ras.forEach(ra => {
+        thead += `<th colspan="3">${ra.codigo}</th>`;
+    });
+    thead += '<th class="col-total-h">Total</th>';
+    thead += '</tr>';
+    // Fila 2: Op.1 Op.2 Op.3 por cada RA
+    thead += '<tr>';
+    thead += '<th></th><th></th>';
+    ras.forEach(ra => {
+        const min = Math.round((ra.valorTotal || 0) * 0.7);
+        thead += `<th style="font-size:0.75rem;background:#16305C">Op.1</th>`;
+        thead += `<th style="font-size:0.75rem;background:#16305C">Op.2<br><span style="font-weight:400;opacity:.7">Val:${ra.valorTotal||0}</span></th>`;
+        thead += `<th style="font-size:0.75rem;background:#253A5E">Op.3<br><span style="font-weight:400;opacity:.7">Mín:${min}</span></th>`;
+    });
+    thead += '<th></th></tr>';
+    document.getElementById('historialTablaCalifHead').innerHTML = thead;
+
+    // Cuerpo
+    let tbody = '';
+    const totalesPorRA = {};
+    ras.forEach(ra => totalesPorRA[ra.id] = []);
+
+    estudiantes.forEach((est, idx) => {
+        let total = 0;
+        let row = `<tr>`;
+        row += `<td class="td-num">${idx+1}</td>`;
+        row += `<td class="td-nombre">${est.nombre}</td>`;
+
+        ras.forEach(ra => {
+            const min = Math.round((ra.valorTotal || 0) * 0.7);
+            const cal = calificaciones.find(c => String(c.estudianteId) === String(est.id) && String(c.raId) === String(ra.id));
+            const v1 = cal?.op1 ?? '';
+            const v2 = cal?.op2 ?? '';
+            const v3 = cal?.op3 ?? '';
+            const vFinal = v3 !== '' && v3 !== null ? Number(v3) : v2 !== '' && v2 !== null ? Number(v2) : v1 !== '' && v1 !== null ? Number(v1) : 0;
+            total += vFinal;
+            totalesPorRA[ra.id].push(vFinal);
+
+            const cls = (v) => v === '' || v === null ? 'h-vacio' : Number(v) >= min ? 'h-apro' : 'h-repr';
+            row += `<td class="${cls(v1)}">${v1 !== '' && v1 !== null ? v1 : '—'}</td>`;
+            row += `<td class="${cls(v2)}">${v2 !== '' && v2 !== null ? v2 : '—'}</td>`;
+            row += `<td class="${cls(v3)}">${v3 !== '' && v3 !== null ? v3 : '—'}</td>`;
+        });
+
+        const totalPosible = ras.reduce((s, ra) => s + (ra.valorTotal || 0), 0);
+        const apro = totalPosible > 0 && total >= totalPosible * 0.7;
+        row += `<td class="${apro ? 'h-total-apro' : 'h-total-repr'}">${total}</td>`;
+        row += '</tr>';
+        tbody += row;
+    });
+
+    // Fila promedio grupo
+    let filaGrupo = '<tr class="fila-grupo-h"><td></td><td class="td-nombre">Promedio del grupo</td>';
+    let sumaGrupo = 0;
+    ras.forEach(ra => {
+        const vals = totalesPorRA[ra.id].filter(v => v > 0);
+        const prom = vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(1) : '—';
+        filaGrupo += `<td colspan="3">${prom}</td>`;
+        if (prom !== '—') sumaGrupo += parseFloat(prom);
+    });
+    const promTotal = ras.length ? (sumaGrupo / ras.length).toFixed(1) : '—';
+    filaGrupo += `<td>${promTotal}</td></tr>`;
+    tbody += filaGrupo;
+
+    document.getElementById('historialTablaCalifBody').innerHTML = tbody;
+}
+
+// ── Render Actividades ────────────────────────────────────────────────────────
+
+function renderHistorialActividades() {
+    const { ras, estudiantes, actividades, anioSeleccionado } = historialState;
+    const raFiltro = document.getElementById('historialSelectRA').value;
+    const rasFiltradas = raFiltro ? ras.filter(ra => String(ra.id) === String(raFiltro)) : ras;
+    const moduloNombre = document.getElementById('historialSelectModulo').selectedOptions[0]?.text || '';
+
+    document.getElementById('historialActInfo').textContent =
+        `${moduloNombre} · ${historialState.cursoSeleccionado} · ${anioSeleccionado}`;
+
+    if (!rasFiltradas.length || !estudiantes.length) {
+        document.getElementById('historialTablaActHead').innerHTML = '';
+        document.getElementById('historialTablaActBody').innerHTML =
+            '<tr><td colspan="99" style="text-align:center;padding:30px;color:var(--color-texto-secundario)">No hay actividades registradas para este período.</td></tr>';
+        return;
+    }
+
+    // Calcular número máximo de actividades por RA
+    const maxActsPorRA = {};
+    rasFiltradas.forEach(ra => {
+        const acts = actividades.filter(a => String(a.raId) === String(ra.id));
+        const nums = acts.map(a => Number(a.numero));
+        maxActsPorRA[ra.id] = nums.length ? Math.max(...nums) : 0;
+    });
+
+    // Encabezado
+    let thead = '<tr><th style="width:40px">#</th><th class="col-nombre-h">Nombre</th>';
+    rasFiltradas.forEach(ra => {
+        const n = maxActsPorRA[ra.id];
+        if (n > 0) thead += `<th colspan="${n}">${ra.codigo}</th>`;
+    });
+    thead += '<th class="col-total-h">Total</th></tr>';
+    thead += '<tr><th></th><th></th>';
+    rasFiltradas.forEach(ra => {
+        for (let i = 1; i <= maxActsPorRA[ra.id]; i++) {
+            thead += `<th style="font-size:0.75rem;background:#16305C">Ac.${i}</th>`;
+        }
+    });
+    thead += '<th></th></tr>';
+    document.getElementById('historialTablaActHead').innerHTML = thead;
+
+    // Cuerpo
+    let tbody = '';
+    estudiantes.forEach((est, idx) => {
+        let total = 0;
+        let row = `<tr><td class="td-num">${idx+1}</td><td class="td-nombre">${est.nombre}</td>`;
+        rasFiltradas.forEach(ra => {
+            for (let i = 1; i <= maxActsPorRA[ra.id]; i++) {
+                const act = actividades.find(a =>
+                    String(a.raId) === String(ra.id) &&
+                    String(a.estudianteId) === String(est.id) &&
+                    Number(a.numero) === i
+                );
+                const v = act?.valor ?? null;
+                if (v !== null && v !== '') total += Number(v);
+                row += `<td class="${v !== null && v !== '' ? 'h-apro' : 'h-vacio'}">${v !== null && v !== '' ? v : '—'}</td>`;
+            }
+        });
+        row += `<td class="h-total-apro">${total || '—'}</td></tr>`;
+        tbody += row;
+    });
+
+    document.getElementById('historialTablaActBody').innerHTML = tbody;
+}
+
+// ── Render Asistencia ─────────────────────────────────────────────────────────
+
+function renderHistorialAsistencia() {
+    const { asistencia, estudiantes, anioSeleccionado } = historialState;
+    const moduloNombre = document.getElementById('historialSelectModulo').selectedOptions[0]?.text || '';
+
+    document.getElementById('historialAsistInfo').textContent =
+        `${moduloNombre} · ${historialState.cursoSeleccionado} · ${anioSeleccionado}`;
+
+    if (!asistencia.length || !estudiantes.length) {
+        document.getElementById('historialTablaAsistHead').innerHTML = '';
+        document.getElementById('historialTablaAsistBody').innerHTML =
+            '<tr><td colspan="99" style="text-align:center;padding:30px;color:var(--color-texto-secundario)">No hay registros de asistencia para este período.</td></tr>';
+        return;
+    }
+
+    const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+    // Calcular porcentaje por estudiante por mes (reutiliza lógica del resumen anual)
+    const mesesConDatos = asistencia.map(({ mes, asistencias }) => {
+        const [y, m] = mes.split('-').map(Number);
+        const label = MESES[m-1] + ' ' + y;
+        const estudiantesData = estudiantes.map(est => {
+            const registros = asistencias.filter(a => String(a.estudianteId) === String(est.id));
+            const diasTrabajados = new Set(registros.filter(r => ['P','E','A'].includes(r.estado)).map(r => r.dia)).size;
+            const presentes = registros.filter(r => r.estado === 'P').length;
+            const excusas   = registros.filter(r => r.estado === 'E').length;
+            const pct = diasTrabajados > 0 ? ((presentes + excusas) / diasTrabajados * 100) : 0;
+            return { id: est.id, pct: parseFloat(pct.toFixed(2)) };
+        }).filter(e => e.pct > 0 || asistencias.some(a => String(a.estudianteId) === String(e.id)));
+        return { label, estudiantesData };
+    });
+
+    // Encabezado
+    let thead = '<tr><th style="width:40px">#</th><th class="col-nombre-h">Nombre</th>';
+    mesesConDatos.forEach(m => { thead += `<th>${m.label}</th>`; });
+    thead += '<th class="col-total-h">Promedio final</th></tr>';
+    document.getElementById('historialTablaAsistHead').innerHTML = thead;
+
+    // Cuerpo
+    let tbody = '';
+    const promediosMeses = new Array(mesesConDatos.length).fill(0);
+    const countMeses     = new Array(mesesConDatos.length).fill(0);
+
+    estudiantes.forEach((est, idx) => {
+        let suma = 0, count = 0;
+        let row = `<tr><td class="td-num">${idx+1}</td><td class="td-nombre">${est.nombre}</td>`;
+        mesesConDatos.forEach((mes, mi) => {
+            const d = mes.estudiantesData.find(e => String(e.id) === String(est.id));
+            if (d) {
+                const cls = d.pct >= 80 ? 'h-pct-alto' : 'h-pct-bajo';
+                row += `<td class="${cls}">${d.pct.toFixed(2)}</td>`;
+                suma += d.pct; count++;
+                promediosMeses[mi] += d.pct; countMeses[mi]++;
+            } else {
+                row += `<td class="h-vacio">—</td>`;
+            }
+        });
+        const pf = count > 0 ? (suma / count).toFixed(2) : '—';
+        const clsPf = pf !== '—' && parseFloat(pf) >= 80 ? 'h-pct-alto' : pf !== '—' ? 'h-pct-bajo' : 'h-vacio';
+        row += `<td class="${clsPf}">${pf !== '—' ? pf + '%' : '—'}</td></tr>`;
+        tbody += row;
+    });
+
+    // Fila promedio grupo
+    let filaGrupo = '<tr class="fila-grupo-h"><td></td><td class="td-nombre">Promedio del grupo</td>';
+    let sumaGral = 0, countGral = 0;
+    mesesConDatos.forEach((_, mi) => {
+        const prom = countMeses[mi] > 0 ? Math.round(promediosMeses[mi] / countMeses[mi]) : null;
+        if (prom !== null) {
+            filaGrupo += `<td>${prom}%</td>`;
+            sumaGral += prom; countGral++;
+        } else {
+            filaGrupo += `<td class="h-vacio">—</td>`;
+        }
+    });
+    const promGral = countGral > 0 ? Math.round(sumaGral / countGral) : '—';
+    filaGrupo += `<td>${promGral !== '—' ? promGral + '%' : '—'}</td></tr>`;
+    tbody += filaGrupo;
+
+    document.getElementById('historialTablaAsistBody').innerHTML = tbody;
+}
+
+// ── Exportar Excel desde Historial ───────────────────────────────────────────
+
+function exportarExcelHistorialCalif() {
+    if (typeof XLSX === 'undefined') { mostrarMensajeError('Error', 'SheetJS no está disponible.'); return; }
+    const tabla = document.getElementById('historialTablaCalif');
+    if (!tabla.querySelector('tbody tr')) return;
+
+    const wb = XLSX.utils.book_new();
+    const ws = _excelDesdeTablaHistorial(tabla, 'Calificaciones');
+    XLSX.utils.book_append_sheet(wb, ws, 'Calificaciones');
+
+    const modulo = (document.getElementById('historialSelectModulo').selectedOptions[0]?.text || 'Modulo').replace(/\s+/g,'_');
+    XLSX.writeFile(wb, `Historial_Calificaciones_${modulo}_${historialState.anioSeleccionado}.xlsx`);
+}
+
+function exportarExcelHistorialAct() {
+    if (typeof XLSX === 'undefined') { mostrarMensajeError('Error', 'SheetJS no está disponible.'); return; }
+    const tabla = document.getElementById('historialTablaAct');
+    if (!tabla.querySelector('tbody tr')) return;
+
+    const wb = XLSX.utils.book_new();
+    const ws = _excelDesdeTablaHistorial(tabla, 'Actividades');
+    XLSX.utils.book_append_sheet(wb, ws, 'Actividades');
+
+    const modulo = (document.getElementById('historialSelectModulo').selectedOptions[0]?.text || 'Modulo').replace(/\s+/g,'_');
+    XLSX.writeFile(wb, `Historial_Actividades_${modulo}_${historialState.anioSeleccionado}.xlsx`);
+}
+
+function exportarExcelHistorialAsist() {
+    if (typeof XLSX === 'undefined') { mostrarMensajeError('Error', 'SheetJS no está disponible.'); return; }
+    const tabla = document.getElementById('historialTablaAsist');
+    if (!tabla.querySelector('tbody tr')) return;
+
+    const wb = XLSX.utils.book_new();
+    const ws = _excelDesdeTablaHistorial(tabla, 'Asistencia');
+    XLSX.utils.book_append_sheet(wb, ws, 'Asistencia');
+
+    const modulo = (document.getElementById('historialSelectModulo').selectedOptions[0]?.text || 'Modulo').replace(/\s+/g,'_');
+    XLSX.writeFile(wb, `Historial_Asistencia_${modulo}_${historialState.anioSeleccionado}.xlsx`);
+}
+
+function _excelDesdeTablaHistorial(tabla, tipo) {
+    const C_HEAD = '1E5AA0', C_HEAD2 = '16305C', C_TOTAL_H = '142F78';
+    const C_APRO = 'C8E6C9', C_REPR = 'FFCDD2', C_APRO_FG = '1B5E20', C_REPR_FG = 'B71C1C';
+    const C_GRUPO = 'BBDEFB', C_GRUPO_FG = '0D2E6E';
+    const C_ALT = 'F0F4FF';
+
+    const fill  = c  => ({ type:'pattern', pattern:'solid', fgColor:{ rgb: c } });
+    const font  = (b, c) => ({ bold: b, name:'Arial', sz:10, color:{ rgb: c||'1A1A1A' } });
+    const aln   = (h) => ({ horizontal: h, vertical:'center', wrapText:false });
+    const bdr   = () => ({ top:{style:'thin',color:{rgb:'B0BEC5'}}, bottom:{style:'thin',color:{rgb:'B0BEC5'}}, left:{style:'thin',color:{rgb:'B0BEC5'}}, right:{style:'thin',color:{rgb:'B0BEC5'}} });
+    const mkC   = (v, bold, fg, bg, halign) => ({ v, t: typeof v==='number'?'n':'s', s:{ font:font(bold,fg), fill:fill(bg||'FFFFFF'), alignment:aln(halign||'center'), border:bdr() } });
+
+    const ws = {};
+    let maxC = 0;
+
+    // Encabezados
+    const ths = Array.from(tabla.querySelectorAll('thead tr'));
+    let r = 0;
+    ths.forEach(tr => {
+        let c = 0;
+        tr.querySelectorAll('th').forEach(th => {
+            while (ws[XLSX.utils.encode_cell({r, c})]) c++;
+            const colspan = parseInt(th.getAttribute('colspan') || '1');
+            const v = th.textContent.replace(/\s+/g,' ').trim();
+            const isTotal = th.classList.contains('col-total-h');
+            ws[XLSX.utils.encode_cell({r, c})] = mkC(v, true, 'FFFFFF', isTotal ? C_TOTAL_H : (r===1 ? C_HEAD2 : C_HEAD), 'center');
+            for (let ci = 1; ci < colspan; ci++) {
+                ws[XLSX.utils.encode_cell({r, c:c+ci})] = mkC('', false, 'FFFFFF', isTotal ? C_TOTAL_H : (r===1 ? C_HEAD2 : C_HEAD), 'center');
+            }
+            c += colspan;
+            if (c > maxC) maxC = c;
+        });
+        r++;
+    });
+
+    // Cuerpo
+    const trs = Array.from(tabla.querySelectorAll('tbody tr'));
+    trs.forEach((tr, ri) => {
+        const isGrupo = tr.classList.contains('fila-grupo-h');
+        const isAlt   = ri % 2 === 1 && !isGrupo;
+        let c = 0;
+        tr.querySelectorAll('td').forEach(td => {
+            const colspan = parseInt(td.getAttribute('colspan') || '1');
+            const raw = td.textContent.trim();
+            const num = raw !== '—' && raw !== '' && !isNaN(parseFloat(raw.replace('%',''))) ? parseFloat(raw.replace('%','')) : null;
+            const v = num !== null ? num : raw;
+
+            let bg = isGrupo ? C_GRUPO : isAlt ? C_ALT : 'FFFFFF';
+            let fg = isGrupo ? C_GRUPO_FG : '1A1A1A';
+
+            const cls = td.className;
+            if (cls.includes('h-apro') || cls.includes('h-pct-alto'))  { bg = C_APRO; fg = C_APRO_FG; }
+            if (cls.includes('h-repr') || cls.includes('h-pct-bajo'))  { bg = C_REPR; fg = C_REPR_FG; }
+            if (cls.includes('h-total-apro')) { bg = 'A5D6A7'; fg = C_APRO_FG; }
+            if (cls.includes('h-total-repr')) { bg = 'EF9A9A'; fg = C_REPR_FG; }
+
+            const halign = c <= 1 ? 'left' : 'center';
+            ws[XLSX.utils.encode_cell({r, c})] = mkC(v, isGrupo || c===maxC-1, fg, bg, halign);
+            for (let ci = 1; ci < colspan; ci++) {
+                ws[XLSX.utils.encode_cell({r, c:c+ci})] = mkC('', false, fg, bg, 'center');
+            }
+            c += colspan;
+            if (c > maxC) maxC = c;
+        });
+        r++;
+    });
+
+    ws['!ref'] = XLSX.utils.encode_range({ s:{r:0,c:0}, e:{r:r-1,c:maxC-1} });
+    ws['!cols'] = Array.from({length: maxC}, (_, i) => ({ wch: i===0?5 : i===1?30 : 10 }));
+    ws['!rows'] = [{ hpt:22 }, { hpt:18 }];
+    return ws;
+}
