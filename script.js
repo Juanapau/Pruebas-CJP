@@ -1943,22 +1943,43 @@ function configurarNavegacion(contenedorId, btnLeftId, btnRightId) {
         }
     }
     
-    // Hover — iniciar y detener scroll continuo
+    // Hover (desktop) — scroll continuo
     btnLeft.addEventListener('mouseenter', () => iniciarScrollContinuo('left'));
     btnLeft.addEventListener('mouseleave', detenerScroll);
     btnRight.addEventListener('mouseenter', () => iniciarScrollContinuo('right'));
     btnRight.addEventListener('mouseleave', detenerScroll);
-    
-    // También mantener el click para dispositivos táctiles
+
+    // Touch (móvil) — scroll suave al tocar
+    const esTactil = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+    btnLeft.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (esTactil()) iniciarScrollContinuo('left');
+    }, { passive: false });
+    btnLeft.addEventListener('touchend', detenerScroll);
+
+    btnRight.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (esTactil()) iniciarScrollContinuo('right');
+    }, { passive: false });
+    btnRight.addEventListener('touchend', detenerScroll);
+
+    // Click — para toque rápido
     btnLeft.addEventListener('click', () => {
-        contenedor.scrollBy({ left: -300, behavior: 'smooth' });
+        contenedor.scrollBy({ left: -280, behavior: 'smooth' });
     });
     btnRight.addEventListener('click', () => {
-        contenedor.scrollBy({ left: 300, behavior: 'smooth' });
+        contenedor.scrollBy({ left: 280, behavior: 'smooth' });
     });
-    
+
     contenedor.addEventListener('scroll', actualizarBotones);
-    window.addEventListener('resize', actualizarBotones);
+    window.addEventListener('resize', () => {
+        setTimeout(actualizarBotones, 150);
+    });
+    // Recheck on orientation change
+    window.addEventListener('orientationchange', () => {
+        setTimeout(actualizarBotones, 300);
+    });
     
     // Observer para detectar cambios en el contenido
     const observer = new MutationObserver(() => {
@@ -2840,7 +2861,8 @@ const menuElementos = {
     textoModo: document.getElementById('textoModo'),
     menuCalif: document.getElementById('menuRegistroCalif'),
     menuAct: document.getElementById('menuRegistroAct'),
-    menuAsist: document.getElementById('menuRegistroAsist')
+    menuAsist: document.getElementById('menuRegistroAsist'),
+    menuHistorial: document.getElementById('menuHistorial')
 };
 
 function inicializarMenu() {
@@ -2904,7 +2926,7 @@ function actualizarTextoModo() {
 
 function actualizarMenuActivo() {
     // Remover active de todos
-    [menuElementos.menuCalif, menuElementos.menuAct, menuElementos.menuAsist].forEach(btn => {
+    [menuElementos.menuCalif, menuElementos.menuAct, menuElementos.menuAsist, menuElementos.menuHistorial].forEach(btn => {
         btn.classList.remove('active');
     });
     
@@ -2915,6 +2937,8 @@ function actualizarMenuActivo() {
         menuElementos.menuAct.classList.add('active');
     } else if (asistenciaElementos.vistaAsistencia.style.display !== 'none') {
         menuElementos.menuAsist.classList.add('active');
+    } else if (document.getElementById('vistaHistorial').style.display !== 'none') {
+        menuElementos.menuHistorial.classList.add('active');
     }
 }
 
@@ -5329,6 +5353,7 @@ function abrirHistorial() {
     document.getElementById('vistaActividades').style.display = 'none';
     document.getElementById('vistaAsistencia').style.display = 'none';
     document.getElementById('vistaHistorial').style.display = 'block';
+    actualizarMenuActivo();
 
     // Resetear estado e interfaz completamente
     historialState.anioSeleccionado  = null;
@@ -5549,7 +5574,7 @@ function renderHistorialCalificaciones() {
     const { ras, estudiantes, calificaciones, anioSeleccionado, moduloSeleccionado } = historialState;
     const moduloNombre = document.getElementById('historialSelectModulo').selectedOptions[0]?.text || '';
 
-    document.getElementById('historialCalifInfo').textContent =
+    document.getElementById('historialInfoModulo').textContent =
         `${moduloNombre} · ${historialState.cursoSeleccionado} · ${anioSeleccionado} · ${estudiantes.length} estudiantes`;
 
     if (!ras.length || !estudiantes.length) {
@@ -5580,6 +5605,7 @@ function renderHistorialCalificaciones() {
     });
     thead += '</tr>';
     document.getElementById('historialTablaCalifHead').innerHTML = thead;
+    configurarNavegacion('historialScrollCalif', 'scrollLeftHistorialCalif', 'scrollRightHistorialCalif');
 
     // Cuerpo
     let tbody = '';
@@ -5608,9 +5634,9 @@ function renderHistorialCalificaciones() {
             row += `<td class="${cls(v3)}">${v3 !== '' && v3 !== null ? v3 : '—'}</td>`;
         });
 
-        const totalPosible = ras.reduce((s, ra) => s + (ra.valorTotal || 0), 0);
-        const apro = totalPosible > 0 && total >= totalPosible * 0.7;
-        row += `<td class="${apro ? 'h-total-apro' : 'h-total-repr'}">${total}</td>`;
+        const totalRedondeado = parseFloat(total.toFixed(2));
+        const clsTotal = totalRedondeado >= 70 ? 'h-total-apro' : 'h-total-repr';
+        row += `<td class="${clsTotal}">${totalRedondeado}</td>`;
         row += '</tr>';
         tbody += row;
     });
@@ -5624,8 +5650,8 @@ function renderHistorialCalificaciones() {
         filaGrupo += `<td colspan="3">${prom}</td>`;
         if (prom !== '—') sumaGrupo += parseFloat(prom);
     });
-    const promTotal = ras.length ? (sumaGrupo / ras.length).toFixed(1) : '—';
-    filaGrupo += `<td>${promTotal}</td></tr>`;
+    const promTotal = ras.length ? parseFloat((sumaGrupo / ras.length).toFixed(2)) : '—';
+    filaGrupo += `<td>${promTotal !== '—' ? promTotal : promTotal}</td></tr>`;
     tbody += filaGrupo;
 
     document.getElementById('historialTablaCalifBody').innerHTML = tbody;
@@ -5639,7 +5665,7 @@ function renderHistorialActividades() {
     const rasFiltradas = raFiltro ? ras.filter(ra => String(ra.id) === String(raFiltro)) : ras;
     const moduloNombre = document.getElementById('historialSelectModulo').selectedOptions[0]?.text || '';
 
-    document.getElementById('historialActInfo').textContent =
+    document.getElementById('historialInfoModulo').textContent =
         `${moduloNombre} · ${historialState.cursoSeleccionado} · ${anioSeleccionado}`;
 
     if (!rasFiltradas.length || !estudiantes.length) {
@@ -5687,14 +5713,17 @@ function renderHistorialActividades() {
                 );
                 const v = act?.valor ?? null;
                 if (v !== null && v !== '') total += Number(v);
-                row += `<td class="${v !== null && v !== '' ? 'h-apro' : 'h-vacio'}">${v !== null && v !== '' ? v : '—'}</td>`;
+                const vMostrar = v !== null && v !== '' ? parseFloat(Number(v).toFixed(2)) : null;
+                row += `<td class="${vMostrar !== null ? 'h-apro' : 'h-vacio'}">${vMostrar !== null ? vMostrar : '—'}</td>`;
             }
         });
-        row += `<td class="h-total-apro">${total || '—'}</td></tr>`;
+        const totalAct = total > 0 ? Number(total.toFixed(2)) : '—';
+        row += `<td class="h-total-apro">${totalAct !== '—' ? totalAct.toFixed(2) : totalAct}</td></tr>`;
         tbody += row;
     });
 
     document.getElementById('historialTablaActBody').innerHTML = tbody;
+    configurarNavegacion('historialScrollAct', 'scrollLeftHistorialAct', 'scrollRightHistorialAct');
 }
 
 // ── Render Asistencia ─────────────────────────────────────────────────────────
@@ -5703,7 +5732,7 @@ function renderHistorialAsistencia() {
     const { asistencia, estudiantes, anioSeleccionado } = historialState;
     const moduloNombre = document.getElementById('historialSelectModulo').selectedOptions[0]?.text || '';
 
-    document.getElementById('historialAsistInfo').textContent =
+    document.getElementById('historialInfoModulo').textContent =
         `${moduloNombre} · ${historialState.cursoSeleccionado} · ${anioSeleccionado}`;
 
     if (!asistencia.length || !estudiantes.length) {
@@ -5778,6 +5807,7 @@ function renderHistorialAsistencia() {
     tbody += filaGrupo;
 
     document.getElementById('historialTablaAsistBody').innerHTML = tbody;
+    configurarNavegacion('historialScrollAsist', 'scrollLeftHistorialAsist', 'scrollRightHistorialAst');
 }
 
 // ── Exportar Excel desde Historial ───────────────────────────────────────────
