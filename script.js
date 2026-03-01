@@ -1943,43 +1943,22 @@ function configurarNavegacion(contenedorId, btnLeftId, btnRightId) {
         }
     }
     
-    // Hover (desktop) — scroll continuo
+    // Hover — iniciar y detener scroll continuo
     btnLeft.addEventListener('mouseenter', () => iniciarScrollContinuo('left'));
     btnLeft.addEventListener('mouseleave', detenerScroll);
     btnRight.addEventListener('mouseenter', () => iniciarScrollContinuo('right'));
     btnRight.addEventListener('mouseleave', detenerScroll);
-
-    // Touch (móvil) — scroll suave al tocar
-    const esTactil = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-
-    btnLeft.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (esTactil()) iniciarScrollContinuo('left');
-    }, { passive: false });
-    btnLeft.addEventListener('touchend', detenerScroll);
-
-    btnRight.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (esTactil()) iniciarScrollContinuo('right');
-    }, { passive: false });
-    btnRight.addEventListener('touchend', detenerScroll);
-
-    // Click — para toque rápido
+    
+    // También mantener el click para dispositivos táctiles
     btnLeft.addEventListener('click', () => {
-        contenedor.scrollBy({ left: -280, behavior: 'smooth' });
+        contenedor.scrollBy({ left: -300, behavior: 'smooth' });
     });
     btnRight.addEventListener('click', () => {
-        contenedor.scrollBy({ left: 280, behavior: 'smooth' });
+        contenedor.scrollBy({ left: 300, behavior: 'smooth' });
     });
-
+    
     contenedor.addEventListener('scroll', actualizarBotones);
-    window.addEventListener('resize', () => {
-        setTimeout(actualizarBotones, 150);
-    });
-    // Recheck on orientation change
-    window.addEventListener('orientationchange', () => {
-        setTimeout(actualizarBotones, 300);
-    });
+    window.addEventListener('resize', actualizarBotones);
     
     // Observer para detectar cambios en el contenido
     const observer = new MutationObserver(() => {
