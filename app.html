@@ -656,11 +656,14 @@
             </div>
         </div>
 
-        <!-- Pestañas -->
-        <div class="historial-tabs">
-            <button class="historial-tab activo" data-tab="calificaciones">📝 Calificaciones</button>
-            <button class="historial-tab" data-tab="actividades">📊 Actividades</button>
-            <button class="historial-tab" data-tab="asistencia">📋 Asistencia</button>
+        <!-- Pestañas + Info módulo -->
+        <div class="historial-tabs-bar">
+            <div class="historial-tabs">
+                <button class="historial-tab activo" data-tab="calificaciones">📝 Calificaciones</button>
+                <button class="historial-tab" data-tab="actividades">📊 Actividades</button>
+                <button class="historial-tab" data-tab="asistencia">📋 Asistencia</button>
+            </div>
+            <span id="historialInfoModulo" class="historial-info-modulo"></span>
         </div>
 
         <!-- Contenido pestañas -->
@@ -681,10 +684,16 @@
             <!-- Panel Calificaciones -->
             <div id="historialPanelCalificaciones" class="historial-panel" style="display:none;">
                 <div class="historial-panel-header">
-                    <span id="historialCalifInfo" class="historial-panel-info"></span>
+                    <span></span>
                     <button id="historialBtnExcelCalif" class="btn-historial-excel">📊 Exportar Excel</button>
                 </div>
-                <div class="historial-tabla-scroll">
+                <div class="historial-tabla-scroll" id="historialScrollCalif">
+                    <div class="scroll-nav-buttons scroll-nav-left">
+                        <button class="scroll-nav-btn" id="scrollLeftHistorialCalif">◀</button>
+                    </div>
+                    <div class="scroll-nav-buttons scroll-nav-right">
+                        <button class="scroll-nav-btn" id="scrollRightHistorialCalif">▶</button>
+                    </div>
                     <table id="historialTablaCalif" class="historial-tabla">
                         <thead id="historialTablaCalifHead"></thead>
                         <tbody id="historialTablaCalifBody"></tbody>
@@ -695,17 +704,21 @@
             <!-- Panel Actividades -->
             <div id="historialPanelActividades" class="historial-panel" style="display:none;">
                 <div class="historial-panel-header">
-                    <span id="historialActInfo" class="historial-panel-info"></span>
+                    <div class="historial-subfilter">
+                        <label>Selecciona RA:</label>
+                        <select id="historialSelectRA">
+                            <option value="">Todos los RAs</option>
+                        </select>
+                    </div>
                     <button id="historialBtnExcelAct" class="btn-historial-excel">📊 Exportar Excel</button>
                 </div>
-                <!-- Sub-selector de RA -->
-                <div class="historial-subfilter">
-                    <label>RA:</label>
-                    <select id="historialSelectRA">
-                        <option value="">Todos los RAs</option>
-                    </select>
-                </div>
-                <div class="historial-tabla-scroll">
+                <div class="historial-tabla-scroll" id="historialScrollAct">
+                    <div class="scroll-nav-buttons scroll-nav-left">
+                        <button class="scroll-nav-btn" id="scrollLeftHistorialAct">◀</button>
+                    </div>
+                    <div class="scroll-nav-buttons scroll-nav-right">
+                        <button class="scroll-nav-btn" id="scrollRightHistorialAct">▶</button>
+                    </div>
                     <table id="historialTablaAct" class="historial-tabla">
                         <thead id="historialTablaActHead"></thead>
                         <tbody id="historialTablaActBody"></tbody>
@@ -719,7 +732,13 @@
                     <span id="historialAsistInfo" class="historial-panel-info"></span>
                     <button id="historialBtnExcelAsist" class="btn-historial-excel">📊 Exportar Excel</button>
                 </div>
-                <div class="historial-tabla-scroll">
+                <div class="historial-tabla-scroll" id="historialScrollAsist">
+                    <div class="scroll-nav-buttons scroll-nav-left">
+                        <button class="scroll-nav-btn" id="scrollLeftHistorialAsist">◀</button>
+                    </div>
+                    <div class="scroll-nav-buttons scroll-nav-right">
+                        <button class="scroll-nav-btn" id="scrollRightHistorialAst">▶</button>
+                    </div>
                     <table id="historialTablaAsist" class="historial-tabla">
                         <thead id="historialTablaAsistHead"></thead>
                         <tbody id="historialTablaAsistBody"></tbody>
