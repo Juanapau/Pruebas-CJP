@@ -80,7 +80,6 @@ body {
     padding: 20px;
     width: 100%;
     box-sizing: border-box;
-    overflow-x: hidden;
 }
 
 /* Header */
@@ -378,7 +377,7 @@ body.dark-mode .btn-exportar-excel-cal:hover {
     flex-wrap: nowrap;
 }
 
-/* En móvil los botones dentro de btns-tabla-acciones nunca se apilan ni se estiran */
+/* button sizing handled in responsive block */
 .btns-tabla-acciones .btn-guardar,
 .btns-tabla-acciones .btn-exportar-pdf,
 .btns-tabla-acciones .btn-exportar-excel-cal,
@@ -387,11 +386,9 @@ body.dark-mode .btn-exportar-excel-cal:hover {
 .botones-asistencia .btn-exportar-excel-resumen,
 .botones-actividades-grupo .btn-guardar,
 .botones-actividades-grupo .btn-exportar-pdf-actividades {
-    width: auto !important;
+    width: auto;
     flex: 1;
     white-space: nowrap;
-    font-size: 0.9rem;
-    padding: 12px 16px;
 }
 
 /* Botón Exportar PDF - verde */
@@ -1691,30 +1688,7 @@ td {
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
-    tbody td:first-child,
-    thead th:first-child {
-        position: sticky;
-        left: 0;
-        z-index: 5;
-        background: var(--color-blanco);
-        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
-    }
-    
-    tbody td:nth-child(2),
-    thead th:nth-child(2) {
-        position: sticky;
-        left: 40px;
-        z-index: 5;
-        background: var(--color-blanco);
-        box-shadow: 2px 0 4px rgba(0,0,0,0.1);
-    }
-    
-    body.dark-mode tbody td:first-child,
-    body.dark-mode thead th:first-child,
-    body.dark-mode tbody td:nth-child(2),
-    body.dark-mode thead th:nth-child(2) {
-        background: var(--color-blanco);
-    }
+    /* sticky columns handled in new responsive block below */
 }
 
 @media (max-width: 480px) {
@@ -5132,7 +5106,7 @@ body:not(.dark-mode) .dia-semana-check input:checked ~ .dia-semana-abrev {
    ══════════════════════════════════════════════════════════════════════════ */
 
 .vista-historial {
-    padding: 0 32px 40px 32px;
+    padding: 0 16px 40px 16px;
 }
 
 /* ── Header ── */
@@ -5196,11 +5170,31 @@ body.dark-mode .historial-filtros {
 }
 
 /* ── Pestañas ── */
+/* Tabs bar: tabs on left, module info on right */
+.historial-tabs-bar {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 2px solid var(--color-borde);
+    gap: 12px;
+}
+
 .historial-tabs {
     display: flex;
     gap: 6px;
     margin-bottom: 0;
-    border-bottom: 2px solid var(--color-borde);
+    border-bottom: none;
+}
+
+.historial-info-modulo {
+    font-size: 0.82rem;
+    color: var(--color-texto-secundario);
+    font-style: italic;
+    white-space: nowrap;
+    padding-bottom: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 50%;
 }
 
 .historial-tab {
@@ -5287,11 +5281,11 @@ body.dark-mode .historial-filtros {
 /* ── Panel ── */
 .historial-panel-header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: stretch;
+    justify-content: flex-start;
     margin-bottom: 14px;
-    flex-wrap: wrap;
     gap: 10px;
+    width: 100%;
 }
 
 .historial-panel-info {
@@ -5311,6 +5305,9 @@ body.dark-mode .historial-filtros {
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 2px 6px rgba(25,118,210,0.3);
+    white-space: nowrap;
+    align-self: stretch;
+    flex-shrink: 0;
 }
 
 .btn-historial-excel:hover {
@@ -5326,31 +5323,97 @@ body.dark-mode .historial-filtros {
 .historial-subfilter {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-    font-size: 0.88rem;
+    gap: 8px;
+    font-size: 0.85rem;
     color: var(--color-texto-secundario);
     font-weight: 600;
+    flex: 1;
+    min-width: 0;
 }
 
 .historial-subfilter select {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid var(--color-borde);
-    background: var(--color-superficie);
-    color: var(--color-texto);
+    padding: 8px 36px 8px 12px;
+    border-radius: 8px;
+    border: 2px solid #4DD0E1 !important;
+    background: linear-gradient(135deg, #E0F7FA 0%, #B2EBF2 100%);
+    color: #006064;
     font-size: 0.88rem;
+    font-weight: 400;
     cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23006064' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px top 50%;
+    background-size: 12px;
+    width: 100%;
+    min-height: 40px;
+    white-space: normal;
+    height: auto;
+    outline: none !important;
+    box-shadow: none;
+    transition: all 0.2s ease;
+}
+
+.historial-subfilter select:focus {
+    border: 2px solid #4DD0E1 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(77, 208, 225, 0.2) !important;
+}
+
+.historial-subfilter select:hover {
+    border-color: #00ACC1;
+    background: linear-gradient(135deg, #B2EBF2 0%, #80DEEA 100%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%23006064' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px top 50%;
+    background-size: 12px;
+    box-shadow: 0 0 12px rgba(77, 208, 225, 0.4);
+    transform: translateY(-1px);
+}
+
+body.dark-mode .historial-subfilter select {
+    background: linear-gradient(135deg, #1A3A40 0%, #266A77 100%);
+    border: 2px solid #4DD0E1 !important;
+    color: #ffffff;
+    font-weight: 400;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%2380DEEA' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px top 50%;
+    background-size: 12px;
+}
+
+body.dark-mode .historial-subfilter select:focus {
+    border: 2px solid #4DD0E1 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(77, 208, 225, 0.25) !important;
+}
+
+body.dark-mode .historial-subfilter select:hover {
+    background: linear-gradient(135deg, #266A77 0%, #2d8a9e 100%);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='10' viewBox='0 0 16 10'%3E%3Cpath fill='%2380DEEA' d='M8 10L0 2l1.5-1.5L8 7l6.5-6.5L16 2z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px top 50%;
+    background-size: 12px;
+    border-color: #00ACC1;
+    box-shadow: 0 0 12px rgba(77, 208, 225, 0.35);
 }
 
 /* ── Tabla ── */
 .historial-tabla-scroll {
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: 600px;
+    border-radius: 8px;
+    position: relative;
+    display: block;
+    width: 100%;
 }
 
 .historial-tabla {
     border-collapse: collapse;
-    width: 100%;
+    width: max-content;
+    min-width: 100%;
     font-size: 0.88rem;
 }
 
@@ -5383,6 +5446,7 @@ body.dark-mode .historial-filtros {
 .historial-tabla td.td-nombre {
     text-align: left;
     font-weight: 500;
+    white-space: nowrap;
 }
 
 .historial-tabla td.td-num {
@@ -5400,15 +5464,15 @@ body.dark-mode .historial-filtros {
 }
 
 /* Colores calificaciones historial */
-.historial-tabla td.h-apro  { background: #1E3D28; color: #A5D6A7; font-weight: 600; }
-.historial-tabla td.h-repr  { background: #3D1E1E; color: #FFCDD2; font-weight: 600; }
+.historial-tabla td.h-apro  { background: #1E3D28; color: #ffffff; font-weight: 600; }
+.historial-tabla td.h-repr  { background: #3D1E1E; color: #ffffff; font-weight: 600; }
 .historial-tabla td.h-total-apro { background: #1A4D2A; color: #69F0AE; font-weight: 700; }
 .historial-tabla td.h-total-repr { background: #4D1A1A; color: #FF5252; font-weight: 700; }
 .historial-tabla td.h-vacio { color: var(--color-texto-secundario); font-style: italic; }
 
 /* Colores asistencia historial */
-.historial-tabla td.h-pct-alto { background: #1E3D28; color: #A5D6A7; font-weight: 600; }
-.historial-tabla td.h-pct-bajo { background: #3D1E1E; color: #FFCDD2; font-weight: 600; }
+.historial-tabla td.h-pct-alto { background: #1E3D28; color: #ffffff; font-weight: 600; }
+.historial-tabla td.h-pct-bajo { background: #3D1E1E; color: #ffffff; font-weight: 600; }
 
 /* Fila promedio grupo */
 .historial-tabla tr.fila-grupo-h td {
@@ -5421,12 +5485,12 @@ body.dark-mode .historial-filtros {
 /* Modo claro */
 /* colores de th en historial ahora usan var(--color-header-principal) */
 body:not(.dark-mode) .historial-tabla tr:nth-child(even) td { background: #F5F7FF; }
-body:not(.dark-mode) .historial-tabla td.h-apro  { background: #E8F5E9; color: #1B5E20; }
-body:not(.dark-mode) .historial-tabla td.h-repr  { background: #FFEBEE; color: #B71C1C; }
-body:not(.dark-mode) .historial-tabla td.h-total-apro { background: #C8E6C9; color: #1B5E20; }
-body:not(.dark-mode) .historial-tabla td.h-total-repr { background: #FFCDD2; color: #B71C1C; }
-body:not(.dark-mode) .historial-tabla td.h-pct-alto { background: #E8F5E9; color: #1B5E20; }
-body:not(.dark-mode) .historial-tabla td.h-pct-bajo { background: #FFEBEE; color: #B71C1C; }
+body:not(.dark-mode) .historial-tabla td.h-apro  { background: #2E7D32; color: #ffffff; }
+body:not(.dark-mode) .historial-tabla td.h-repr  { background: #C62828; color: #ffffff; }
+body:not(.dark-mode) .historial-tabla td.h-total-apro { background: #1B5E20; color: #A5D6A7; }
+body:not(.dark-mode) .historial-tabla td.h-total-repr { background: #B71C1C; color: #FFCDD2; }
+body:not(.dark-mode) .historial-tabla td.h-pct-alto { background: #2E7D32; color: #ffffff; }
+body:not(.dark-mode) .historial-tabla td.h-pct-bajo { background: #C62828; color: #ffffff; }
 body:not(.dark-mode) .historial-tabla tr.fila-grupo-h td { background: #E3F2FD !important; color: #0D47A1; }
 
 @media (max-width: 768px) {
@@ -5440,5 +5504,519 @@ body:not(.dark-mode) .historial-tabla tr.fila-grupo-h td { background: #E3F2FD !
         white-space: nowrap;
         padding: 10px 14px;
         font-size: 0.85rem;
+    }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE MÓVIL — REVISIÓN COMPLETA
+   Cubre: portrait ≤768px, portrait ≤480px, landscape móvil, touch
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Variables de tamaño táctil ── */
+:root {
+    --btn-h-mobile: 44px;
+    --btn-font-mobile: 0.82rem;
+    --input-font-mobile: 16px; /* evita zoom en iOS */
+}
+
+/* ══════════════════════════════════════════
+   PORTRAIT ≤ 768px  (teléfonos y tablets pequeñas)
+   ══════════════════════════════════════════ */
+@media screen and (max-width: 768px) {
+
+    /* ── Layout base ── */
+    body { font-size: 14px; }
+
+    .container {
+        padding: 8px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* ── Botones de acción principales ──
+       Reducen tamaño y hacen wrap en fila */
+    .btn-guardar,
+    .btn-exportar-pdf,
+    .btn-exportar-excel-cal,
+    .btn-exportar-pdf-actividades,
+    .btn-volver-historial,
+    .btn-historial-excel,
+    .btn-resumen-anual,
+    .btn-volver-asistencia,
+    .btn-exportar-excel-resumen,
+    .btn-volver-nuevo {
+        padding: 10px 14px;
+        font-size: var(--btn-font-mobile);
+        min-height: var(--btn-h-mobile);
+        white-space: nowrap;
+    }
+
+    /* Íconos dentro de botones: ocultar texto, dejar solo ícono en 480 */
+    .btns-tabla-acciones {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .btns-tabla-acciones .btn-guardar,
+    .btns-tabla-acciones .btn-exportar-pdf,
+    .btns-tabla-acciones .btn-exportar-excel-cal {
+        flex: 1 1 auto;
+        min-width: 0;
+        font-size: var(--btn-font-mobile);
+        padding: 10px 12px;
+        min-height: var(--btn-h-mobile);
+    }
+
+    .botones-asistencia {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .botones-asistencia .btn-guardar,
+    .botones-asistencia .btn-volver-asistencia,
+    .botones-asistencia .btn-exportar-excel-resumen {
+        flex: 1 1 auto;
+        font-size: var(--btn-font-mobile);
+        padding: 10px 12px;
+        min-height: var(--btn-h-mobile);
+    }
+
+    .botones-actividades-grupo {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .botones-actividades-grupo .btn-guardar,
+    .botones-actividades-grupo .btn-exportar-pdf-actividades {
+        flex: 1 1 auto;
+        font-size: var(--btn-font-mobile);
+        padding: 10px 12px;
+        min-height: var(--btn-h-mobile);
+    }
+
+    /* ── Inputs numéricos ── */
+    input[type="number"],
+    input[type="text"],
+    input[type="month"],
+    select {
+        font-size: var(--input-font-mobile); /* previene zoom iOS */
+    }
+
+    /* ── Barras de scroll azules ──
+       En móvil se achican y se reposicionan */
+    .scroll-nav-btn {
+        width: 28px;
+        height: 200px;
+        font-size: 1.1rem;
+    }
+
+    .scroll-nav-left { left: 0; }
+    .scroll-nav-right { right: 0; }
+
+    /* ── Tabla scroll ── */
+    .tabla-scroll {
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+        max-height: 55vh;
+    }
+
+    /* Sticky primeras dos columnas en tablas principales */
+    .tabla-scroll tbody td:first-child,
+    .tabla-scroll thead th:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 6;
+        background: var(--color-fondo);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.15);
+    }
+
+    .tabla-scroll tbody td:nth-child(2),
+    .tabla-scroll thead th:nth-child(2) {
+        position: sticky;
+        left: 38px;
+        z-index: 6;
+        background: var(--color-fondo);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.15);
+    }
+
+    body.dark-mode .tabla-scroll tbody td:first-child,
+    body.dark-mode .tabla-scroll thead th:first-child,
+    body.dark-mode .tabla-scroll tbody td:nth-child(2),
+    body.dark-mode .tabla-scroll thead th:nth-child(2) {
+        background: var(--color-fondo);
+    }
+
+    /* ── Filtros compactos ── */
+    .filtros-compactos-grid,
+    .filtros-actividades-compactos,
+    .filtros-asistencia-compactos {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .filtros-asistencia-compactos {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    /* ── Tabla header con botón ── */
+    .tabla-header-con-boton {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .tabla-header-con-boton h2 {
+        font-size: 1.1rem;
+    }
+
+    /* ── Módulo oscuro selects ── */
+    .filtro-compacto select {
+        font-size: var(--input-font-mobile);
+        min-height: var(--btn-h-mobile);
+    }
+
+    /* ── Vista historial ── */
+    .vista-historial {
+        padding: 0 8px 30px 8px;
+    }
+
+    .historial-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .btn-volver-historial {
+        align-self: flex-start;
+        font-size: var(--btn-font-mobile);
+        padding: 10px 16px;
+        min-height: var(--btn-h-mobile);
+    }
+
+    .historial-tabs-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+
+    .historial-info-modulo {
+        max-width: 100%;
+        font-size: 0.78rem;
+        padding-bottom: 4px;
+    }
+
+    .historial-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        padding-bottom: 2px;
+    }
+
+    .historial-tab {
+        white-space: nowrap;
+        padding: 9px 14px;
+        font-size: 0.82rem;
+    }
+
+    .historial-panel-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .historial-subfilter {
+        width: 100%;
+    }
+
+    .historial-subfilter select {
+        font-size: var(--input-font-mobile);
+        min-height: var(--btn-h-mobile);
+    }
+
+    .btn-historial-excel {
+        align-self: flex-start;
+        font-size: var(--btn-font-mobile);
+        padding: 10px 14px;
+        min-height: var(--btn-h-mobile);
+    }
+
+    .historial-tabla-scroll {
+        -webkit-overflow-scrolling: touch;
+        max-height: 52vh;
+    }
+
+    /* Sticky en tabla historial */
+    .historial-tabla-scroll .historial-tabla tbody td:first-child,
+    .historial-tabla-scroll .historial-tabla thead th:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 6;
+        background: var(--color-fondo);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.15);
+    }
+
+    .historial-tabla-scroll .historial-tabla tbody td:nth-child(2),
+    .historial-tabla-scroll .historial-tabla thead th:nth-child(2) {
+        position: sticky;
+        left: 36px;
+        z-index: 6;
+        background: var(--color-fondo);
+        box-shadow: 2px 0 4px rgba(0,0,0,0.15);
+    }
+
+    /* ── Barras scroll historial ── */
+    #historialScrollCalif .scroll-nav-btn,
+    #historialScrollAct .scroll-nav-btn,
+    #historialScrollAsist .scroll-nav-btn {
+        width: 26px;
+        height: 160px;
+        font-size: 1rem;
+    }
+
+    /* ── Filtros de selección (filtros-seccion-compacta) ── */
+    .filtros-seccion-compacta {
+        padding: 12px 10px;
+    }
+
+    .filtros-titulo-compacto {
+        font-size: 0.9rem;
+    }
+
+    /* ── Modal evaluación ── */
+    .modal-evaluacion-contenido {
+        width: 95vw;
+        max-height: 90vh;
+        padding: 16px;
+    }
+
+    /* ── Menú flotante ── */
+    .btn-menu-flotante {
+        width: 50px;
+        height: 50px;
+        bottom: 16px;
+        left: 16px;
+        font-size: 1.4rem;
+    }
+}
+
+/* ══════════════════════════════════════════
+   PORTRAIT ≤ 480px  (teléfonos pequeños)
+   ══════════════════════════════════════════ */
+@media screen and (max-width: 480px) {
+
+    body { font-size: 13px; }
+
+    .container { padding: 6px; }
+
+    /* Botones más compactos */
+    .btn-guardar,
+    .btn-exportar-pdf,
+    .btn-exportar-excel-cal,
+    .btn-exportar-pdf-actividades,
+    .btn-historial-excel,
+    .btn-volver-historial {
+        padding: 9px 10px;
+        font-size: 0.78rem;
+        gap: 4px;
+    }
+
+    /* Barras scroll más delgadas */
+    .scroll-nav-btn {
+        width: 22px;
+        height: 150px;
+        font-size: 0.9rem;
+    }
+
+    .historial-tabla-scroll .scroll-nav-btn {
+        height: 120px;
+    }
+
+    /* Tabla */
+    th, td {
+        padding: 5px 4px;
+        font-size: 0.75rem;
+    }
+
+    .tabla-scroll { max-height: 50vh; }
+    .historial-tabla-scroll { max-height: 48vh; }
+
+    /* Filtros en columna simple */
+    .filtros-asistencia-compactos {
+        grid-template-columns: 1fr;
+    }
+
+    .historial-tab {
+        padding: 8px 11px;
+        font-size: 0.78rem;
+    }
+
+    .historial-titulo h2 {
+        font-size: 1.2rem;
+    }
+
+    /* Ocultar texto en botones de acción, dejar solo ícono */
+    .btns-tabla-acciones .btn-guardar .texto-btn,
+    .btns-tabla-acciones .btn-exportar-pdf .texto-btn,
+    .btns-tabla-acciones .btn-exportar-excel-cal .texto-btn {
+        display: none;
+    }
+}
+
+/* ══════════════════════════════════════════
+   LANDSCAPE MÓVIL  (altura ≤ 500px)
+   Teléfonos girados horizontalmente
+   ══════════════════════════════════════════ */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+
+    /* Reducir alturas para caber en pantalla corta */
+    .tabla-scroll,
+    .historial-tabla-scroll {
+        max-height: 40vh;
+    }
+
+    /* Barras scroll más cortas en landscape */
+    .scroll-nav-btn {
+        width: 26px;
+        height: 120px;
+        font-size: 1rem;
+    }
+
+    /* Header más compacto */
+    .historial-header {
+        flex-direction: row;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .historial-titulo h2 { font-size: 1.1rem; }
+    .historial-subtitulo { display: none; }
+
+    .historial-filtros {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 10px;
+        padding-top: 8px;
+    }
+
+    .filtros-seccion-compacta {
+        padding: 8px 10px;
+    }
+
+    .filtros-compactos-grid,
+    .filtros-actividades-compactos {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .filtros-asistencia-compactos {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    /* Botones más compactos en landscape */
+    .btn-guardar,
+    .btn-exportar-pdf,
+    .btn-exportar-excel-cal,
+    .btn-exportar-pdf-actividades,
+    .btn-historial-excel,
+    .btn-volver-historial {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        min-height: 38px;
+    }
+
+    /* Menú flotante más pequeño y arriba del scroll */
+    .btn-menu-flotante {
+        width: 44px;
+        height: 44px;
+        bottom: 12px;
+        left: 12px;
+        font-size: 1.2rem;
+    }
+
+    /* Scroll del menú lateral en landscape */
+    .menu-lateral {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Tabla */
+    th, td {
+        padding: 5px 5px;
+        font-size: 0.78rem;
+    }
+
+    /* Header tabla con botón — en fila */
+    .tabla-header-con-boton {
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+}
+
+/* ══════════════════════════════════════════
+   DISPOSITIVOS TÁCTILES — MEJORAS GENERALES
+   ══════════════════════════════════════════ */
+@media (hover: none) and (pointer: coarse) {
+
+    /* Área táctil mínima en todos los botones interactivos */
+    button, select, input, a {
+        min-height: 44px;
+        cursor: pointer;
+    }
+
+    /* Sin transform hover en táctil (evita glitch) */
+    .btn-guardar:hover,
+    .btn-exportar-pdf:hover,
+    .btn-exportar-excel-cal:hover,
+    .btn-historial-excel:hover,
+    .historial-subfilter select:hover,
+    .filtro-compacto select:hover {
+        transform: none;
+    }
+
+    /* Scroll táctil suave en todas las tablas */
+    .tabla-scroll,
+    .historial-tabla-scroll {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+
+    /* Barras de scroll azules: más anchas en táctil para fácil toque */
+    .scroll-nav-btn {
+        width: 32px;
+        opacity: 0.85;
+    }
+
+    .scroll-nav-btn.visible {
+        opacity: 0.9;
+        pointer-events: all;
+    }
+
+    /* Checkbox y botones táctiles en modal evaluación */
+    .eval-checkbox {
+        width: 24px;
+        height: 24px;
+    }
+
+    .eval-nivel-btn,
+    .eval-escala-btn {
+        min-height: 44px;
+        padding: 10px 14px;
+    }
+
+    /* Día de asistencia: área táctil mayor */
+    .celda-asistencia input {
+        min-height: 44px;
+        font-size: 1rem;
+    }
+
+    /* Botones de día de la semana */
+    .dia-semana-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 0.88rem;
     }
 }
