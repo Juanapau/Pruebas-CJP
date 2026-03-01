@@ -1943,31 +1943,38 @@ function configurarNavegacion(contenedorId, btnLeftId, btnRightId) {
         }
     }
     
-    // Hover — scroll continuo en desktop
-    btnLeft.addEventListener('mouseenter', () => iniciarScrollContinuo('left'));
-    btnLeft.addEventListener('mouseleave', detenerScroll);
-    btnRight.addEventListener('mouseenter', () => iniciarScrollContinuo('right'));
-    btnRight.addEventListener('mouseleave', detenerScroll);
+    // Detectar si es dispositivo táctil
+    const esTactil = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
-    // Touch — scroll continuo mientras el dedo esté presionado
-    btnLeft.addEventListener('touchstart',  (e) => { e.preventDefault(); iniciarScrollContinuo('left');  }, { passive: false });
-    btnLeft.addEventListener('touchend',    () => detenerScroll());
-    btnLeft.addEventListener('touchcancel', () => detenerScroll());
-    btnRight.addEventListener('touchstart',  (e) => { e.preventDefault(); iniciarScrollContinuo('right'); }, { passive: false });
-    btnRight.addEventListener('touchend',    () => detenerScroll());
-    btnRight.addEventListener('touchcancel', () => detenerScroll());
+    if (esTactil) {
+        // Móvil/táctil: cada clic desplaza un paso fijo (no scroll continuo)
+        const PASO_MOVIL = 150; // px por clic
+        btnLeft.addEventListener('click', () => {
+            contenedor.scrollBy({ left: -PASO_MOVIL, behavior: 'smooth' });
+            setTimeout(actualizarBotones, 350);
+        });
+        btnRight.addEventListener('click', () => {
+            contenedor.scrollBy({ left: PASO_MOVIL, behavior: 'smooth' });
+            setTimeout(actualizarBotones, 350);
+        });
+    } else {
+        // Escritorio: scroll continuo mientras el cursor esté encima
+        btnLeft.addEventListener('mouseenter', () => iniciarScrollContinuo('left'));
+        btnLeft.addEventListener('mouseleave', detenerScroll);
+        btnRight.addEventListener('mouseenter', () => iniciarScrollContinuo('right'));
+        btnRight.addEventListener('mouseleave', detenerScroll);
 
-    // Click rápido (tap en móvil)
-    btnLeft.addEventListener('click', () => {
-        contenedor.scrollBy({ left: -280, behavior: 'smooth' });
-    });
-    btnRight.addEventListener('click', () => {
-        contenedor.scrollBy({ left: 280, behavior: 'smooth' });
-    });
-
+        // Click de escritorio como respaldo
+        btnLeft.addEventListener('click', () => {
+            contenedor.scrollBy({ left: -300, behavior: 'smooth' });
+        });
+        btnRight.addEventListener('click', () => {
+            contenedor.scrollBy({ left: 300, behavior: 'smooth' });
+        });
+    }
+    
     contenedor.addEventListener('scroll', actualizarBotones);
-    window.addEventListener('resize', () => setTimeout(actualizarBotones, 150));
-    window.addEventListener('orientationchange', () => setTimeout(actualizarBotones, 350));
+    window.addEventListener('resize', actualizarBotones);
     
     // Observer para detectar cambios en el contenido
     const observer = new MutationObserver(() => {
