@@ -1286,23 +1286,27 @@ async function guardarTodasLasActividades() {
             const actividadNumero = input.dataset.actividad;
             const raId = input.dataset.ra || state.raSeleccionado;
             const valor = parseFloat(input.value);
-            
-            if (!isNaN(valor) && valor >= 0) {
-                // Guardar actividad
-                actividadesAGuardar.push({
-                    raId: raId,
-                    estudianteId: estudianteId,
-                    actividadNumero: actividadNumero,
-                    valor: valor
-                });
-                
-                // Actualizar state local
-                let act = state.actividades.find(a => 
-                    a.estudianteId == estudianteId && 
-                    a.numero == actividadNumero && 
-                    a.raId == raId
-                );
-                if (!act) {
+            const vacio = input.value.trim() === '' || isNaN(valor);
+
+            // Incluir SIEMPRE en la lista: con valor numérico o con null (para borrar en Sheets)
+            actividadesAGuardar.push({
+                raId: raId,
+                estudianteId: estudianteId,
+                actividadNumero: actividadNumero,
+                valor: vacio ? null : valor
+            });
+
+            // Actualizar state local
+            const idx = state.actividades.findIndex(a =>
+                a.estudianteId == estudianteId &&
+                a.numero == actividadNumero &&
+                a.raId == raId
+            );
+            if (vacio) {
+                // Celda borrada → eliminar del state para que no reaparezca
+                if (idx !== -1) state.actividades.splice(idx, 1);
+            } else {
+                if (idx === -1) {
                     state.actividades.push({
                         id: Date.now(),
                         estudianteId: estudianteId,
@@ -1311,10 +1315,10 @@ async function guardarTodasLasActividades() {
                         raId: raId
                     });
                 } else {
-                    act.valor = valor;
+                    state.actividades[idx].valor = valor;
                 }
-                
-                // Calcular total por estudiante
+
+                // Calcular total por estudiante (solo valores reales)
                 if (!totalesPorEstudiante[estudianteId]) {
                     totalesPorEstudiante[estudianteId] = 0;
                 }
@@ -1324,7 +1328,7 @@ async function guardarTodasLasActividades() {
         
         console.log(`📦 Total de actividades a guardar: ${actividadesAGuardar.length}`);
         
-        // OPTIMIZACIÓN: 1 sola petición para TODAS las actividades
+        // Enviar SIEMPRE aunque solo haya nulls, para que Sheets procese los borrados
         if (actividadesAGuardar.length > 0) {
             const response = await fetchConReintentos(CONFIG.GOOGLE_SCRIPT_URL, {
                 method: 'POST',
@@ -1400,6 +1404,8 @@ async function guardarTodasLasActividades() {
         invalidarCache('calificaciones', state.moduloSeleccionado);
         CachePersistente.invalidar(`actividades_${state.raSeleccionado}`);
         CachePersistente.invalidar(`calificaciones_${state.moduloSeleccionado}`);
+        // Limpiar también el caché persistente de estudiantes por si acaso
+        CachePersistente.invalidar(`actividades_${state.raSeleccionado}_prev`);
         
         console.log('✅ Datos guardados - caché invalidado para próxima carga');
         
@@ -5713,7 +5719,7 @@ function renderHistorialActividades() {
             }
         });
         const totalAct = total > 0 ? Math.round(total) : '—';
-        row += `<td class="h-total-apro">${totalAct}</td></tr>`;
+        row += `<td class="h-total-apro">${totalAct !== '—' ? totalAct : totalAct}</td></tr>`;
         tbody += row;
     });
 
