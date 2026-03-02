@@ -824,7 +824,7 @@ function generarTablaRegistro() {
             bodyHTML += `<td class="celda-oportunidad"><input type="number" class="input-oportunidad-simple" data-estudiante="${estudiante.id}" data-ra="${ra.id}" data-oportunidad="3" value="${calificacion.op3 !== null && calificacion.op3 !== undefined ? calificacion.op3 : ''}" min="0" max="${ra.valorTotal}"></td>`;
         });
         
-        bodyHTML += `<td class="celda-total">${totalEstudiante}</td>`;
+        bodyHTML += `<td class="celda-total">${Math.round(totalEstudiante)}</td>`;
         bodyHTML += '</tr>';
     });
     
@@ -918,7 +918,7 @@ function generarTablaActividades() {
             totalActividades += valor || 0;
         }
         
-        bodyHTML += `<td class="celda-total">${totalActividades.toFixed(2)}</td>`;
+        bodyHTML += `<td class="celda-total">${Math.round(totalActividades)}</td>`;
         bodyHTML += '</tr>';
     });
     
@@ -1057,7 +1057,7 @@ function actualizarTotalActividades(input) {
     
     const celdaTotal = fila.querySelector('.celda-total');
     if (celdaTotal) {
-        celdaTotal.textContent = total.toFixed(2);
+        celdaTotal.textContent = Math.round(total);
     }
     
     // Solo actualizar el estado local, NO guardar automáticamente
@@ -1211,7 +1211,7 @@ function actualizarTotales() {
         // Actualizar celda total (última celda)
         const celdaTotal = fila.cells[fila.cells.length - 1];
         if (celdaTotal) {
-            celdaTotal.textContent = totalEstudiante;
+            celdaTotal.textContent = Math.round(totalEstudiante);
         }
     });
 }
@@ -4071,7 +4071,7 @@ async function guardarEvaluacion() {
                 });
                 const celdaTotal = fila.querySelector('.celda-total');
                 if (celdaTotal) {
-                    celdaTotal.textContent = total.toFixed(2);
+                    celdaTotal.textContent = Math.round(total);
                 }
             }
         }
@@ -4428,7 +4428,7 @@ async function exportarReporteActividades() {
                 { content: idx + 1,         styles: { halign: 'center', fontStyle: 'bold', fontSize: 8 } },
                 { content: est.nombre,       styles: { halign: 'left',   fontSize: 8 } },
                 ...celdas,
-                { content: total.toFixed(2), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [240, 245, 255] } }
+                { content: Math.round(total), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [240, 245, 255] } }
             ];
         });
 
@@ -4452,7 +4452,7 @@ async function exportarReporteActividades() {
             { content: '',               styles: { fillColor: [220, 230, 245] } },
             { content: 'Promedio grupo', styles: { halign: 'left', fontStyle: 'bold', fontSize: 8, fillColor: [220, 230, 245], textColor: [30, 90, 180] } },
             ...promediosCol,
-            { content: totalPromedios.toFixed(2), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [200, 220, 255], textColor: [30,30,30] } }
+            { content: Math.round(totalPromedios), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [200, 220, 255], textColor: [30,30,30] } }
         ]);
 
         // Anchos de columna calculados dinámicamente
@@ -4713,7 +4713,7 @@ function exportarExcelCalificaciones() {
             });
         });
         ws[XLSX.utils.encode_cell({ r:rGrupo, c:COL_TOTAL })] = mkCell(
-            parseFloat(totalPromedios.toFixed(1)), true, C.GRUPO_FG, C.GRUPO, 'center', true
+            Math.round(totalPromedios), true, C.GRUPO_FG, C.GRUPO, 'center', true
         );
 
         ws['!ref'] = XLSX.utils.encode_range(range);
@@ -5041,7 +5041,7 @@ async function exportarReporteCalificaciones() {
             });
             return sum + (finales.length ? finales.reduce((a, b) => a + b, 0) / finales.length : 0);
         }, 0);
-        resumenFila.push({ content: totalPromedios.toFixed(1), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [200, 220, 255] } });
+        resumenFila.push({ content: Math.round(totalPromedios), styles: { halign: 'center', fontStyle: 'bold', fontSize: 8, fillColor: [200, 220, 255] } });
         doc.autoTable({
             head: [headRow1, headRow2],
             body: [...bodyRows, resumenFila],
@@ -5629,7 +5629,7 @@ function renderHistorialCalificaciones() {
             row += `<td class="${cls(v3)}">${v3 !== '' && v3 !== null ? v3 : '—'}</td>`;
         });
 
-        const totalRedondeado = parseFloat(total.toFixed(2));
+        const totalRedondeado = Math.round(total);
         const clsTotal = totalRedondeado >= 70 ? 'h-total-apro' : 'h-total-repr';
         row += `<td class="${clsTotal}">${totalRedondeado}</td>`;
         row += '</tr>';
@@ -5645,7 +5645,7 @@ function renderHistorialCalificaciones() {
         filaGrupo += `<td colspan="3">${prom}</td>`;
         if (prom !== '—') sumaGrupo += parseFloat(prom);
     });
-    const promTotal = ras.length ? parseFloat((sumaGrupo / ras.length).toFixed(2)) : '—';
+    const promTotal = ras.length ? Math.round(sumaGrupo / ras.length) : '—';
     filaGrupo += `<td>${promTotal !== '—' ? promTotal : promTotal}</td></tr>`;
     tbody += filaGrupo;
 
@@ -5712,8 +5712,8 @@ function renderHistorialActividades() {
                 row += `<td class="${vMostrar !== null ? 'h-apro' : 'h-vacio'}">${vMostrar !== null ? vMostrar : '—'}</td>`;
             }
         });
-        const totalAct = total > 0 ? Number(total.toFixed(2)) : '—';
-        row += `<td class="h-total-apro">${totalAct !== '—' ? totalAct.toFixed(2) : totalAct}</td></tr>`;
+        const totalAct = total > 0 ? Math.round(total) : '—';
+        row += `<td class="h-total-apro">${totalAct}</td></tr>`;
         tbody += row;
     });
 
