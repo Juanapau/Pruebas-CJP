@@ -4693,7 +4693,7 @@ function exportarExcelCalificaciones() {
             const totalPosible = state.ras.reduce((s, ra) => s + (ra.valorTotal || 0), 0);
             const aprobado     = totalPosible > 0 && total >= totalPosible * 0.7;
             ws[XLSX.utils.encode_cell({ r, c: COL_TOTAL })] = mkCell(
-                total, true,
+                Math.round(total), true,
                 aprobado ? C.TOTAL_A_FG : C.TOTAL_R_FG,
                 aprobado ? C.TOTAL_A    : C.TOTAL_R,
                 'center', true
@@ -5014,7 +5014,7 @@ async function exportarReporteCalificaciones() {
             const totalPosible = state.ras.reduce((s, ra) => s + (ra.valorTotal || 0), 0);
             const aprobado = totalPosible > 0 && total >= totalPosible * 0.7;
             fila.push({
-                content: String(total),
+                content: String(Math.round(total)),
                 styles: {
                     halign: 'center', fontStyle: 'bold', fontSize: 8,
                     fillColor: aprobado ? [180, 230, 180] : [255, 190, 190],
